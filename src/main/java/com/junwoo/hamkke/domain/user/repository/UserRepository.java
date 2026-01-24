@@ -15,9 +15,7 @@ import java.util.Optional;
  */
 public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
-    Optional<UserEntity> findByEmail(String email);
-
-    boolean existsByEmail(String email);
+    Optional<UserEntity> findByNickname(String nickname);
 
     boolean existsByNickname(String nickname);
 
@@ -35,8 +33,4 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
             @Param("myId") Long myId,
             @Param("keyword") String keyword
     );
-
-    List<UserEntity> findByIdInAndNicknameContainingIgnoreCaseOrderByNicknameAsc(List<Long> ids, String nickname);
-
-    List<UserEntity> findByIdInOrderByNicknameAsc(List<Long> ids);
 }

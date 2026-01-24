@@ -47,7 +47,7 @@ public class JwtTokenProvider {
         Date validity = new Date(now.getTime() + accessTokenValidityInMilliseconds);
 
         return Jwts.builder()
-                .setSubject(user.email())
+                .setSubject(user.nickname())
                 .claim("id", user.id())
                 .claim("role", user.role().name())
                 .setIssuedAt(now)
@@ -82,7 +82,7 @@ public class JwtTokenProvider {
         }
     }
 
-    public String getEmailFromToken(String token) {
+    public String getNicknameFromToken(String token) {
         Claims claims = Jwts.parser()
                 .verifyWith(secretKey)
                 .build()

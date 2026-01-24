@@ -31,17 +31,17 @@ public class AuthService {
             throw new AuthException(ErrorCode.INVALID_REFRESH_TOKEN);
         }
 
-        String email = jwtTokenProvider.getEmailFromToken(refreshToken);
+        String nickname = jwtTokenProvider.getNicknameFromToken(refreshToken);
 
-        String savedToken = refreshTokenService.get(email);
+        String savedToken = refreshTokenService.get(nickname);
         if (!refreshToken.equals(savedToken)) {
             throw new AuthException(ErrorCode.INVALID_REFRESH_TOKEN);
         }
 
-        AuthDTO user = userService.findByEmail(email);
+        AuthDTO user = userService.findByNickname(nickname);
         String newAccessToken = jwtTokenProvider.createAccessToken(user);
 
-        log.info("[AuthService] Access Token 재발급 성공 - email={}", email);
+        log.info("[AuthService] Access Token 재발급 성공 - nickname={}", nickname);
 
         return newAccessToken;
     }

@@ -19,6 +19,6 @@ jwt:
 
 logging:
   level:
-    com.junwoo.hamkke: info
+    com.junwoo.hamkke: debug
     org.hibernate.sql: info
     org.springframework.security: info

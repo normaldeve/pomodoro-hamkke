@@ -76,8 +76,8 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public AuthDTO findByEmail(String email) {
-        UserEntity userEntity = userRepository.findByEmail(email)
+    public AuthDTO findByNickname(String  nickname) {
+        UserEntity userEntity = userRepository.findByNickname(nickname)
                 .orElseThrow(() -> new UserException(ErrorCode.CANNOT_FOUND_USER));
 
         return AuthDTO.from(userEntity);

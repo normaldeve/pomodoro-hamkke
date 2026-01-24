@@ -45,12 +45,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (StringUtils.hasText(token) && jwtTokenProvider.validateToken(token)) {
             Long userId = jwtTokenProvider.getClaims(token).get("id", Long.class);
-            String email = jwtTokenProvider.getEmailFromToken(token);
+            String nickname = jwtTokenProvider.getNicknameFromToken(token);
             String role = jwtTokenProvider.getClaims(token).get("role", String.class);
 
             AuthDTO user = AuthDTO.builder()
                     .id(userId)
-                    .email(email)
+                    .nickname(nickname)
                     .role(Role.valueOf(role))
                     .build();
 
@@ -60,7 +60,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
-            log.info("JWT 인증 성공 - email: {}", email);
+            log.info("JWT 인증 성공 - nickname: {}", nickname);
         }
 
         filterChain.doFilter(request, response);

@@ -27,9 +27,9 @@ public class JwtLogoutHandler implements LogoutHandler {
     public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
 
         String refreshToken = jwtTokenProvider.extractRefreshTokenFromCookie(request);
-        String email = jwtTokenProvider.getEmailFromToken(refreshToken);
+        String nickname = jwtTokenProvider.getNicknameFromToken(refreshToken);
 
-        refreshTokenService.delete(email);
+        refreshTokenService.delete(nickname);
 
         Cookie cookie = new Cookie("refresh_token", null);
         cookie.setHttpOnly(true);
@@ -38,6 +38,6 @@ public class JwtLogoutHandler implements LogoutHandler {
         cookie.setMaxAge(0);
         response.addCookie(cookie);
 
-        log.info("로그아웃 완료 - email: {}", email);
+        log.info("로그아웃 완료 - nickname: {}", nickname);
     }
 }
