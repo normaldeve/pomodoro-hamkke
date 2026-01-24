@@ -27,10 +27,8 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         AuthDTO userDTO = new AuthDTO(
                 user.getId(),
-                user.getEmail(),
                 user.getNickname(),
                 user.getProfileUrl(),
-                false,
                 user.getRole()
         );
 

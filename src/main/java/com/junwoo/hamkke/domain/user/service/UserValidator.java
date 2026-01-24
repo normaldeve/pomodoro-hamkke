@@ -20,15 +20,6 @@ public class UserValidator {
 
     private final UserRepository userRepository;
 
-    @Transactional(readOnly = true)
-    public void checkEmailDuplicate(String email) {
-        if (userRepository.existsByEmail(email)) {
-            log.error("[UserValidator] 회원 가입 실패 - 이미 존재하는 이메일: {}", email);
-
-            throw new UserException(ErrorCode.ALREADY_EXISTS_EMAIL);
-        }
-    }
-
     public void checkNicknameDuplicate(String nickname) {
         if (userRepository.existsByNickname(nickname)) {
             log.error("[UserValidator] 회원 가입 실패 - 이미 존재하는 닉네임: {}", nickname);

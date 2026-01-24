@@ -81,9 +81,9 @@ public class LoginAuthenticationFilter extends UsernamePasswordAuthenticationFil
         AuthDTO user = userDetails.getUser();
 
         String accessToken = jwtTokenProvider.createAccessToken(user);
-        String refreshToken = jwtTokenProvider.createRefreshToken(user.email());
+        String refreshToken = jwtTokenProvider.createRefreshToken(user.nickname());
 
-        refreshTokenService.save(user.email(), refreshToken, jwtTokenProvider.getRefreshTokenValidityInMilliseconds());
+        refreshTokenService.save(user.nickname(), refreshToken, jwtTokenProvider.getRefreshTokenValidityInMilliseconds());
 
         Cookie refreshTokenCookie = new Cookie("refresh_token", refreshToken);
         refreshTokenCookie.setHttpOnly(true);
@@ -93,7 +93,7 @@ public class LoginAuthenticationFilter extends UsernamePasswordAuthenticationFil
 
         response.addCookie(refreshTokenCookie);
 
-        log.info("로그인에 성공했습니다 - email: {}, role: {}", user.email(), user.role());
+        log.info("로그인에 성공했습니다 - nickname: {}, role: {}", user.nickname(), user.role());
 
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");

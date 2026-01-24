@@ -12,8 +12,6 @@ import java.time.LocalDateTime;
 public record SignupResponse(
         Long id,
         String nickname,
-        String email,
-        String profileUrl,
         Role role,
         LocalDateTime createdAt
 ) {

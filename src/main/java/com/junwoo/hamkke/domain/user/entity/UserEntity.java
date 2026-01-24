@@ -27,8 +27,6 @@ public class UserEntity extends BaseEntity {
 
     private String nickname;
 
-    private String email;
-
     private String password;
 
     private String profileUrl;
@@ -39,9 +37,7 @@ public class UserEntity extends BaseEntity {
     public  static UserEntity createUser(SignupRequest request, PasswordEncoder passwordEncoder) {
         return UserEntity.builder()
                 .nickname(request.nickname())
-                .email(request.email())
                 .password(passwordEncoder.encode(request.password()))
-                .profileUrl(request.profileUrl())
                 .role(Role.USER)
                 .build();
     }

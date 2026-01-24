@@ -38,21 +38,17 @@ public class UserService {
 
     public SignupResponse signup(SignupRequest request) {
 
-        userValidator.checkEmailDuplicate(request.email());
-
         userValidator.checkNicknameDuplicate(request.nickname());
 
         UserEntity user = UserEntity.createUser(request, passwordEncoder);
 
         UserEntity savedUser = userRepository.save(user);
 
-        log.info("[UserService] 회원 가입 성공 - email: {}, nickname: {}", savedUser.getEmail(), savedUser.getNickname());
+        log.info("[UserService] 회원 가입 성공 - nickname: {}", savedUser.getNickname());
 
         return new SignupResponse(
                 savedUser.getId(),
                 savedUser.getNickname(),
-                savedUser.getEmail(),
-                savedUser.getProfileUrl(),
                 savedUser.getRole(),
                 savedUser.getCreatedAt()
         );

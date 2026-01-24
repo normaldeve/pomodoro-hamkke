@@ -11,13 +11,12 @@ import java.time.LocalDateTime;
  */
 public record UserInfo(
         Long userId,
-        String email,
         String nickname,
         String profileUrl,
         LocalDateTime createdAt
 ) {
 
     public static UserInfo from(UserEntity user) {
-        return new UserInfo(user.getId(), user.getEmail(), user.getNickname(), user.getProfileUrl(), user.getCreatedAt());
+        return new UserInfo(user.getId(), user.getNickname(), user.getProfileUrl(), user.getCreatedAt());
     }
 }
