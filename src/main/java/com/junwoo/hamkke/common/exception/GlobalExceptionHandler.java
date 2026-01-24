@@ -61,7 +61,7 @@ public class GlobalExceptionHandler {
 
         ErrorResponse response = new ErrorResponse(
                 HttpStatus.BAD_REQUEST.value(),
-                LocalDateTime.now(),
+                LocalDateTime.now().toString(),
                 "요청 데이터 유효성 검사에 실패했습니다",
                 validationErrors);
 

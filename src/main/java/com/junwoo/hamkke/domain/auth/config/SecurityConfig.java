@@ -3,6 +3,8 @@ package com.junwoo.hamkke.domain.auth.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.junwoo.hamkke.domain.auth.dto.SecurityPassUrlList;
 import com.junwoo.hamkke.domain.auth.jwt.JwtTokenProvider;
+import com.junwoo.hamkke.domain.auth.security.CustomAccessDeniedHandler;
+import com.junwoo.hamkke.domain.auth.security.CustomAuthenticationEntryPoint;
 import com.junwoo.hamkke.domain.auth.security.JwtAuthenticationFilter;
 import com.junwoo.hamkke.domain.auth.security.login.LoginAuthenticationFilter;
 import com.junwoo.hamkke.domain.auth.security.logout.JwtLogoutHandler;
@@ -52,6 +54,8 @@ public class SecurityConfig {
     private final JwtTokenProvider jwtTokenProvider;
     private final ObjectMapper objectMapper;
     private final RefreshTokenService refreshTokenService;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+    private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
     @Value("${cors.allowed-origins}")
     private String allowedOrigins;
@@ -104,6 +108,10 @@ public class SecurityConfig {
                         .addLogoutHandler(logoutHandler)
                         .logoutSuccessHandler(logoutSuccessHandler)
                         .clearAuthentication(true)
+                )
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(customAuthenticationEntryPoint)
+                        .accessDeniedHandler(customAccessDeniedHandler)
                 )
                 .build();
     }

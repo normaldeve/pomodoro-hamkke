@@ -1,0 +1,49 @@
+package com.junwoo.hamkke.domain.room.dto;
+
+import com.junwoo.hamkke.domain.room.entity.RoomStatus;
+import com.junwoo.hamkke.domain.room.entity.StudyRoomEntity;
+import lombok.Builder;
+
+import java.time.LocalDateTime;
+import java.util.Set;
+
+/**
+ *
+ * @author junnukim1007gmail.com
+ * @date 26. 1. 24.
+ */
+@Builder
+public record StudyRoomResponse(
+        Long roomId,
+        String title,
+        String description,
+        Set<String> hashtags,
+        int focusMinutes,
+        int breakMinutes,
+        int totalSessions,
+        int currentParticipants,
+        int maxParticipants,
+        boolean secret,
+        Long hostId,
+        RoomStatus status,
+        LocalDateTime createdAt
+) {
+
+    public static StudyRoomResponse from(StudyRoomEntity room) {
+        return StudyRoomResponse.builder()
+                .roomId(room.getId())
+                .title(room.getTitle())
+                .description(room.getDescription())
+                .hashtags(room.getHashtags())
+                .focusMinutes(room.getFocusMinutes())
+                .breakMinutes(room.getBreakMinutes())
+                .totalSessions(room.getTotalSessions())
+                .currentParticipants(room.getCurrentParticipants())
+                .maxParticipants(room.getMaxParticipants())
+                .secret(room.isSecret())
+                .hostId(room.getHostId())
+                .status(room.getStatus())
+                .createdAt(room.getCreatedAt())
+                .build();
+    }
+}

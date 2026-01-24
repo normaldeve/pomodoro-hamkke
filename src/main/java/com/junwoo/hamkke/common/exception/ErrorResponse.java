@@ -16,15 +16,15 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class ErrorResponse {
     private final int code;
-    private final LocalDateTime timestamp;
+    private final String timestamp;
     private final String message;
     private final Map<String, Object> details;
 
     public ErrorResponse(DomainException exception) {
-        this(exception.getErrorCode().getCode() ,LocalDateTime.now(), exception.getMessage(), exception.getDetails());
+        this(exception.getErrorCode().getCode() ,LocalDateTime.now().toString(), exception.getMessage(), exception.getDetails());
     }
 
     public ErrorResponse(Exception e, int code) {
-        this(code, LocalDateTime.now(), e.getMessage(), new HashMap<>());
+        this(code, LocalDateTime.now().toString(), e.getMessage(), new HashMap<>());
     }
 }
