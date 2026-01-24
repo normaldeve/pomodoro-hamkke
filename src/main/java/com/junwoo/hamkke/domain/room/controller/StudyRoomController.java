@@ -49,4 +49,12 @@ public class StudyRoomController {
 
         return ResponseEntity.ok(studyRoomService.getStudyRooms(page));
     }
+
+    @GetMapping("/{roomId}")
+    public ResponseEntity<StudyRoomResponse> getStudyRoom(
+            @PathVariable Long roomId
+    ) {
+
+        return ResponseEntity.ok(studyRoomService.getStudyRoom(roomId));
+    }
 }

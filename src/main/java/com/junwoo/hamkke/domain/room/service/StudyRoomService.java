@@ -1,9 +1,11 @@
 package com.junwoo.hamkke.domain.room.service;
 
+import com.junwoo.hamkke.common.exception.ErrorCode;
 import com.junwoo.hamkke.domain.room.dto.CreateStudyRoomRequest;
 import com.junwoo.hamkke.domain.room.dto.StudyRoomResponse;
 import com.junwoo.hamkke.domain.room.entity.StudyRoomEntity;
 import com.junwoo.hamkke.domain.room.entity.StudyRoomMemberEntity;
+import com.junwoo.hamkke.domain.room.exception.StudyRoomException;
 import com.junwoo.hamkke.domain.room.repository.StudyRoomMemberRepository;
 import com.junwoo.hamkke.domain.room.repository.StudyRoomRepository;
 import lombok.RequiredArgsConstructor;
@@ -54,4 +56,10 @@ public class StudyRoomService {
         return studyRoomRepository.findAll(pageable)
                 .map(StudyRoomResponse::from);
     }
+
+    @Transactional(readOnly = true)
+    public StudyRoomResponse getStudyRoom(Long roomId) {
+        return StudyRoomResponse.from(studyRoomRepository.findById(roomId).orElseThrow(() -> new StudyRoomException(ErrorCode.CANNOT_FOUND_ROOM)));
+    }
+
 }

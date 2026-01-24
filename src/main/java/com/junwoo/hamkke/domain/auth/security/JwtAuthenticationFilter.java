@@ -62,7 +62,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
-            log.info("JWT 인증 성공 - nickname: {}", nickname);
+            log.info("JWT 인증 성공 - username: {}", username);
         }
 
         filterChain.doFilter(request, response);
