@@ -63,9 +63,9 @@ public class LoginAuthenticationFilter extends UsernamePasswordAuthenticationFil
         try {
             LoginRequest loginRequest = objectMapper.readValue(request.getInputStream(), LoginRequest.class);
 
-            log.info("로그인을 시도합니다 - email: {}", loginRequest.email());
+            log.info("로그인을 시도합니다 - username: {}", loginRequest.username());
 
-            UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(loginRequest.email(), loginRequest.password());
+            UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(loginRequest.username(), loginRequest.password());
 
             setDetails(request, authRequest);
             return this.getAuthenticationManager().authenticate(authRequest);

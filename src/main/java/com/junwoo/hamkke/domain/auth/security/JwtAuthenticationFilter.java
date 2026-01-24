@@ -45,11 +45,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (StringUtils.hasText(token) && jwtTokenProvider.validateToken(token)) {
             Long userId = jwtTokenProvider.getClaims(token).get("id", Long.class);
-            String nickname = jwtTokenProvider.getNicknameFromToken(token);
+            String username = jwtTokenProvider.getUsernameFromToken(token);
+            String nickname = jwtTokenProvider.getClaims(token).get("nickname", String.class);
             String role = jwtTokenProvider.getClaims(token).get("role", String.class);
 
             AuthDTO user = AuthDTO.builder()
                     .id(userId)
+                    .username(username)
                     .nickname(nickname)
                     .role(Role.valueOf(role))
                     .build();

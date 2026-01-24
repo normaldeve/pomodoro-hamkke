@@ -21,12 +21,13 @@ public class CustomUserDetailsService implements UserDetailsService {
     private final UserRepository userRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String nickname) throws UsernameNotFoundException {
-        UserEntity user = userRepository.findByNickname(nickname)
-                .orElseThrow(() -> new UsernameNotFoundException("입력하신 닉네임으로 사용자를 찾을 수 없습니다: " + nickname));
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        UserEntity user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("입력하신 아이디로 사용자를 찾을 수 없습니다: " + username));
 
         AuthDTO userDTO = new AuthDTO(
                 user.getId(),
+                user.getUsername(),
                 user.getNickname(),
                 user.getProfileUrl(),
                 user.getRole()

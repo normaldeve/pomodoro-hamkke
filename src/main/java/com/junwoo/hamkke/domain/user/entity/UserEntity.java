@@ -25,6 +25,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @AllArgsConstructor
 public class UserEntity extends BaseEntity {
 
+    private String username;
+
     private String nickname;
 
     private String password;
@@ -36,6 +38,7 @@ public class UserEntity extends BaseEntity {
 
     public  static UserEntity createUser(SignupRequest request, PasswordEncoder passwordEncoder) {
         return UserEntity.builder()
+                .username(request.username())
                 .nickname(request.nickname())
                 .password(passwordEncoder.encode(request.password()))
                 .role(Role.USER)

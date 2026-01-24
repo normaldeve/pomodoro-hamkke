@@ -82,7 +82,7 @@ public class JwtTokenProvider {
         }
     }
 
-    public String getNicknameFromToken(String token) {
+    public String getUsernameFromToken(String token) {
         Claims claims = Jwts.parser()
                 .verifyWith(secretKey)
                 .build()

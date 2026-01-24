@@ -1,6 +1,7 @@
 package com.junwoo.hamkke.domain.user.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 /**
@@ -9,6 +10,13 @@ import jakarta.validation.constraints.Size;
  * @date 26. 1. 12.
  */
 public record SignupRequest(
+        @NotBlank(message = "사용자 아이디는 필수입니다")
+        @Pattern(
+                regexp = "^[a-z0-9]+$",
+                message = "아이디는 소문자 영문과 숫자만 가능합니다"
+        )
+        String username,
+
         @NotBlank(message = "닉네임은 필수입니다")
         @Size(min = 2, max = 20, message = "닉네임은 2자 이상 20자 이하여야 합니다")
         String nickname,

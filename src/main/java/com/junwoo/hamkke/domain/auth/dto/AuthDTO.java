@@ -12,6 +12,7 @@ import lombok.Builder;
 @Builder
 public record AuthDTO(
         Long id,
+        String username,
         String nickname,
         String profileUrl,
         Role role
@@ -20,6 +21,7 @@ public record AuthDTO(
     public static AuthDTO from(UserEntity user) {
         return AuthDTO.builder()
                 .id(user.getId())
+                .username(user.getUsername())
                 .nickname(user.getNickname())
                 .profileUrl(user.getProfileUrl())
                 .role(user.getRole())

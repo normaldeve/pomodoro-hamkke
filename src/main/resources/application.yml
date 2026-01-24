@@ -28,3 +28,7 @@ cloud:
       auto: false
     s3:
       bucket: ${AWS_S3_BUCKET}
+
+admin:
+  id: ${ADMIN_ID}
+  password: ${ADMIN_PASSWORD}
