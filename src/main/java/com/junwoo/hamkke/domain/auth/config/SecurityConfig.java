@@ -9,7 +9,7 @@ import com.junwoo.hamkke.domain.auth.security.JwtAuthenticationFilter;
 import com.junwoo.hamkke.domain.auth.security.login.LoginAuthenticationFilter;
 import com.junwoo.hamkke.domain.auth.security.logout.JwtLogoutHandler;
 import com.junwoo.hamkke.domain.auth.security.logout.JwtLogoutSuccessHandler;
-import com.junwoo.hamkke.domain.auth.service.RefreshTokenService;
+import com.junwoo.hamkke.domain.auth.service.RefreshTokenProvider;
 import com.junwoo.hamkke.domain.user.entity.Role;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -53,7 +53,7 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final JwtTokenProvider jwtTokenProvider;
     private final ObjectMapper objectMapper;
-    private final RefreshTokenService refreshTokenService;
+    private final RefreshTokenProvider refreshTokenProvider;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
@@ -82,10 +82,10 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http, AuthenticationManager authenticationManager) throws Exception {
 
         LoginAuthenticationFilter loginAuthenticationFilter = new LoginAuthenticationFilter(
-                authenticationManager, objectMapper, jwtTokenProvider, refreshTokenService
+                authenticationManager, objectMapper, jwtTokenProvider, refreshTokenProvider
         );
 
-        LogoutHandler logoutHandler = new JwtLogoutHandler(refreshTokenService, jwtTokenProvider);
+        LogoutHandler logoutHandler = new JwtLogoutHandler(refreshTokenProvider, jwtTokenProvider);
         JwtLogoutSuccessHandler logoutSuccessHandler = new JwtLogoutSuccessHandler(objectMapper);
 
         return http

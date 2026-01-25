@@ -20,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class AuthService {
 
-    private final RefreshTokenService refreshTokenService;
+    private final RefreshTokenProvider refreshTokenProvider;
     private final JwtTokenProvider jwtTokenProvider;
     private final UserService userService;
 
@@ -33,7 +33,7 @@ public class AuthService {
 
         String username = jwtTokenProvider.getUsernameFromToken(refreshToken);
 
-        String savedToken = refreshTokenService.get(username);
+        String savedToken = refreshTokenProvider.get(username);
         if (!refreshToken.equals(savedToken)) {
             throw new AuthException(ErrorCode.INVALID_REFRESH_TOKEN);
         }

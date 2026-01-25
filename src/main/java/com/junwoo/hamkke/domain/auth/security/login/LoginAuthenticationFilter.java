@@ -9,7 +9,7 @@ import com.junwoo.hamkke.domain.auth.dto.TokenResponse;
 import com.junwoo.hamkke.domain.auth.exception.AuthException;
 import com.junwoo.hamkke.domain.auth.jwt.JwtTokenProvider;
 import com.junwoo.hamkke.domain.auth.security.userdetail.CustomUserDetails;
-import com.junwoo.hamkke.domain.auth.service.RefreshTokenService;
+import com.junwoo.hamkke.domain.auth.service.RefreshTokenProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -38,18 +38,18 @@ public class LoginAuthenticationFilter extends UsernamePasswordAuthenticationFil
 
     private final ObjectMapper objectMapper;
     private final JwtTokenProvider jwtTokenProvider;
-    private final RefreshTokenService refreshTokenService;
+    private final RefreshTokenProvider refreshTokenProvider;
 
     public LoginAuthenticationFilter(
             AuthenticationManager authenticationManager,
             ObjectMapper objectMapper,
             JwtTokenProvider jwtTokenProvider,
-            RefreshTokenService refreshTokenService
+            RefreshTokenProvider refreshTokenProvider
     ) {
         super(authenticationManager);
         this.objectMapper = objectMapper;
         this.jwtTokenProvider = jwtTokenProvider;
-        this.refreshTokenService = refreshTokenService;
+        this.refreshTokenProvider = refreshTokenProvider;
         setFilterProcessesUrl("/api/auth/login");
     }
 
@@ -83,7 +83,7 @@ public class LoginAuthenticationFilter extends UsernamePasswordAuthenticationFil
         String accessToken = jwtTokenProvider.createAccessToken(user);
         String refreshToken = jwtTokenProvider.createRefreshToken(user.nickname());
 
-        refreshTokenService.save(user.nickname(), refreshToken, jwtTokenProvider.getRefreshTokenValidityInMilliseconds());
+        refreshTokenProvider.save(user.nickname(), refreshToken, jwtTokenProvider.getRefreshTokenValidityInMilliseconds());
 
         Cookie refreshTokenCookie = new Cookie("refresh_token", refreshToken);
         refreshTokenCookie.setHttpOnly(true);

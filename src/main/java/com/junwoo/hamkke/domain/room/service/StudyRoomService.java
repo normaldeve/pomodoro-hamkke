@@ -3,6 +3,7 @@ package com.junwoo.hamkke.domain.room.service;
 import com.junwoo.hamkke.common.exception.ErrorCode;
 import com.junwoo.hamkke.domain.room.dto.CreateStudyRoomRequest;
 import com.junwoo.hamkke.domain.room.dto.StudyRoomResponse;
+import com.junwoo.hamkke.domain.room.entity.RoomStatus;
 import com.junwoo.hamkke.domain.room.entity.StudyRoomEntity;
 import com.junwoo.hamkke.domain.room.entity.StudyRoomMemberEntity;
 import com.junwoo.hamkke.domain.room.exception.StudyRoomException;
@@ -51,9 +52,14 @@ public class StudyRoomService {
     @Transactional(readOnly = true)
     public Page<StudyRoomResponse> getStudyRooms(int page) {
 
-        Pageable pageable = PageRequest.of(page, PAGE_SIZE, Sort.by("createdAt").descending());
+        Pageable pageable = PageRequest.of(
+                page,
+                PAGE_SIZE,
+                Sort.by("createdAt").descending()
+        );
 
-        return studyRoomRepository.findAll(pageable)
+        return studyRoomRepository
+                .findByStatusNot(RoomStatus.FINISHED, pageable)
                 .map(StudyRoomResponse::from);
     }
 

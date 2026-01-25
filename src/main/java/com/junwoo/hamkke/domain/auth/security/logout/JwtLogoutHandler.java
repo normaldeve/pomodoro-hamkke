@@ -1,7 +1,7 @@
 package com.junwoo.hamkke.domain.auth.security.logout;
 
 import com.junwoo.hamkke.domain.auth.jwt.JwtTokenProvider;
-import com.junwoo.hamkke.domain.auth.service.RefreshTokenService;
+import com.junwoo.hamkke.domain.auth.service.RefreshTokenProvider;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -20,7 +20,7 @@ import org.springframework.security.web.authentication.logout.LogoutHandler;
 @RequiredArgsConstructor
 public class JwtLogoutHandler implements LogoutHandler {
 
-    private final RefreshTokenService refreshTokenService;
+    private final RefreshTokenProvider refreshTokenService;
     private final JwtTokenProvider jwtTokenProvider;
 
     @Override
