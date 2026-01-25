@@ -1,4 +1,4 @@
-package com.junwoo.hamkke.domain.message.config;
+package com.junwoo.hamkke.common.websocket;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,17 +20,14 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
-                .setAllowedOriginPatterns("*")
-                .withSockJS();
+                .setAllowedOriginPatterns("*");
     }
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         registry.setApplicationDestinationPrefixes("/app");
 
-        registry.enableSimpleBroker("/topic", "/queue");
-
-        registry.setUserDestinationPrefix("/user");
+        registry.enableSimpleBroker("/topic");
     }
 
     @Override

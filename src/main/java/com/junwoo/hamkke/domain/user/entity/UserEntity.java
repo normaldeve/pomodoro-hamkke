@@ -20,7 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Getter
 @Builder
 @Entity
-@Table(name = "uses")
+@Table(name = "users")
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserEntity extends BaseEntity {
