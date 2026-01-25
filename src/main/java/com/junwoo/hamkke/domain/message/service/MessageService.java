@@ -9,7 +9,11 @@ import com.junwoo.hamkke.domain.user.entity.UserEntity;
 import com.junwoo.hamkke.domain.user.exception.UserException;
 import com.junwoo.hamkke.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
@@ -34,4 +38,13 @@ public class MessageService {
 
         return MessageResponse.from(savedMessage, sender);
     }
+
+    @Transactional(readOnly = true)
+    public Slice<MessageResponse> getMessages(Long roomId, Long lastMessageId, int size) {
+
+        Pageable pageable = PageRequest.of(0, size);
+
+        return messageRepository.findRoomMessages(roomId, lastMessageId, pageable);
+    }
+
 }
