@@ -1,0 +1,27 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;MODE=MySQL
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        format_sql: false
+        show_sql: false
+
+  h2:
+    console:
+      enabled: true
+
+jwt:
+  secret: ${JWT_SECRET}
+  access-token-validity: 60000
+  refresh-token-validity: 120000
+
+logging:
+  level:
+    root: warn

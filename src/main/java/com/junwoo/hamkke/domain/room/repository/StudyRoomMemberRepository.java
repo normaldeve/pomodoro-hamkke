@@ -16,4 +16,8 @@ public interface StudyRoomMemberRepository extends JpaRepository<StudyRoomMember
             Long studyRoomId
     );
 
+    boolean existsByStudyRoomIdAndUserId(Long studyRoomId, Long userId);
+
+    long countByStudyRoomId(Long studyRoomId);
+
 }

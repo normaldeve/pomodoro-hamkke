@@ -27,6 +27,8 @@ public enum ErrorCode {
 
     CANNOT_FOUND_GOAL(HttpStatus.NOT_FOUND.value(), "해당 스터디룸에서 작성한 목표를 찾지 못했습니다"),
 
+    ROOM_CAPACITY_EXCEEDED(HttpStatus.CONFLICT.value(), "해당 스터디룸은 이미 인원이 가득 찼습니다."),
+    SECRET_ROOM_PASSWORD_INVALID(HttpStatus.BAD_REQUEST.value(), "비밀방 비밀번호가 잘못되었습니다"),
     CANNOT_FOUND_ROOM(HttpStatus.NOT_FOUND.value(), "스터디룸을 찾을 수 없습니다"),
     SECRET_ROOM_NEED_PASSWORD(HttpStatus.BAD_REQUEST.value(), "비밀방은 비밀번호 입력이 필수입니다");
     private final int code;

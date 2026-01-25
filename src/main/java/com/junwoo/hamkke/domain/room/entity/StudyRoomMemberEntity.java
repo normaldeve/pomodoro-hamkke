@@ -1,10 +1,7 @@
 package com.junwoo.hamkke.domain.room.entity;
 
 import com.junwoo.hamkke.common.entity.BaseEntity;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 
 /**
@@ -15,7 +12,14 @@ import lombok.*;
 @Getter
 @Builder
 @Entity
-@Table(name = "study_room_member")
+@Table(
+        name = "study_room_member",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        columnNames = {"study_room_id", "user_id"}
+                )
+        }
+)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class StudyRoomMemberEntity extends BaseEntity {
