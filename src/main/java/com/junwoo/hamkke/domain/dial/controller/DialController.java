@@ -2,6 +2,7 @@ package com.junwoo.hamkke.domain.dial.controller;
 
 import com.junwoo.hamkke.domain.auth.security.userdetail.CustomUserDetails;
 import com.junwoo.hamkke.domain.dial.dto.DialDragMessage;
+import com.junwoo.hamkke.domain.dial.dto.TimerStartRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.DestinationVariable;

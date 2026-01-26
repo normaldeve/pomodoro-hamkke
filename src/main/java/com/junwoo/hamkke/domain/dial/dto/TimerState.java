@@ -14,8 +14,30 @@ import lombok.Setter;
 @Builder
 public class TimerState {
     private Long roomId;
-    private Integer minutes;
-    private Integer remainingSeconds;
-    private Boolean isRunning;
-    private Long startTime;
+    private TimerPhase phase;
+    private int phaseDurationSeconds;
+    private int remainingSeconds;
+    private int defaultFocusMinutes;
+    private int defaultBreakMinutes;
+    private int totalSessions;
+    private int currentSession;
+    // 방장이 다음 집중 세션의 시간을 수정할 수 있고 이는 필수가 아닙니다.
+    private Integer nextFocusMinutes;
+    private boolean running;
+    private long phaseStartTime;
+
+    public static TimerState createFocus(Long roomId, TimerStartRequest request) {
+        return TimerState.builder()
+                .roomId(roomId)
+                .phase(TimerPhase.FOCUS)
+                .phaseDurationSeconds(request.focusMinutes() * 60)
+                .remainingSeconds(request.focusMinutes() * 60)
+                .defaultFocusMinutes(request.focusMinutes())
+                .defaultBreakMinutes(request.breakMinutes())
+                .totalSessions(request.totalSessions())
+                .currentSession(1)
+                .running(true)
+                .phaseStartTime(System.currentTimeMillis())
+                .build();
+    }
 }
