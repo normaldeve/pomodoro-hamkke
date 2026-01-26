@@ -1,7 +1,10 @@
 package com.junwoo.hamkke.domain.room_member.service;
 
 import com.junwoo.hamkke.domain.room_member.dto.MemberFocusRuntime;
+import com.junwoo.hamkke.domain.room_member.entity.FocusStatType;
+import com.junwoo.hamkke.domain.room_member.entity.StudyRoomFocusStatEntity;
 import com.junwoo.hamkke.domain.room_member.entity.StudyRoomMemberEntity;
+import com.junwoo.hamkke.domain.room_member.repository.StudyRoomFocusStatRepository;
 import com.junwoo.hamkke.domain.room_member.repository.StudyRoomMemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,6 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class MemberFocusRuntimeService {
 
     private final Map<Long, Map<Long, MemberFocusRuntime>> runtimes = new ConcurrentHashMap<>();
+    private final StudyRoomFocusStatRepository focusStatRepository;
     private final StudyRoomMemberRepository memberRepository;
 
     public void onEnterRoom(Long roomId, Long userId, boolean isFocus) {
@@ -47,6 +51,32 @@ public class MemberFocusRuntimeService {
         }
     }
 
+    @Transactional
+    public void saveSessionFocusTime(Long roomId, int sessionNumber) {
+        List<StudyRoomMemberEntity> members = memberRepository.findByStudyRoomId(roomId);
+
+        Map<Long, MemberFocusRuntime> roomMap = runtimes.getOrDefault(roomId, Map.of());
+
+        for (StudyRoomMemberEntity member : members) {
+            MemberFocusRuntime runtime = roomMap.get(member.getUserId());
+            if (runtime != null && runtime.isFocusing()) {
+                runtime.stopFocus();
+
+                StudyRoomFocusStatEntity stat = StudyRoomFocusStatEntity.builder()
+                        .roomId(roomId)
+                        .userId(member.getUserId())
+                        .sessionNumber(sessionNumber)
+                        .focusSeconds(runtime.finishAndGetTotalSeconds())
+                        .type(FocusStatType.SESSION_COMPLETE)
+                        .build();
+
+                focusStatRepository.save(stat);
+
+                runtime.resetForNextSession();
+            }
+        }
+    }
+
     @Transactional(readOnly = true)
     public void stopFocus(Long roomId) {
         List<StudyRoomMemberEntity> members = memberRepository.findByStudyRoomId(roomId);
@@ -61,9 +91,25 @@ public class MemberFocusRuntimeService {
         }
     }
 
-    public int onMemberLeave(Long roomId, Long userId) {
+    public void onMemberLeave(Long roomId, Long userId, int currentSession) {
         MemberFocusRuntime runtime = runtimes.getOrDefault(roomId, Map.of()).remove(userId);
 
-        return runtime == null ? 0 : runtime.finishAndGetTotalSeconds();
+        if (runtime != null) {
+            int currentFocusSeconds = runtime.finishAndGetTotalSeconds();
+
+            if (currentFocusSeconds > 0) {
+                StudyRoomFocusStatEntity stat = StudyRoomFocusStatEntity.builder()
+                        .roomId(roomId)
+                        .userId(userId)
+                        .sessionNumber(currentSession)
+                        .focusSeconds(currentFocusSeconds)
+                        .type(FocusStatType.EARLY_EXIT)
+                        .build();
+
+                focusStatRepository.save(stat);
+            }
+
+            runtimes.getOrDefault(roomId, Map.of()).remove(userId);
+        }
     }
 }

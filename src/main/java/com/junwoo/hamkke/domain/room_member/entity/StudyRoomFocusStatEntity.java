@@ -2,6 +2,8 @@ package com.junwoo.hamkke.domain.room_member.entity;
 
 import com.junwoo.hamkke.common.entity.BaseEntity;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import lombok.*;
 
@@ -22,5 +24,10 @@ public class StudyRoomFocusStatEntity extends BaseEntity {
 
     private Long userId;
 
+    private int sessionNumber;
+
     private int focusSeconds;
+
+    @Enumerated(EnumType.STRING)
+    private FocusStatType type;
 }

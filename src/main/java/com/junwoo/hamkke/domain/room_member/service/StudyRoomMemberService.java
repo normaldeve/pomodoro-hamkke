@@ -89,10 +89,6 @@ public class StudyRoomMemberService {
 
         room.addCurrentParticipant();
 
-        // 포커스 타임 중간에 입장하는 참가자 공부 시간 측정을 위함
-        boolean isFocusing = timerStateService.isFocusing(roomId);
-        runtimeService.onEnterRoom(roomId, userId, isFocusing);
-
         return Optional.of(ParticipantMemberInfo.from(user));
     }
 
@@ -103,15 +99,7 @@ public class StudyRoomMemberService {
 
         room.removeCurrentParticipant();
 
-        int focusedSeconds = runtimeService.onMemberLeave(roomId, userId);
-
-        StudyRoomFocusStatEntity stat = StudyRoomFocusStatEntity.builder()
-                .roomId(roomId)
-                .userId(userId)
-                .focusSeconds(focusedSeconds)
-                .build();
-
-        focusStatRepository.save(stat);
+        runtimeService.onMemberLeave(roomId, userId, room.getCurrentSession());
 
         studyRoomMemberRepository.deleteByStudyRoomIdAndUserId(roomId, userId);
     }

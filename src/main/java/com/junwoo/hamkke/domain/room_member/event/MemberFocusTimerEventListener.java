@@ -1,6 +1,7 @@
 package com.junwoo.hamkke.domain.room_member.event;
 
 import com.junwoo.hamkke.domain.dial.dto.TimerPhase;
+import com.junwoo.hamkke.domain.dial.dto.event.RoomSessionAdvancedEvent;
 import com.junwoo.hamkke.domain.dial.dto.event.TimerPhaseChangeEvent;
 import com.junwoo.hamkke.domain.room_member.service.MemberFocusRuntimeService;
 import lombok.RequiredArgsConstructor;

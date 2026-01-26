@@ -34,4 +34,10 @@ public class MemberFocusRuntime {
         stopFocus();
         return totalFocusedSeconds;
     }
+
+    public void resetForNextSession() {
+        totalFocusedSeconds = 0;
+        focusing = false;
+        focusStartedAt = 0;
+    }
 }
