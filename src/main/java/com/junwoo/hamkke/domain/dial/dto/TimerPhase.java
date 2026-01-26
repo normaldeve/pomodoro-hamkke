@@ -7,5 +7,5 @@ package com.junwoo.hamkke.domain.dial.dto;
  * @date 26. 1. 26.
  */
 public enum TimerPhase {
-    IDLE, FOCUS, BREAK
+    IDLE, FOCUS, BREAK, FINISHED
 }

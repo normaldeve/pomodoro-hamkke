@@ -1,10 +1,15 @@
 package com.junwoo.hamkke.domain.dial.service;
 
 import com.junwoo.hamkke.domain.dial.dto.TimerPhase;
+import com.junwoo.hamkke.domain.dial.dto.event.FocusTimeChangedEvent;
+import com.junwoo.hamkke.domain.dial.dto.event.RoomSessionAdvancedEvent;
+import com.junwoo.hamkke.domain.dial.dto.event.RoomTimerStartedEvent;
+import com.junwoo.hamkke.domain.dial.dto.event.TimerPhaseChangeEvent;
 import com.junwoo.hamkke.domain.dial.dto.TimerStartRequest;
 import com.junwoo.hamkke.domain.dial.dto.TimerState;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +28,7 @@ public class TimerStateService {
 
     private final SimpMessagingTemplate messagingTemplate;
 
+    private final ApplicationEventPublisher eventPublisher;
     private final Map<Long, TimerState> timerState = new ConcurrentHashMap<>();
     private final Map<Long, ScheduledFuture<?>> tasks = new ConcurrentHashMap<>();
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(4);
@@ -34,6 +40,8 @@ public class TimerStateService {
         timerState.put(roomId, state);
         startTick(roomId);
         broadcast(state);
+
+        eventPublisher.publishEvent(new RoomTimerStartedEvent(roomId, request.focusMinutes()));
     }
 
     public void pause(Long roomId) {
@@ -74,6 +82,8 @@ public class TimerStateService {
 
         state.setNextFocusMinutes(focusMinutes);
         broadcast(state);
+
+        eventPublisher.publishEvent(new FocusTimeChangedEvent(roomId, focusMinutes));
     }
 
     private void startTick(Long roomId) {
@@ -97,7 +107,7 @@ public class TimerStateService {
 
     private void onPhaseFinished(TimerState state) {
         if (state.getPhase() == TimerPhase.FOCUS) {
-            switchToBreak(state);
+            onFocusFinished(state);
         } else if (state.getPhase() == TimerPhase.BREAK) {
             onBreakFinished(state);
         }
@@ -108,6 +118,17 @@ public class TimerStateService {
         state.setPhaseDurationSeconds(state.getDefaultBreakMinutes() * 60);
         state.setRemainingSeconds(state.getDefaultBreakMinutes() * 60);
         state.setPhaseStartTime(System.currentTimeMillis());
+
+        eventPublisher.publishEvent(new TimerPhaseChangeEvent(state.getRoomId(), TimerPhase.BREAK));
+    }
+
+    private void onFocusFinished(TimerState state) {
+        if (state.getCurrentSession() >= state.getTotalSessions()) {
+            finishTimer(state);
+            return;
+        }
+
+        switchToBreak(state);
     }
 
     private void onBreakFinished(TimerState state) {
@@ -116,6 +137,10 @@ public class TimerStateService {
             return;
         }
 
+        startNextFocus(state);
+    }
+
+    public void startNextFocus(TimerState state) {
         state.setCurrentSession(state.getCurrentSession() + 1);
 
         int focusMinutes = state.getNextFocusMinutes() != null
@@ -126,12 +151,16 @@ public class TimerStateService {
         state.setPhaseDurationSeconds(focusMinutes * 60);
         state.setRemainingSeconds(focusMinutes * 60);
         state.setPhaseStartTime(System.currentTimeMillis());
+
+        eventPublisher.publishEvent(new RoomSessionAdvancedEvent(state.getRoomId(), state.getCurrentSession()));
     }
 
     private void finishTimer(TimerState state) {
         state.setRunning(false);
         stop(state.getRoomId());
         broadcast(state);
+
+        eventPublisher.publishEvent(new TimerPhaseChangeEvent(state.getRoomId(), TimerPhase.FINISHED));
     }
 
     private void broadcast(TimerState state) {

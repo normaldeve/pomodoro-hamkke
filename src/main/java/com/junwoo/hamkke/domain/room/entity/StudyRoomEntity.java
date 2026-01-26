@@ -29,6 +29,7 @@ public class StudyRoomEntity extends UpdatableBaseEntity {
 
     private int focusMinutes;
     private int breakMinutes;
+    private int currentSession;
     private int totalSessions;
 
     private int currentParticipants;
@@ -47,7 +48,9 @@ public class StudyRoomEntity extends UpdatableBaseEntity {
                 .title(request.title())
                 .description(request.description())
                 .hashtags(request.hashtags())
+                .focusMinutes(0)
                 .breakMinutes(request.breakMinutes())
+                .currentSession(1)
                 .totalSessions(request.totalSessions())
                 .maxParticipants(request.maxParticipants())
                 .secret(request.secret())
@@ -59,5 +62,23 @@ public class StudyRoomEntity extends UpdatableBaseEntity {
 
     public void addCurrentParticipant() {
         this.currentParticipants++;
+    }
+
+    public void changeStatus(RoomStatus status) {
+        this.status = status;
+    }
+
+    public void changeFocusMinutes(int focusMinutes) {
+        this.focusMinutes = focusMinutes;
+    }
+
+    public void handleTimerStartEvent(int focusMinutes) {
+        this.focusMinutes = focusMinutes;
+        this.status = RoomStatus.FOCUS;
+    }
+
+    public void finishSession() {
+        this.currentSession++;
+        this.status = RoomStatus.FOCUS;
     }
 }

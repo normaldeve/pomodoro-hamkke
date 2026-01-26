@@ -20,6 +20,7 @@ public record StudyRoomResponse(
         Set<String> hashtags,
         int focusMinutes,
         int breakMinutes,
+        int currentSession,
         int totalSessions,
         int currentParticipants,
         int maxParticipants,
@@ -35,6 +36,7 @@ public record StudyRoomResponse(
                 .title(room.getTitle())
                 .description(room.getDescription())
                 .hashtags(room.getHashtags())
+                .currentSession(room.getCurrentSession())
                 .focusMinutes(room.getFocusMinutes())
                 .breakMinutes(room.getBreakMinutes())
                 .totalSessions(room.getTotalSessions())
