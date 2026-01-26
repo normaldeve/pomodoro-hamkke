@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @date 26. 1. 25.
  */
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class MessageService {
 

@@ -2,6 +2,7 @@ package com.junwoo.hamkke.domain.room.service;
 
 import com.junwoo.hamkke.common.exception.ErrorCode;
 import com.junwoo.hamkke.domain.room.dto.EnterStudyRoomRequest;
+import com.junwoo.hamkke.domain.room.dto.ParticipantMemberInfo;
 import com.junwoo.hamkke.domain.room.dto.StudyRoomMemberResponse;
 import com.junwoo.hamkke.domain.room.entity.StudyRoomEntity;
 import com.junwoo.hamkke.domain.room.entity.StudyRoomMemberEntity;
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -51,15 +53,15 @@ public class StudyRoomMemberService {
                 ).toList();
     }
 
-    /**
-     * [TODO] 방 인원 Lock 적용 테스트 코드 확인할 것!!
-     */
-    public void enterRoom(Long roomId, Long userId, EnterStudyRoomRequest request) {
+    public Optional<ParticipantMemberInfo> enterRoom(Long roomId, Long userId, EnterStudyRoomRequest request) {
 
         // 이미 입장한 멤버인지 확인
         if (studyRoomMemberRepository.existsByStudyRoomIdAndUserId(roomId, userId)) {
-            return;
+            return Optional.empty();
         }
+
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new StudyRoomException(ErrorCode.CANNOT_FOUND_USER));
 
         // 비관적 락 적용
         StudyRoomEntity room = studyRoomRepository.findByIdForUpdate(roomId)
@@ -80,5 +82,7 @@ public class StudyRoomMemberService {
         studyRoomMemberRepository.save(member);
 
         room.addCurrentParticipant();
+
+        return Optional.of(ParticipantMemberInfo.from(user));
     }
 }
