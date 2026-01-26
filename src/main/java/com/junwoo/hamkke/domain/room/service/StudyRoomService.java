@@ -1,14 +1,16 @@
 package com.junwoo.hamkke.domain.room.service;
 
 import com.junwoo.hamkke.common.exception.ErrorCode;
+import com.junwoo.hamkke.domain.dial.service.TimerStateService;
 import com.junwoo.hamkke.domain.room.dto.CreateStudyRoomRequest;
 import com.junwoo.hamkke.domain.room.dto.StudyRoomResponse;
 import com.junwoo.hamkke.domain.room.entity.RoomStatus;
 import com.junwoo.hamkke.domain.room.entity.StudyRoomEntity;
-import com.junwoo.hamkke.domain.room.entity.StudyRoomMemberEntity;
+import com.junwoo.hamkke.domain.room_member.entity.StudyRoomMemberEntity;
 import com.junwoo.hamkke.domain.room.exception.StudyRoomException;
-import com.junwoo.hamkke.domain.room.repository.StudyRoomMemberRepository;
+import com.junwoo.hamkke.domain.room_member.repository.StudyRoomMemberRepository;
 import com.junwoo.hamkke.domain.room.repository.StudyRoomRepository;
+import com.junwoo.hamkke.domain.room_member.service.MemberFocusRuntimeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;

@@ -1,13 +1,16 @@
-package com.junwoo.hamkke.domain.room.service;
+package com.junwoo.hamkke.domain.room_member.service;
 
 import com.junwoo.hamkke.common.exception.ErrorCode;
-import com.junwoo.hamkke.domain.room.dto.EnterStudyRoomRequest;
-import com.junwoo.hamkke.domain.room.dto.ParticipantMemberInfo;
-import com.junwoo.hamkke.domain.room.dto.StudyRoomMemberResponse;
+import com.junwoo.hamkke.domain.dial.service.TimerStateService;
+import com.junwoo.hamkke.domain.room_member.dto.EnterStudyRoomRequest;
+import com.junwoo.hamkke.domain.room_member.dto.ParticipantMemberInfo;
+import com.junwoo.hamkke.domain.room_member.dto.StudyRoomMemberResponse;
 import com.junwoo.hamkke.domain.room.entity.StudyRoomEntity;
-import com.junwoo.hamkke.domain.room.entity.StudyRoomMemberEntity;
+import com.junwoo.hamkke.domain.room_member.entity.StudyRoomFocusStatEntity;
+import com.junwoo.hamkke.domain.room_member.entity.StudyRoomMemberEntity;
 import com.junwoo.hamkke.domain.room.exception.StudyRoomException;
-import com.junwoo.hamkke.domain.room.repository.StudyRoomMemberRepository;
+import com.junwoo.hamkke.domain.room_member.repository.StudyRoomFocusStatRepository;
+import com.junwoo.hamkke.domain.room_member.repository.StudyRoomMemberRepository;
 import com.junwoo.hamkke.domain.room.repository.StudyRoomRepository;
 import com.junwoo.hamkke.domain.user.entity.UserEntity;
 import com.junwoo.hamkke.domain.user.repository.UserRepository;
@@ -33,7 +36,10 @@ public class StudyRoomMemberService {
 
     private final UserRepository userRepository;
     private final StudyRoomRepository studyRoomRepository;
+    private final TimerStateService timerStateService;
+    private final MemberFocusRuntimeService runtimeService;
     private final StudyRoomMemberRepository studyRoomMemberRepository;
+    private final StudyRoomFocusStatRepository focusStatRepository;
 
     @Transactional(readOnly = true)
     public List<StudyRoomMemberResponse> getStudyRoomMembers(Long roomId) {
@@ -83,6 +89,30 @@ public class StudyRoomMemberService {
 
         room.addCurrentParticipant();
 
+        // 포커스 타임 중간에 입장하는 참가자 공부 시간 측정을 위함
+        boolean isFocusing = timerStateService.isFocusing(roomId);
+        runtimeService.onEnterRoom(roomId, userId, isFocusing);
+
         return Optional.of(ParticipantMemberInfo.from(user));
+    }
+
+    public void leaveRoom(Long roomId, Long userId) {
+
+        StudyRoomEntity room = studyRoomRepository.findById(roomId)
+                .orElseThrow(() -> new StudyRoomException(ErrorCode.CANNOT_FOUND_ROOM));
+
+        room.removeCurrentParticipant();
+
+        int focusedSeconds = runtimeService.onMemberLeave(roomId, userId);
+
+        StudyRoomFocusStatEntity stat = StudyRoomFocusStatEntity.builder()
+                .roomId(roomId)
+                .userId(userId)
+                .focusSeconds(focusedSeconds)
+                .build();
+
+        focusStatRepository.save(stat);
+
+        studyRoomMemberRepository.deleteByStudyRoomIdAndUserId(roomId, userId);
     }
 }

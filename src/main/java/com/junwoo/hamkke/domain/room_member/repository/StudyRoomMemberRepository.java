@@ -1,6 +1,6 @@
-package com.junwoo.hamkke.domain.room.repository;
+package com.junwoo.hamkke.domain.room_member.repository;
 
-import com.junwoo.hamkke.domain.room.entity.StudyRoomMemberEntity;
+import com.junwoo.hamkke.domain.room_member.entity.StudyRoomMemberEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -20,4 +20,7 @@ public interface StudyRoomMemberRepository extends JpaRepository<StudyRoomMember
 
     long countByStudyRoomId(Long studyRoomId);
 
+    void deleteByStudyRoomIdAndUserId(Long roomId, Long userId);
+
+    List<StudyRoomMemberEntity> findByStudyRoomId(Long roomId);
 }

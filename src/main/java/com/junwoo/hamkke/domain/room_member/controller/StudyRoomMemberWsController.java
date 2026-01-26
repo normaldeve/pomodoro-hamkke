@@ -1,8 +1,8 @@
-package com.junwoo.hamkke.domain.room.controller;
+package com.junwoo.hamkke.domain.room_member.controller;
 
-import com.junwoo.hamkke.domain.room.dto.EnterStudyRoomRequest;
-import com.junwoo.hamkke.domain.room.dto.ParticipantMemberInfo;
-import com.junwoo.hamkke.domain.room.service.StudyRoomMemberService;
+import com.junwoo.hamkke.domain.room_member.dto.EnterStudyRoomRequest;
+import com.junwoo.hamkke.domain.room_member.dto.ParticipantMemberInfo;
+import com.junwoo.hamkke.domain.room_member.service.StudyRoomMemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -38,6 +38,21 @@ public class StudyRoomMemberWsController {
             messagingTemplate.convertAndSend("/topic/study-room/" + roomId + "/members", response);
         } catch (Exception e) {
             log.error("[WS] 사용자 방 입장 전송 실패 roomId={}", roomId, e);
+        }
+    }
+
+    @MessageMapping("/study-room/{roomId}/members/exit")
+    public void exitMember(
+            @DestinationVariable Long roomId,
+            @Payload Long userId
+    ) {
+
+        studyRoomMemberService.leaveRoom(roomId, userId);
+
+        try {
+            messagingTemplate.convertAndSend("/topic/study-room/" + roomId + "/members", userId);
+        } catch (Exception e) {
+            log.error("[WS] 사용자 방 떠나기 실패 userId = {}", userId, e);
         }
     }
 }

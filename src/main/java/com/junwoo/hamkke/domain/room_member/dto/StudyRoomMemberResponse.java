@@ -1,7 +1,7 @@
-package com.junwoo.hamkke.domain.room.dto;
+package com.junwoo.hamkke.domain.room_member.dto;
 
-import com.junwoo.hamkke.domain.room.entity.RoomMemberRole;
-import com.junwoo.hamkke.domain.room.entity.StudyRoomMemberEntity;
+import com.junwoo.hamkke.domain.room_member.entity.RoomMemberRole;
+import com.junwoo.hamkke.domain.room_member.entity.StudyRoomMemberEntity;
 import com.junwoo.hamkke.domain.user.entity.UserEntity;
 import lombok.Builder;
 

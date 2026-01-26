@@ -1,4 +1,4 @@
-package com.junwoo.hamkke.domain.room.entity;
+package com.junwoo.hamkke.domain.room_member.entity;
 
 /**
  *

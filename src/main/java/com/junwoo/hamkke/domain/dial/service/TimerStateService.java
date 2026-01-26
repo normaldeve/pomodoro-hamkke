@@ -86,6 +86,16 @@ public class TimerStateService {
         eventPublisher.publishEvent(new FocusTimeChangedEvent(roomId, focusMinutes));
     }
 
+    public boolean isFocusing(Long roomId) {
+        TimerState state = timerState.get(roomId);
+
+        if (state == null) {
+            return false;
+        }
+
+        return state.isRunning() && state.getPhase() == TimerPhase.FOCUS;
+    }
+
     private void startTick(Long roomId) {
         ScheduledFuture<?> task = scheduler.scheduleAtFixedRate(() -> {
             TimerState state = timerState.get(roomId);

@@ -1,4 +1,4 @@
-package com.junwoo.hamkke.domain.room.dto;
+package com.junwoo.hamkke.domain.room_member.dto;
 
 /**
  *

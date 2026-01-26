@@ -1,7 +1,7 @@
-package com.junwoo.hamkke.domain.room.controller;
+package com.junwoo.hamkke.domain.room_member.controller;
 
-import com.junwoo.hamkke.domain.room.dto.StudyRoomMemberResponse;
-import com.junwoo.hamkke.domain.room.service.StudyRoomMemberService;
+import com.junwoo.hamkke.domain.room_member.dto.StudyRoomMemberResponse;
+import com.junwoo.hamkke.domain.room_member.service.StudyRoomMemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

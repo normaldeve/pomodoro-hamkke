@@ -64,6 +64,10 @@ public class StudyRoomEntity extends UpdatableBaseEntity {
         this.currentParticipants++;
     }
 
+    public void removeCurrentParticipant() {
+        this.currentParticipants--;
+    }
+
     public void changeStatus(RoomStatus status) {
         this.status = status;
     }
