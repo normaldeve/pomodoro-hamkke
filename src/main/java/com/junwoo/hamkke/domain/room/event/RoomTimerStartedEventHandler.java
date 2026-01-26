@@ -7,6 +7,7 @@ import com.junwoo.hamkke.domain.room.entity.RoomStatus;
 import com.junwoo.hamkke.domain.room.entity.StudyRoomEntity;
 import com.junwoo.hamkke.domain.room.exception.StudyRoomException;
 import com.junwoo.hamkke.domain.room.repository.StudyRoomRepository;
+import com.junwoo.hamkke.domain.room_member.service.MemberFocusRuntimeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -25,6 +26,7 @@ public class RoomTimerStartedEventHandler {
 
     private final SimpMessagingTemplate messagingTemplate;
     private final StudyRoomRepository studyRoomRepository;
+    private final MemberFocusRuntimeService runtimeService;
 
     @Async("domainEventExecutor")
     @EventListener
@@ -35,6 +37,8 @@ public class RoomTimerStartedEventHandler {
                 .orElseThrow(() -> new StudyRoomException(ErrorCode.CANNOT_FOUND_ROOM));
 
         room.handleTimerStartEvent(event.focusMinutes());
+
+        runtimeService.startFocus(event.roomId());
 
         messagingTemplate.convertAndSend(
                 "/topic/study-room/" + room.getId() + "/room-state",

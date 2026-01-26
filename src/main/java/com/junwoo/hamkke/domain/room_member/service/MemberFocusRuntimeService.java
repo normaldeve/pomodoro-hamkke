@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- *
+ * [TODO] 방 참여 시 공부 기록 측정하는 부분이 이해가 안 되네
  * @author junnukim1007gmail.com
  * @date 26. 1. 26.
  */
