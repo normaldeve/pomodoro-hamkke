@@ -43,6 +43,8 @@ public class RoomStatusEventListener {
 
         room.changeStatus(newStatus);
 
+        log.info("[RoomStatusEventListener] handle() : 방 상태를 변경 완료했습니다 - roomId: {}, status: {}", room.getId(), newStatus);
+
         messagingTemplate.convertAndSend("/topic/study-room/" + room.getId() + "/status", newStatus);
     }
 }

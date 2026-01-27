@@ -83,6 +83,5 @@ public class StudyRoomEntity extends UpdatableBaseEntity {
 
     public void finishSession() {
         this.currentSession++;
-        this.status = RoomStatus.FOCUS;
     }
 }

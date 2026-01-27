@@ -3,7 +3,6 @@ package com.junwoo.hamkke.domain.dial.service;
 import com.junwoo.hamkke.domain.dial.dto.TimerPhase;
 import com.junwoo.hamkke.domain.dial.dto.event.FocusTimeChangedEvent;
 import com.junwoo.hamkke.domain.dial.dto.event.RoomSessionAdvancedEvent;
-import com.junwoo.hamkke.domain.dial.dto.event.RoomTimerStartedEvent;
 import com.junwoo.hamkke.domain.dial.dto.event.TimerPhaseChangeEvent;
 import com.junwoo.hamkke.domain.dial.dto.TimerStartRequest;
 import com.junwoo.hamkke.domain.dial.dto.TimerState;
@@ -45,7 +44,8 @@ public class TimerStateService {
         broadcast(state);
 
         log.info("[TimerStateService] start() :타이머 시작 관련 이벤트를 호출합니다 - roomId: {}", roomId);
-        eventPublisher.publishEvent(new RoomTimerStartedEvent(roomId, request.focusMinutes()));
+        eventPublisher.publishEvent(new TimerPhaseChangeEvent(state.getRoomId(), TimerPhase.FOCUS));
+        eventPublisher.publishEvent(new FocusTimeChangedEvent(roomId, state.getDefaultFocusMinutes()));
     }
 
     // 집중, 휴식 종료
@@ -75,7 +75,6 @@ public class TimerStateService {
         state.setPhaseDurationSeconds(state.getDefaultBreakMinutes() * 60);
         state.setRemainingSeconds(state.getDefaultBreakMinutes() * 60);
         state.setPhaseStartTime(System.currentTimeMillis());
-
         broadcast(state);
 
         log.info("[TimerStateService] switchToBreak() : 타이머 상태 변경 이벤트를 생성합니다 - roomId: {}, phase: {}", state.getRoomId(), TimerPhase.BREAK);
@@ -101,6 +100,7 @@ public class TimerStateService {
         state.setPhaseDurationSeconds(focusMinutes * 60);
         state.setRemainingSeconds(focusMinutes * 60);
         state.setPhaseStartTime(System.currentTimeMillis());
+        broadcast(state);
 
         log.info("[TimerStateService] startNextFocus() : 다음 세션 이벤트를 생성합니다 - roomId: {}, session: {} -> {}", state.getRoomId(), state.getCurrentSession(), state.getCurrentSession() + 1);
         eventPublisher.publishEvent(new RoomSessionAdvancedEvent(state.getRoomId(), state.getCurrentSession()));
@@ -181,7 +181,6 @@ public class TimerStateService {
             if (state.getRemainingSeconds() <= 0) {
                 onPhaseFinished(state);
             }
-
             broadcast(state);
         }, 1, 1, TimeUnit.SECONDS);
 
@@ -190,6 +189,7 @@ public class TimerStateService {
 
     private void broadcast(TimerState state) {
         try {
+            log.info("[TimerStateService] broadcast() : 웹소켓을 통해 데이터를 전달합니다 - roomId: {}, state: {}", state.getRoomId(), state);
             messagingTemplate.convertAndSend("/topic/study-room/" + state.getRoomId() + "/timer", state);
         } catch (Exception e) {
             log.error("[WS] 타이머 상태 전송 실패");

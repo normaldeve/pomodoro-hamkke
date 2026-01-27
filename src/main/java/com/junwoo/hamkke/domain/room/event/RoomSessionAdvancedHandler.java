@@ -23,20 +23,16 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class RoomSessionAdvancedHandler {
 
-    private final SimpMessagingTemplate messagingTemplate;
     private final StudyRoomRepository studyRoomRepository;
 
     @EventListener
     @Transactional
     public void handleTimerPhaseChanged(RoomSessionAdvancedEvent event) {
-        log.info("[이벤트] RoomSessionAdvancedEvent 수신 - roomId: {}, session: {}", event.roomId(), event.currentSession());
+        log.info("[RoomSessionAdvancedHandler] handle() : 세션이 종료되는 이벤트를 수신 - roomId: {}, session: {}", event.roomId(), event.currentSession());
 
         StudyRoomEntity room = studyRoomRepository.findById(event.roomId())
                 .orElseThrow(() -> new StudyRoomException(ErrorCode.CANNOT_FOUND_ROOM));
 
         room.finishSession();
-
-        messagingTemplate.convertAndSend("/topic/study-room/" + room.getId() + "/finish-session", room.getStatus());
-
     }
 }
