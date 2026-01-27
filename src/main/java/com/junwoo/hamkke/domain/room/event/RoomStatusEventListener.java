@@ -27,10 +27,10 @@ public class RoomStatusEventListener {
     private final SimpMessagingTemplate messagingTemplate;
     private final StudyRoomRepository studyRoomRepository;
 
-    @Async("domainEventExecutor")
     @EventListener
     @Transactional
-    public void handleTimerPhaseChanged(TimerPhaseChangeEvent event) {
+    public void handle(TimerPhaseChangeEvent event) {
+        log.info("[RoomStatusEventListener] handle() : TimerPhaseChangeEvent 이벤트를 처리합니다 - roomId: {}, phase: {}", event.roomId(), event.phase());
         StudyRoomEntity room = studyRoomRepository.findById(event.roomId())
                 .orElseThrow(() -> new StudyRoomException(ErrorCode.CANNOT_FOUND_ROOM));
 

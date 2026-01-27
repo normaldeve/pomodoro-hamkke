@@ -33,48 +33,94 @@ public class TimerStateService {
     private final Map<Long, ScheduledFuture<?>> tasks = new ConcurrentHashMap<>();
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(4);
 
+    // 타이머 시작
     public void start(Long roomId, TimerStartRequest request) {
         stop(roomId);
+
+        log.info("[TimerStateService] start() : 타이머를 시작합니다 - roomId: {}", roomId);
 
         TimerState state = TimerState.createFocus(roomId, request);
         timerState.put(roomId, state);
         startTick(roomId);
         broadcast(state);
 
+        log.info("[TimerStateService] start() :타이머 시작 관련 이벤트를 호출합니다 - roomId: {}", roomId);
         eventPublisher.publishEvent(new RoomTimerStartedEvent(roomId, request.focusMinutes()));
     }
 
-    public void pause(Long roomId) {
-        TimerState state = timerState.get(roomId);
-        if (state == null || !state.isRunning()) {
+    // 집중, 휴식 종료
+    private void onPhaseFinished(TimerState state) {
+        log.info("[TimerStateService] onPhaseFinished() : 페이즈 완료 처리 - roomId: {}, phase: {}", state.getRoomId(), state.getPhase());
+        if (state.getPhase() == TimerPhase.FOCUS) {
+            onFocusFinished(state);
+        } else if (state.getPhase() == TimerPhase.BREAK) {
+            onBreakFinished(state);
+        }
+    }
+
+    // 집중 시간 종료
+    private void onFocusFinished(TimerState state) {
+        log.info("[TimerStateService] onFocusFinished() : 집중 종료 - roomId: {}", state.getRoomId());
+        if (state.getCurrentSession() >= state.getTotalSessions()) {
+            finishTimer(state);
             return;
         }
+
+        switchToBreak(state);
+    }
+
+    private void switchToBreak(TimerState state) {
+        log.info("[TimerStateService] switchToBreak() : 휴식 전환 - roomId: {}", state.getRoomId());
+        state.setPhase(TimerPhase.BREAK);
+        state.setPhaseDurationSeconds(state.getDefaultBreakMinutes() * 60);
+        state.setRemainingSeconds(state.getDefaultBreakMinutes() * 60);
+        state.setPhaseStartTime(System.currentTimeMillis());
+
+        broadcast(state);
+
+        log.info("[TimerStateService] switchToBreak() : 타이머 상태 변경 이벤트를 생성합니다 - roomId: {}, phase: {}", state.getRoomId(), TimerPhase.BREAK);
+        eventPublisher.publishEvent(new TimerPhaseChangeEvent(state.getRoomId(), TimerPhase.BREAK));
+    }
+
+    private void onBreakFinished(TimerState state) {
+        log.info("[TimerStateService] onBreakFinished() : 휴식 종료 - roomId: {}", state.getRoomId());
+
+        startNextFocus(state);
+    }
+
+    public void startNextFocus(TimerState state) {
+        log.info("[TimerStateService] startNextFocus() : 다음 세션 시작 - roomId: {}, session: {} -> {}", state.getRoomId(), state.getCurrentSession(), state.getCurrentSession() + 1);
+
+        state.setCurrentSession(state.getCurrentSession() + 1);
+
+        // 변경된 집중 시간이 있다면 해당 시간으로 변경
+        int focusMinutes = state.getNextFocusMinutes() != null ? state.getNextFocusMinutes() : state.getDefaultFocusMinutes();
+
+        state.setNextFocusMinutes(null);
+        state.setPhase(TimerPhase.FOCUS);
+        state.setPhaseDurationSeconds(focusMinutes * 60);
+        state.setRemainingSeconds(focusMinutes * 60);
+        state.setPhaseStartTime(System.currentTimeMillis());
+
+        log.info("[TimerStateService] startNextFocus() : 다음 세션 이벤트를 생성합니다 - roomId: {}, session: {} -> {}", state.getRoomId(), state.getCurrentSession(), state.getCurrentSession() + 1);
+        eventPublisher.publishEvent(new RoomSessionAdvancedEvent(state.getRoomId(), state.getCurrentSession()));
+    }
+
+    // 전체 세션 이후 타이머 종료
+    private void finishTimer(TimerState state) {
+        log.info("[TimerStateService] finishTimer() : 타이머 완료 roomId: {}, 총 세션: {}", state.getRoomId(), state.getTotalSessions());
 
         state.setRunning(false);
-        stop(roomId);
+        stop(state.getRoomId());
         broadcast(state);
+
+        log.info("TimerStateService] finishTimer() : 타이머 상태 변경 이벤트를 생성합니다 - roomId: {}, phase: {}", state.getRoomId(), TimerPhase.FINISHED);
+        eventPublisher.publishEvent(new TimerPhaseChangeEvent(state.getRoomId(), TimerPhase.FINISHED));
     }
 
-    public void resume(Long roomId) {
-        TimerState state = timerState.get(roomId);
-        if (state == null || state.isRunning()) {
-            return;
-        }
-
-        state.setRunning(true);
-        state.setPhaseStartTime(System.currentTimeMillis());
-        startTick(roomId);
-        broadcast(state);
-    }
-
-    public void stop(Long roomId) {
-        ScheduledFuture<?> task = tasks.remove(roomId);
-        if (task != null) {
-            task.cancel(false);
-        }
-    }
-
+    // 다음 집중 시간 업데이트
     public void updateNextFocusTime(Long roomId, int focusMinutes) {
+        log.info("[TimerStateService] updateNextFocusTime() : 다음 집중 시간 설정을 변경합니다 - roomId: {}", roomId);
         TimerState state = timerState.get(roomId);
         if (state == null || state.getPhase() != TimerPhase.BREAK) {
             return;
@@ -86,17 +132,44 @@ public class TimerStateService {
         eventPublisher.publishEvent(new FocusTimeChangedEvent(roomId, focusMinutes));
     }
 
-    public boolean isFocusing(Long roomId) {
+    // 타이머 정지
+    public void pause(Long roomId) {
+        log.info("[TimerStateService] pause() : 타이머를 일시정지 합니다 - roomId: {}", roomId);
         TimerState state = timerState.get(roomId);
-
-        if (state == null) {
-            return false;
+        if (state == null || !state.isRunning()) {
+            return;
         }
 
-        return state.isRunning() && state.getPhase() == TimerPhase.FOCUS;
+        state.setRunning(false);
+        stop(roomId);
+        broadcast(state);
     }
 
+    // 타이머 재개
+    public void resume(Long roomId) {
+        log.info("[TimerStateService] resume() : 타이머를 재개합니다 - roomId: {}", roomId);
+        TimerState state = timerState.get(roomId);
+        if (state == null || state.isRunning()) {
+            return;
+        }
+
+        state.setRunning(true);
+        state.setPhaseStartTime(System.currentTimeMillis());
+        startTick(roomId);
+        broadcast(state);
+    }
+
+    // 타이머 스케줄러 삭제
+    public void stop(Long roomId) {
+        ScheduledFuture<?> task = tasks.remove(roomId);
+        if (task != null) {
+            task.cancel(false);
+        }
+    }
+
+    // 타이머 스케줄러 시작
     private void startTick(Long roomId) {
+        log.info("[TimerStateService] startTick() : 스케줄러 시작 - roomId: {}", roomId);
         ScheduledFuture<?> task = scheduler.scheduleAtFixedRate(() -> {
             TimerState state = timerState.get(roomId);
             if (state == null || !state.isRunning()) {
@@ -113,66 +186,6 @@ public class TimerStateService {
         }, 1, 1, TimeUnit.SECONDS);
 
         tasks.put(roomId, task);
-    }
-
-    private void onPhaseFinished(TimerState state) {
-        if (state.getPhase() == TimerPhase.FOCUS) {
-            onFocusFinished(state);
-        } else if (state.getPhase() == TimerPhase.BREAK) {
-            onBreakFinished(state);
-        }
-    }
-
-    private void switchToBreak(TimerState state) {
-        state.setPhase(TimerPhase.BREAK);
-        state.setPhaseDurationSeconds(state.getDefaultBreakMinutes() * 60);
-        state.setRemainingSeconds(state.getDefaultBreakMinutes() * 60);
-        state.setPhaseStartTime(System.currentTimeMillis());
-
-        eventPublisher.publishEvent(new TimerPhaseChangeEvent(state.getRoomId(), TimerPhase.BREAK));
-    }
-
-    private void onFocusFinished(TimerState state) {
-        if (state.getCurrentSession() >= state.getTotalSessions()) {
-            finishTimer(state);
-            return;
-        }
-
-        switchToBreak(state);
-    }
-
-    private void onBreakFinished(TimerState state) {
-        if (state.getCurrentSession() >= state.getTotalSessions()) {
-            finishTimer(state);
-            return;
-        }
-
-        startNextFocus(state);
-    }
-
-    public void startNextFocus(TimerState state) {
-        state.setCurrentSession(state.getCurrentSession() + 1);
-
-        int focusMinutes = state.getNextFocusMinutes() != null
-                ? state.getNextFocusMinutes() : state.getDefaultFocusMinutes();
-
-        state.setNextFocusMinutes(null);
-        state.setPhase(TimerPhase.FOCUS);
-        state.setPhaseDurationSeconds(focusMinutes * 60);
-        state.setRemainingSeconds(focusMinutes * 60);
-        state.setPhaseStartTime(System.currentTimeMillis());
-
-        eventPublisher.publishEvent(new RoomSessionAdvancedEvent(state.getRoomId(), state.getCurrentSession()));
-
-        eventPublisher.publishEvent(new TimerPhaseChangeEvent(state.getRoomId(), TimerPhase.FOCUS));
-    }
-
-    private void finishTimer(TimerState state) {
-        state.setRunning(false);
-        stop(state.getRoomId());
-        broadcast(state);
-
-        eventPublisher.publishEvent(new TimerPhaseChangeEvent(state.getRoomId(), TimerPhase.FINISHED));
     }
 
     private void broadcast(TimerState state) {

@@ -6,10 +6,8 @@ import com.junwoo.hamkke.domain.room_member.dto.EnterStudyRoomRequest;
 import com.junwoo.hamkke.domain.room_member.dto.ParticipantMemberInfo;
 import com.junwoo.hamkke.domain.room_member.dto.StudyRoomMemberResponse;
 import com.junwoo.hamkke.domain.room.entity.StudyRoomEntity;
-import com.junwoo.hamkke.domain.room_member.entity.StudyRoomFocusStatEntity;
 import com.junwoo.hamkke.domain.room_member.entity.StudyRoomMemberEntity;
 import com.junwoo.hamkke.domain.room.exception.StudyRoomException;
-import com.junwoo.hamkke.domain.room_member.repository.StudyRoomFocusStatRepository;
 import com.junwoo.hamkke.domain.room_member.repository.StudyRoomMemberRepository;
 import com.junwoo.hamkke.domain.room.repository.StudyRoomRepository;
 import com.junwoo.hamkke.domain.user.entity.UserEntity;
@@ -36,8 +34,6 @@ public class StudyRoomMemberService {
 
     private final UserRepository userRepository;
     private final StudyRoomRepository studyRoomRepository;
-    private final TimerStateService timerStateService;
-    private final MemberFocusRuntimeService runtimeService;
     private final StudyRoomMemberRepository studyRoomMemberRepository;
 
     @Transactional(readOnly = true)
@@ -88,9 +84,6 @@ public class StudyRoomMemberService {
 
         room.addCurrentParticipant();
 
-        boolean isFocusing = timerStateService.isFocusing(roomId);
-        runtimeService.onEnterRoom(roomId, userId, isFocusing);
-
         return Optional.of(ParticipantMemberInfo.from(user));
     }
 
@@ -100,8 +93,6 @@ public class StudyRoomMemberService {
                 .orElseThrow(() -> new StudyRoomException(ErrorCode.CANNOT_FOUND_ROOM));
 
         room.removeCurrentParticipant();
-
-        runtimeService.onMemberLeave(roomId, userId, room.getCurrentSession());
 
         studyRoomMemberRepository.deleteByStudyRoomIdAndUserId(roomId, userId);
     }

@@ -26,7 +26,6 @@ public class FocusTimeChangedEventListener {
     private final SimpMessagingTemplate messagingTemplate;
     private final StudyRoomRepository studyRoomRepository;
 
-    @Async("domainEventExecutor")
     @EventListener
     @Transactional
     public void handle(FocusTimeChangedEvent event) {

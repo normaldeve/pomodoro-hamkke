@@ -28,6 +28,8 @@ public class StudyRoomMemberEntity extends BaseEntity {
 
     private Long userId;
 
+    private int focusSeconds;
+
     @Enumerated(EnumType.STRING)
     private RoomMemberRole role;
 
