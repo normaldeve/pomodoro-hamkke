@@ -76,11 +76,6 @@ public class StudyRoomEntity extends UpdatableBaseEntity {
         this.focusMinutes = focusMinutes;
     }
 
-    public void handleTimerStartEvent(int focusMinutes) {
-        this.focusMinutes = focusMinutes;
-        this.status = RoomStatus.FOCUS;
-    }
-
     public void finishSession() {
         this.currentSession++;
     }

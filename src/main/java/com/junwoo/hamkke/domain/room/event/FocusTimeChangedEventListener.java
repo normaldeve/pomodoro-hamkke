@@ -35,7 +35,6 @@ public class FocusTimeChangedEventListener {
 
         room.changeFocusMinutes(event.focusTime());
 
-        messagingTemplate.convertAndSend(
-                "/topic/study-room/" + room.getId() + "/focus-time",  event.focusTime());
+        messagingTemplate.convertAndSend("/topic/study-room/" + room.getId() + "/focus-time",  event.focusTime());
     }
 }

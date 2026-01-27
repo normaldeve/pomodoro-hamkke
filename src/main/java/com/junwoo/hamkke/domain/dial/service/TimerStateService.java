@@ -104,6 +104,7 @@ public class TimerStateService {
 
         log.info("[TimerStateService] startNextFocus() : 다음 세션 이벤트를 생성합니다 - roomId: {}, session: {} -> {}", state.getRoomId(), state.getCurrentSession(), state.getCurrentSession() + 1);
         eventPublisher.publishEvent(new RoomSessionAdvancedEvent(state.getRoomId(), state.getCurrentSession()));
+        eventPublisher.publishEvent(new TimerPhaseChangeEvent(state.getRoomId(), TimerPhase.FOCUS));
     }
 
     // 전체 세션 이후 타이머 종료
