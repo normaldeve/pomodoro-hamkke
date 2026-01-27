@@ -163,6 +163,8 @@ public class TimerStateService {
         state.setPhaseStartTime(System.currentTimeMillis());
 
         eventPublisher.publishEvent(new RoomSessionAdvancedEvent(state.getRoomId(), state.getCurrentSession()));
+
+        eventPublisher.publishEvent(new TimerPhaseChangeEvent(state.getRoomId(), TimerPhase.FOCUS));
     }
 
     private void finishTimer(TimerState state) {

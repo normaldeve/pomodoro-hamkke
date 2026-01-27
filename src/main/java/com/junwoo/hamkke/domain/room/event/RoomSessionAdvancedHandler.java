@@ -35,9 +35,11 @@ public class RoomSessionAdvancedHandler {
         StudyRoomEntity room = studyRoomRepository.findById(event.roomId())
                 .orElseThrow(() -> new StudyRoomException(ErrorCode.CANNOT_FOUND_ROOM));
 
-        room.finishSession();
+        int completedSession = room.getCurrentSession();
 
-        runtimeService.saveSessionFocusTime(event.roomId(), event.currentSession());
+        runtimeService.saveSessionFocusTime(event.roomId(), completedSession);
+
+        room.finishSession();
 
         messagingTemplate.convertAndSend("/topic/study-room/" + room.getId() + "/finish-session", room.getStatus());
 

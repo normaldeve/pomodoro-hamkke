@@ -30,4 +30,12 @@ public class StudyRoomFocusStatEntity extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private FocusStatType type;
+
+    public void addFocusSeconds(int seconds) {
+        this.focusSeconds += seconds;
+    }
+
+    public void markAsComplete() {
+        this.type = FocusStatType.SESSION_COMPLETE;
+    }
 }

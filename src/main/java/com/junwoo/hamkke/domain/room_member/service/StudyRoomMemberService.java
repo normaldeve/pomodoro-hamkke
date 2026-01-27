@@ -39,7 +39,6 @@ public class StudyRoomMemberService {
     private final TimerStateService timerStateService;
     private final MemberFocusRuntimeService runtimeService;
     private final StudyRoomMemberRepository studyRoomMemberRepository;
-    private final StudyRoomFocusStatRepository focusStatRepository;
 
     @Transactional(readOnly = true)
     public List<StudyRoomMemberResponse> getStudyRoomMembers(Long roomId) {
@@ -88,6 +87,9 @@ public class StudyRoomMemberService {
         studyRoomMemberRepository.save(member);
 
         room.addCurrentParticipant();
+
+        boolean isFocusing = timerStateService.isFocusing(roomId);
+        runtimeService.onEnterRoom(roomId, userId, isFocusing);
 
         return Optional.of(ParticipantMemberInfo.from(user));
     }

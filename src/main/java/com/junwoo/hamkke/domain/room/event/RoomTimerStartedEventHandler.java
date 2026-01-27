@@ -26,6 +26,7 @@ public class RoomTimerStartedEventHandler {
 
     private final SimpMessagingTemplate messagingTemplate;
     private final StudyRoomRepository studyRoomRepository;
+    private final MemberFocusRuntimeService runtimeService;
 
     @Async("domainEventExecutor")
     @EventListener
@@ -36,6 +37,8 @@ public class RoomTimerStartedEventHandler {
                 .orElseThrow(() -> new StudyRoomException(ErrorCode.CANNOT_FOUND_ROOM));
 
         room.handleTimerStartEvent(event.focusMinutes());
+
+        runtimeService.startFocus(event.roomId());
 
         messagingTemplate.convertAndSend(
                 "/topic/study-room/" + room.getId() + "/room-state",
