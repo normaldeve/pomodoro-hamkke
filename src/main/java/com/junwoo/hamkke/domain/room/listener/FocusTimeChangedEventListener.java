@@ -1,13 +1,14 @@
-package com.junwoo.hamkke.domain.room.event;
+package com.junwoo.hamkke.domain.room.listener;
 
 import com.junwoo.hamkke.common.exception.ErrorCode;
-import com.junwoo.hamkke.domain.dial.dto.event.RoomSessionAdvancedEvent;
+import com.junwoo.hamkke.domain.dial.dto.event.FocusTimeChangedEvent;
 import com.junwoo.hamkke.domain.room.entity.StudyRoomEntity;
 import com.junwoo.hamkke.domain.room.exception.StudyRoomException;
 import com.junwoo.hamkke.domain.room.repository.StudyRoomRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,18 +20,20 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class RoomSessionAdvancedHandler {
+public class FocusTimeChangedEventListener {
 
+    private final SimpMessagingTemplate messagingTemplate;
     private final StudyRoomRepository studyRoomRepository;
 
     @EventListener
     @Transactional
-    public void handleTimerPhaseChanged(RoomSessionAdvancedEvent event) {
-        log.info("[RoomSessionAdvancedHandler] handle() : 세션이 종료되는 이벤트를 수신 - roomId: {}, session: {}", event.roomId(), event.currentSession());
+    public void handle(FocusTimeChangedEvent event) {
 
         StudyRoomEntity room = studyRoomRepository.findById(event.roomId())
                 .orElseThrow(() -> new StudyRoomException(ErrorCode.CANNOT_FOUND_ROOM));
 
-        room.finishSession();
+        room.changeFocusMinutes(event.focusTime());
+
+        messagingTemplate.convertAndSend("/topic/study-room/" + room.getId() + "/focus-time",  event.focusTime());
     }
 }

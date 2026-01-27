@@ -12,9 +12,7 @@ import java.util.List;
  */
 public interface StudyRoomMemberRepository extends JpaRepository<StudyRoomMemberEntity, Long> {
 
-    List<StudyRoomMemberEntity> findByStudyRoomIdOrderByRoleAscCreatedAtAsc(
-            Long studyRoomId
-    );
+    List<StudyRoomMemberEntity> findByStudyRoomIdOrderByRoleAscCreatedAtAsc(Long studyRoomId);
 
     boolean existsByStudyRoomIdAndUserId(Long studyRoomId, Long userId);
 
@@ -22,5 +20,6 @@ public interface StudyRoomMemberRepository extends JpaRepository<StudyRoomMember
 
     void deleteByStudyRoomIdAndUserId(Long roomId, Long userId);
 
-    List<StudyRoomMemberEntity> findByStudyRoomId(Long roomId);
+    List<StudyRoomMemberEntity> findAllByStudyRoomId(Long roomId);
+
 }

@@ -1,9 +1,7 @@
 package com.junwoo.hamkke.domain.dial.service;
 
 import com.junwoo.hamkke.domain.dial.dto.TimerPhase;
-import com.junwoo.hamkke.domain.dial.dto.event.FocusTimeChangedEvent;
-import com.junwoo.hamkke.domain.dial.dto.event.RoomSessionAdvancedEvent;
-import com.junwoo.hamkke.domain.dial.dto.event.TimerPhaseChangeEvent;
+import com.junwoo.hamkke.domain.dial.dto.event.*;
 import com.junwoo.hamkke.domain.dial.dto.TimerStartRequest;
 import com.junwoo.hamkke.domain.dial.dto.TimerState;
 import lombok.RequiredArgsConstructor;
@@ -45,6 +43,7 @@ public class TimerStateService {
 
         log.info("[TimerStateService] start() :타이머 시작 관련 이벤트를 호출합니다 - roomId: {}", roomId);
         eventPublisher.publishEvent(new TimerPhaseChangeEvent(state.getRoomId(), TimerPhase.FOCUS));
+        eventPublisher.publishEvent(new FocusTimeStartedEvent(state.getRoomId(), state.getCurrentSession()));
         eventPublisher.publishEvent(new FocusTimeChangedEvent(roomId, state.getDefaultFocusMinutes()));
     }
 
@@ -61,6 +60,7 @@ public class TimerStateService {
     // 집중 시간 종료
     private void onFocusFinished(TimerState state) {
         log.info("[TimerStateService] onFocusFinished() : 집중 종료 - roomId: {}", state.getRoomId());
+        eventPublisher.publishEvent(new FocusTimeFinishedEvent(state.getRoomId(), state.getDefaultFocusMinutes(), state.getCurrentSession()));
         if (state.getCurrentSession() >= state.getTotalSessions()) {
             finishTimer(state);
             return;
@@ -91,6 +91,7 @@ public class TimerStateService {
         log.info("[TimerStateService] startNextFocus() : 다음 세션 시작 - roomId: {}, session: {} -> {}", state.getRoomId(), state.getCurrentSession(), state.getCurrentSession() + 1);
 
         state.setCurrentSession(state.getCurrentSession() + 1);
+        eventPublisher.publishEvent(new FocusTimeStartedEvent(state.getRoomId(), state.getCurrentSession()));
 
         // 변경된 집중 시간이 있다면 해당 시간으로 변경
         int focusMinutes = state.getNextFocusMinutes() != null ? state.getNextFocusMinutes() : state.getDefaultFocusMinutes();
@@ -103,7 +104,7 @@ public class TimerStateService {
         broadcast(state);
 
         log.info("[TimerStateService] startNextFocus() : 다음 세션 이벤트를 생성합니다 - roomId: {}, session: {} -> {}", state.getRoomId(), state.getCurrentSession(), state.getCurrentSession() + 1);
-        eventPublisher.publishEvent(new RoomSessionAdvancedEvent(state.getRoomId(), state.getCurrentSession()));
+        eventPublisher.publishEvent(new RoomSessionAdvancedEvent(state.getRoomId()));
         eventPublisher.publishEvent(new TimerPhaseChangeEvent(state.getRoomId(), TimerPhase.FOCUS));
     }
 

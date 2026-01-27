@@ -1,7 +1,6 @@
 package com.junwoo.hamkke.domain.room_member.service;
 
 import com.junwoo.hamkke.common.exception.ErrorCode;
-import com.junwoo.hamkke.domain.dial.service.TimerStateService;
 import com.junwoo.hamkke.domain.room_member.dto.EnterStudyRoomRequest;
 import com.junwoo.hamkke.domain.room_member.dto.ParticipantMemberInfo;
 import com.junwoo.hamkke.domain.room_member.dto.StudyRoomMemberResponse;

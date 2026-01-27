@@ -6,6 +6,5 @@ package com.junwoo.hamkke.domain.dial.dto.event;
  * @date 26. 1. 26.
  */
 public record RoomSessionAdvancedEvent(
-        Long roomId,
-        int currentSession
+        Long roomId
 ) {}
