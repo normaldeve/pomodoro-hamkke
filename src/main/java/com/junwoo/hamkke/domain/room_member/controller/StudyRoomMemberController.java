@@ -1,10 +1,14 @@
 package com.junwoo.hamkke.domain.room_member.controller;
 
+import com.junwoo.hamkke.domain.auth.security.userdetail.CustomUserDetails;
 import com.junwoo.hamkke.domain.room_member.dto.StudyRoomMemberResponse;
+import com.junwoo.hamkke.domain.room_member.service.FocusTimeService;
 import com.junwoo.hamkke.domain.room_member.service.StudyRoomMemberService;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,6 +24,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class StudyRoomMemberController {
 
+    private final FocusTimeService focusTimeService;
     private final StudyRoomMemberService studyRoomMemberService;
 
     @GetMapping("{roomId}")
@@ -27,5 +32,15 @@ public class StudyRoomMemberController {
             @PathVariable Long roomId
     ) {
         return ResponseEntity.ok(studyRoomMemberService.getStudyRoomMembers(roomId));
+    }
+
+    @GetMapping("/{roomId}/focus-time/total")
+    public ResponseEntity<Integer> getTodayRoomFocusTime(
+            @PathVariable Long roomId,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        Long userId = userDetails.getUser().id();
+
+        return ResponseEntity.ok(focusTimeService.getTodayRoomFocusTime(userId, roomId));
     }
 }

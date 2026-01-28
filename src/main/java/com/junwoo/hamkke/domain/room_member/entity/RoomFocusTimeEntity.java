@@ -13,20 +13,26 @@ import java.time.LocalDate;
  * @author junnukim1007gmail.com
  * @date 26. 1. 27.
  */
-@Getter
-@Builder
 @Entity
 @Table(
-        name = "daily_focus_time",
+        name = "room_focus_time",
         uniqueConstraints = {
-                @UniqueConstraint(columnNames = {"user_id", "focus_date"})
+                @UniqueConstraint(columnNames = {
+                        "user_id",
+                        "study_room_id",
+                        "focus_date"
+                })
         }
 )
+@Getter
+@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class DailyFocusTimeEntity extends BaseEntity {
+public class RoomFocusTimeEntity extends BaseEntity {
 
     private Long userId;
+
+    private Long studyRoomId;
 
     private LocalDate focusDate;
 

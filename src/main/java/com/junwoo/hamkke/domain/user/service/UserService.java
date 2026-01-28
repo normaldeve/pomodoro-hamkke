@@ -54,11 +54,14 @@ public class UserService {
         );
     }
 
-    public String updateProfile(Long userId, MultipartFile file) {
+    public UserInfo updateUserInfo(Long userId, MultipartFile file, String nickname) {
         UserEntity user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserException(ErrorCode.CANNOT_FOUND_USER));
 
-        String newImageUrl = imageUploader.upload(file, ImageDirectory.PROFILE);
+        String newImageUrl = null;
+        if (file != null && !file.isEmpty()) {
+            newImageUrl = imageUploader.upload(file, ImageDirectory.PROFILE);
+        }
 
         if (user.getProfileUrl() != null && !user.getProfileUrl().isEmpty()) {
             try {
@@ -68,11 +71,11 @@ public class UserService {
             }
         }
 
-        user.updateProfile(newImageUrl);
+        user.updateInfo(nickname, newImageUrl);
 
         log.info("[UserService] 프로필 이미지 변경 - userId: {}, imageUrl: {}", userId, newImageUrl);
 
-        return newImageUrl;
+        return UserInfo.from(user);
     }
 
     @Transactional(readOnly = true)

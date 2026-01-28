@@ -2,9 +2,9 @@ package com.junwoo.hamkke.domain.room_member.listener;
 
 import com.junwoo.hamkke.domain.dial.dto.event.FocusTimeFinishedEvent;
 import com.junwoo.hamkke.domain.dial.dto.event.FocusTimeStartedEvent;
-import com.junwoo.hamkke.domain.room_member.entity.DailyFocusTimeEntity;
+import com.junwoo.hamkke.domain.room_member.entity.RoomFocusTimeEntity;
 import com.junwoo.hamkke.domain.room_member.entity.StudyRoomMemberEntity;
-import com.junwoo.hamkke.domain.room_member.repository.DailyFocusTimeRepository;
+import com.junwoo.hamkke.domain.room_member.repository.RoomFocusTimeRepository;
 import com.junwoo.hamkke.domain.room_member.repository.StudyRoomMemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +27,7 @@ import java.util.Objects;
 public class FocusTimeTrackingListener {
 
     private final StudyRoomMemberRepository memberRepository;
-    private final DailyFocusTimeRepository dailyFocusTimeRepository;
+    private final RoomFocusTimeRepository roomFocusTimeRepository;
 
     @EventListener
     @Transactional
@@ -50,14 +50,15 @@ public class FocusTimeTrackingListener {
             if (!Objects.equals(member.getCurrentSessionId(), event.currentSessionId())) {
                 continue;
             }
-            DailyFocusTimeEntity dailyFocusTime = dailyFocusTimeRepository.findByUserIdAndFocusDate(member.getUserId(), today)
-                    .orElseGet(() -> DailyFocusTimeEntity.builder()
+            RoomFocusTimeEntity roomFocusTime = roomFocusTimeRepository.findByUserIdAndStudyRoomIdAndFocusDate(member.getUserId(), event.roomId(), today)
+                    .orElseGet(() -> RoomFocusTimeEntity.builder()
                             .userId(member.getUserId())
+                            .studyRoomId(event.roomId())
                             .focusDate(today)
                             .totalFocusMinutes(0)
                             .build());
-            dailyFocusTime.addMinutes(event.focusTime());
-            dailyFocusTimeRepository.save(dailyFocusTime);
+            roomFocusTime.addMinutes(event.focusTime());
+            roomFocusTimeRepository.save(roomFocusTime);
         }
 
         log.info("[FocusTimeTrackingListener] onFocusPhaseEnd() : 방에 있는 사용자 집중 시간 누적 완료 - roomId: {}, focusTime: {}", event.roomId(), event.focusTime());
