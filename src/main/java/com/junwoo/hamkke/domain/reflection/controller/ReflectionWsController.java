@@ -1,24 +1,15 @@
 package com.junwoo.hamkke.domain.reflection.controller;
 
-import com.junwoo.hamkke.domain.auth.security.userdetail.CustomUserDetails;
 import com.junwoo.hamkke.domain.reflection.dto.CreateReflectionRequest;
-import com.junwoo.hamkke.domain.reflection.dto.CreateReflectionResponse;
+import com.junwoo.hamkke.domain.reflection.dto.ReflectionResponse;
 import com.junwoo.hamkke.domain.reflection.service.ReflectionService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.awt.*;
 
 /**
  *
@@ -39,7 +30,7 @@ public class ReflectionWsController {
             @Payload CreateReflectionRequest request
     ) {
 
-        CreateReflectionResponse response = reflectionService.createReflection(roomId, request);
+        ReflectionResponse response = reflectionService.createReflection(roomId, request);
 
         try {
             messagingTemplate.convertAndSend(
