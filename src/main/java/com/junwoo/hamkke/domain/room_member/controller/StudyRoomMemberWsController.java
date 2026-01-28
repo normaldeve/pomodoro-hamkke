@@ -1,5 +1,6 @@
 package com.junwoo.hamkke.domain.room_member.controller;
 
+import com.junwoo.hamkke.common.websocket.WebSocketDestination;
 import com.junwoo.hamkke.domain.room_member.dto.EnterStudyRoomRequest;
 import com.junwoo.hamkke.domain.room_member.dto.ParticipantMemberInfo;
 import com.junwoo.hamkke.domain.room_member.service.StudyRoomMemberService;
@@ -35,7 +36,7 @@ public class StudyRoomMemberWsController {
         Optional<ParticipantMemberInfo> response = studyRoomMemberService.enterRoom(roomId, request.userId(), request);
 
         try {
-            messagingTemplate.convertAndSend("/topic/study-room/" + roomId + "/members", response);
+            messagingTemplate.convertAndSend(WebSocketDestination.member(roomId), response);
         } catch (Exception e) {
             log.error("[WS] 사용자 방 입장 전송 실패 roomId={}", roomId, e);
         }
@@ -50,7 +51,7 @@ public class StudyRoomMemberWsController {
         studyRoomMemberService.leaveRoom(roomId, userId);
 
         try {
-            messagingTemplate.convertAndSend("/topic/study-room/" + roomId + "/members", userId);
+            messagingTemplate.convertAndSend(WebSocketDestination.member(roomId), userId);
         } catch (Exception e) {
             log.error("[WS] 사용자 방 떠나기 실패 userId = {}", userId, e);
         }

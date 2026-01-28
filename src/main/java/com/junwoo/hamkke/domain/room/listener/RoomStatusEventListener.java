@@ -1,6 +1,7 @@
 package com.junwoo.hamkke.domain.room.listener;
 
 import com.junwoo.hamkke.common.exception.ErrorCode;
+import com.junwoo.hamkke.common.websocket.WebSocketDestination;
 import com.junwoo.hamkke.domain.dial.dto.event.TimerPhaseChangeEvent;
 import com.junwoo.hamkke.domain.room.entity.RoomStatus;
 import com.junwoo.hamkke.domain.room.entity.StudyRoomEntity;
@@ -46,6 +47,6 @@ public class RoomStatusEventListener {
 
         log.info("[RoomStatusEventListener] handle() : 방 상태를 변경 완료했습니다 - roomId: {}, status: {}", room.getId(), newStatus);
 
-        messagingTemplate.convertAndSend("/topic/study-room/" + room.getId() + "/status", newStatus);
+        messagingTemplate.convertAndSend(WebSocketDestination.roomStatus(room.getId()), newStatus);
     }
 }

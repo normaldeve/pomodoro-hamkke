@@ -6,5 +6,5 @@ package com.junwoo.hamkke.domain.image;
  * @date 26. 1. 21.
  */
 public enum ImageDirectory {
-    PROFILE, MESSAGE, SERVER
+    REFLECTION, PROFILE
 }

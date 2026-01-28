@@ -1,5 +1,6 @@
 package com.junwoo.hamkke.domain.dial.service;
 
+import com.junwoo.hamkke.common.websocket.WebSocketDestination;
 import com.junwoo.hamkke.domain.dial.dto.TimerPhase;
 import com.junwoo.hamkke.domain.dial.dto.event.*;
 import com.junwoo.hamkke.domain.dial.dto.TimerStartRequest;
@@ -61,6 +62,7 @@ public class TimerStateService {
     private void onFocusFinished(TimerState state) {
         log.info("[TimerStateService] onFocusFinished() : 집중 종료 - roomId: {}", state.getRoomId());
         eventPublisher.publishEvent(new FocusTimeFinishedEvent(state.getRoomId(), state.getDefaultFocusMinutes(), state.getCurrentSession()));
+        eventPublisher.publishEvent(new ReflectionCreateEvent(state.getRoomId(), state.getCurrentSession()));
         if (state.getCurrentSession() >= state.getTotalSessions()) {
             finishTimer(state);
             return;
@@ -192,7 +194,7 @@ public class TimerStateService {
     private void broadcast(TimerState state) {
         try {
             log.info("[TimerStateService] broadcast() : 웹소켓을 통해 데이터를 전달합니다 - roomId: {}, state: {}", state.getRoomId(), state);
-            messagingTemplate.convertAndSend("/topic/study-room/" + state.getRoomId() + "/timer", state);
+            messagingTemplate.convertAndSend(WebSocketDestination.timer(state.getRoomId()), state);
         } catch (Exception e) {
             log.error("[WS] 타이머 상태 전송 실패");
         }

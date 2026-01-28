@@ -1,7 +1,6 @@
 package com.junwoo.hamkke.domain.message.controller;
 
-import com.junwoo.hamkke.domain.auth.dto.AuthDTO;
-import com.junwoo.hamkke.domain.auth.security.userdetail.CustomUserDetails;
+import com.junwoo.hamkke.common.websocket.WebSocketDestination;
 import com.junwoo.hamkke.domain.message.dto.MessageResponse;
 import com.junwoo.hamkke.domain.message.dto.SendMessageRequest;
 import com.junwoo.hamkke.domain.message.service.MessageService;
@@ -37,7 +36,7 @@ public class MessageController {
         MessageResponse response = messageService.sendMessage(roomId, request, senderId);
 
         try {
-            messagingTemplate.convertAndSend("/topic/study-room/" + roomId + "/messages", response);
+            messagingTemplate.convertAndSend(WebSocketDestination.message(roomId), response);
         } catch (Exception e) {
             log.error("[WS] Message 전송 실패 error: {}", e.getMessage(), e);
         }

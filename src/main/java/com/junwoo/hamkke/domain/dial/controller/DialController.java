@@ -1,14 +1,12 @@
 package com.junwoo.hamkke.domain.dial.controller;
 
-import com.junwoo.hamkke.domain.auth.security.userdetail.CustomUserDetails;
+import com.junwoo.hamkke.common.websocket.WebSocketDestination;
 import com.junwoo.hamkke.domain.dial.dto.DialDragMessage;
-import com.junwoo.hamkke.domain.dial.dto.TimerStartRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
@@ -30,10 +28,7 @@ public class DialController {
             @Payload DialDragMessage message
     ) {
         try {
-            messagingTemplate.convertAndSend(
-                    "/topic/study-room/" + roomId + "/timer",
-                    message
-            );
+            messagingTemplate.convertAndSend(WebSocketDestination.timer(roomId), message);
         } catch (Exception e) {
             log.error("다이얼 드래그 메시지 처리 실패: roomId={}, error={}", roomId, e.getMessage(), e);
         }

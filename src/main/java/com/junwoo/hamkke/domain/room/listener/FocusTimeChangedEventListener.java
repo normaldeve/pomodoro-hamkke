@@ -1,6 +1,7 @@
 package com.junwoo.hamkke.domain.room.listener;
 
 import com.junwoo.hamkke.common.exception.ErrorCode;
+import com.junwoo.hamkke.common.websocket.WebSocketDestination;
 import com.junwoo.hamkke.domain.dial.dto.event.FocusTimeChangedEvent;
 import com.junwoo.hamkke.domain.room.entity.StudyRoomEntity;
 import com.junwoo.hamkke.domain.room.exception.StudyRoomException;
@@ -34,6 +35,6 @@ public class FocusTimeChangedEventListener {
 
         room.changeFocusMinutes(event.focusTime());
 
-        messagingTemplate.convertAndSend("/topic/study-room/" + room.getId() + "/focus-time",  event.focusTime());
+        messagingTemplate.convertAndSend(WebSocketDestination.focusTime(event.roomId()),  event.focusTime());
     }
 }

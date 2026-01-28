@@ -1,9 +1,7 @@
 package com.junwoo.hamkke.domain.room_member.listener;
 
-import com.junwoo.hamkke.domain.dial.dto.TimerPhase;
 import com.junwoo.hamkke.domain.dial.dto.event.FocusTimeFinishedEvent;
 import com.junwoo.hamkke.domain.dial.dto.event.FocusTimeStartedEvent;
-import com.junwoo.hamkke.domain.dial.dto.event.TimerPhaseChangeEvent;
 import com.junwoo.hamkke.domain.room_member.entity.DailyFocusTimeEntity;
 import com.junwoo.hamkke.domain.room_member.entity.StudyRoomMemberEntity;
 import com.junwoo.hamkke.domain.room_member.repository.DailyFocusTimeRepository;
@@ -13,15 +11,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.event.TransactionPhase;
-import org.springframework.transaction.event.TransactionalEventListener;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 
 /**
- * [TODO] 이와 같은 방식으로 업데이트 시 문제가 발생하지는 않을까? -> 테스트 필요!!!!!
+ * [TODO] 아래와 같은 방식으로 사용자 필드 업데이트 시 문제가 발생하지는 않을까? -> 테스트 필요!!!!!
  * @author junnukim1007gmail.com
  * @date 26. 1. 27.
  */
