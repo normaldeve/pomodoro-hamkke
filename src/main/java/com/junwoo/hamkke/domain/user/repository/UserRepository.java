@@ -35,4 +35,6 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
             @Param("myId") Long myId,
             @Param("keyword") String keyword
     );
+
+    boolean existsByUsername(String username);
 }

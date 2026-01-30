@@ -32,3 +32,4 @@ cloud:
 admin:
   id: ${ADMIN_ID}
   password: ${ADMIN_PASSWORD}
+  nickname: ${ADMIN_NICKNAME}
