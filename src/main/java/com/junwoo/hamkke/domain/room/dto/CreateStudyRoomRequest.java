@@ -1,7 +1,6 @@
 package com.junwoo.hamkke.domain.room.dto;
 
-import com.junwoo.hamkke.common.exception.ErrorCode;
-import com.junwoo.hamkke.domain.room.exception.StudyRoomException;
+import com.junwoo.hamkke.domain.room.entity.TimerType;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -20,9 +19,6 @@ public record CreateStudyRoomRequest(
 
         Set<String> hashtags,
 
-        @NotBlank(message = "스터디에 대한 간단한 설명 부탁드려요:)")
-        String description,
-
         @Min(value = 1, message = "쉬는 시간은 1분보다 작을 수 없어요 :)") @Max(value = 15, message = "쉬는 시간은 15분이 최대에요 :)")
         int breakMinutes,
 
@@ -34,7 +30,9 @@ public record CreateStudyRoomRequest(
 
         boolean secret,
 
-        String password
+        String password,
+
+        TimerType timerType
 ) {
 
 }

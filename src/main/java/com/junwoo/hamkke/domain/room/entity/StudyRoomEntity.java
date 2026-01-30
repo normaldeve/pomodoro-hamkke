@@ -6,6 +6,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Min;
 import lombok.*;
 
 import java.util.Set;
@@ -24,7 +25,6 @@ import java.util.Set;
 public class StudyRoomEntity extends UpdatableBaseEntity {
 
     private String title;
-    private String description;
     private Set<String> hashtags;
 
     private int focusMinutes;
@@ -32,11 +32,15 @@ public class StudyRoomEntity extends UpdatableBaseEntity {
     private int currentSession;
     private int totalSessions;
 
+    @Min(value = 0, message = "현재 참여 인원은 0 이상이어야 합니다.")
     private int currentParticipants;
     private int maxParticipants;
 
     private boolean secret;
     private String password;
+
+    @Enumerated(EnumType.STRING)
+    private TimerType timerType;
 
     private Long hostId;
 
@@ -46,7 +50,6 @@ public class StudyRoomEntity extends UpdatableBaseEntity {
     public static StudyRoomEntity createRoom(Long hostId, CreateStudyRoomRequest request) {
         return StudyRoomEntity.builder()
                 .title(request.title())
-                .description(request.description())
                 .hashtags(request.hashtags())
                 .focusMinutes(0)
                 .breakMinutes(request.breakMinutes())
@@ -57,6 +60,7 @@ public class StudyRoomEntity extends UpdatableBaseEntity {
                 .password(request.password())
                 .hostId(hostId)
                 .status(RoomStatus.WAITING)
+                .timerType(request.timerType())
                 .build();
     }
 

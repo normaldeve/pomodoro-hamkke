@@ -2,6 +2,7 @@ package com.junwoo.hamkke.domain.room.dto;
 
 import com.junwoo.hamkke.domain.room.entity.RoomStatus;
 import com.junwoo.hamkke.domain.room.entity.StudyRoomEntity;
+import com.junwoo.hamkke.domain.room.entity.TimerType;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
@@ -16,7 +17,6 @@ import java.util.Set;
 public record StudyRoomResponse(
         Long roomId,
         String title,
-        String description,
         Set<String> hashtags,
         int focusMinutes,
         int breakMinutes,
@@ -27,6 +27,7 @@ public record StudyRoomResponse(
         boolean secret,
         Long hostId,
         RoomStatus status,
+        TimerType timerType,
         LocalDateTime createdAt
 ) {
 
@@ -34,7 +35,6 @@ public record StudyRoomResponse(
         return StudyRoomResponse.builder()
                 .roomId(room.getId())
                 .title(room.getTitle())
-                .description(room.getDescription())
                 .hashtags(room.getHashtags())
                 .currentSession(room.getCurrentSession())
                 .focusMinutes(room.getFocusMinutes())
@@ -45,6 +45,7 @@ public record StudyRoomResponse(
                 .secret(room.isSecret())
                 .hostId(room.getHostId())
                 .status(room.getStatus())
+                .timerType(room.getTimerType())
                 .createdAt(room.getCreatedAt())
                 .build();
     }
