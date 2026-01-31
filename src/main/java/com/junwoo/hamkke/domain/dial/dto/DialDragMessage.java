@@ -1,7 +1,6 @@
 package com.junwoo.hamkke.domain.dial.dto;
 
 import lombok.Data;
-import lombok.Getter;
 
 import java.time.LocalDateTime;
 
