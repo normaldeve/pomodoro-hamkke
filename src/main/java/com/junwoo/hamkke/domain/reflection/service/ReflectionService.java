@@ -42,7 +42,7 @@ public class ReflectionService {
                 .sessionId(saved.getSessionId())
                 .userId(saved.getUserId())
                 .content(saved.getContent())
-                .username(user.getUsername())
+                .nickname(user.getNickname())
                 .userProfileUrl(user.getProfileUrl())
                 .focusScore(saved.getFocusScore())
                 .imageUrl(saved.getImageUrl())

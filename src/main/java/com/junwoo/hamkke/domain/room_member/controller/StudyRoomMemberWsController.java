@@ -12,10 +12,8 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
-import java.util.Optional;
-
 /**
- *
+ * [TODO] 웹 소켓 메시지 전역 예외 처리 필요
  * @author junnukim1007gmail.com
  * @date 26. 1. 26.
  */
@@ -33,7 +31,7 @@ public class StudyRoomMemberWsController {
             @Payload EnterStudyRoomRequest request
     ) {
 
-        Optional<ParticipantMemberInfo> response = studyRoomMemberService.enterRoom(roomId, request.userId(), request);
+        ParticipantMemberInfo response = studyRoomMemberService.enterRoom(roomId, request.userId(), request);
 
         try {
             messagingTemplate.convertAndSend(WebSocketDestination.member(roomId), response);

@@ -22,4 +22,5 @@ public interface StudyRoomMemberRepository extends JpaRepository<StudyRoomMember
 
     List<StudyRoomMemberEntity> findAllByStudyRoomId(Long roomId);
 
+    boolean existsByUserId(Long userId);
 }

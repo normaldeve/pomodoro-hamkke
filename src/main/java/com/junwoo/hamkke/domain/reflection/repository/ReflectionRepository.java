@@ -21,7 +21,7 @@ public interface ReflectionRepository extends JpaRepository<ReflectionEntity, Lo
         r.sessionId,
         u.id,
         r.content,
-        u.username,
+        u.nickname,
         u.profileUrl,
         r.focusScore,
         r.imageUrl,

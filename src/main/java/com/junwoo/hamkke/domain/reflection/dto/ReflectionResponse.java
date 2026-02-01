@@ -15,7 +15,7 @@ public record ReflectionResponse(
         Long sessionId,
         Long userId,
         String content,
-        String username,
+        String nickname,
         String userProfileUrl,
         Integer focusScore,
         String imageUrl,

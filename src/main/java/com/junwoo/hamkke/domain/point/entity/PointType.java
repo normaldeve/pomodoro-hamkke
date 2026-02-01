@@ -6,5 +6,5 @@ package com.junwoo.hamkke.domain.point.entity;
  * @date 26. 1. 31.
  */
 public enum PointType {
-    STUDY, REFLECTION, STUDY_BONUS, BREAK, ATTENDANCE, STUDY_GOAL
+    STUDY_FOCUS, STUDY_REFLECTION, STUDY_BONUS, STUDY_BREAK, ATTENDANCE, STUDY_GOAL
 }
