@@ -93,6 +93,8 @@ public class StudyRoomMemberService {
         return ParticipantMemberInfo.from(user);
     }
 
+    // [TODO] 방에 남은 사용자가 없다면 방이 삭제되어야 한다.
+    // 방에 사용자가 남아 있다면 방장 권한을 넘겨주어야 한다.
     public void leaveRoom(Long roomId, Long userId) {
 
         StudyRoomEntity room = studyRoomRepository.findById(roomId)
