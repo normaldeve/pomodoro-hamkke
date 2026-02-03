@@ -2,12 +2,11 @@ package com.junwoo.hamkke.domain.room.entity;
 
 import com.junwoo.hamkke.common.entity.UpdatableBaseEntity;
 import com.junwoo.hamkke.domain.room.dto.CreateStudyRoomRequest;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.util.Set;
 
@@ -25,6 +24,9 @@ import java.util.Set;
 public class StudyRoomEntity extends UpdatableBaseEntity {
 
     private String title;
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "hashtags", columnDefinition = "JSON")
     private Set<String> hashtags;
 
     private int focusMinutes;
