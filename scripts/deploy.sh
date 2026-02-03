@@ -43,7 +43,7 @@ for i in {1..60}; do
         echo "=== 애플리케이션 로그 ==="
         docker compose logs --tail=100 $NEW_ACTIVE
         echo "=== Flyway 마이그레이션 로그 확인 ==="
-        docker exec mysql mysql -u root -p${MYSQL_ROOT_PASSWORD} -e "SELECT * FROM ${DB_NAME}.flyway_schema_history ORDER BY installed_rank DESC LIMIT 5;"
+        docker exec mysql mysql -u root -p${MYSQL_ROOT_PASSWORD} --silent -e "SELECT * FROM ${DB_NAME}.flyway_schema_history ORDER BY installed_rank DESC LIMIT 5;" 2>/dev/null || echo "Could not fetch Flyway history"
         docker compose stop $NEW_ACTIVE
         exit 1
     fi
@@ -54,7 +54,7 @@ done
 
 # Flyway 마이그레이션 상태 확인
 echo "=== Flyway 마이그레이션 상태 확인 ==="
-docker exec mysql mysql -u root -p${MYSQL_ROOT_PASSWORD} -e "SELECT installed_rank, version, description, success FROM ${DB_NAME}.flyway_schema_history ORDER BY installed_rank;"
+docker exec mysql mysql -u root -p${MYSQL_ROOT_PASSWORD} --silent -e "SELECT installed_rank, version, description, success FROM ${DB_NAME}.flyway_schema_history ORDER BY installed_rank;" 2>/dev/null || echo "Flyway history check skipped"
 
 # Nginx 설정 변경
 echo "Nginx 설정 변경 중..."
