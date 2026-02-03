@@ -13,24 +13,13 @@ services:
   blue:
     image: ${DOCKER_USERNAME}/hamkke:${IMAGE_TAG:-latest}
     container_name: blue
+    networks:
+      app-network:
+        aliases:
+          - backend
     environment:
       - SPRING_PROFILES_ACTIVE=prod
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/${DB_NAME}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
-      - SPRING_DATASOURCE_USERNAME=${DB_USERNAME}
-      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
-      - AWS_ACCESS_KEY=${AWS_ACCESS_KEY}
-      - AWS_SECRET_KEY=${AWS_SECRET_KEY}
-      - AWS_REGION=${AWS_REGION}
-      - AWS_S3_BUCKET=${AWS_S3_BUCKET}
-      - JWT_SECRET=${JWT_SECRET}
-      - JWT_ACCESS_TOKEN_VALIDITY=${JWT_ACCESS_TOKEN_VALIDITY}
-      - JWT_REFRESH_TOKEN_VALIDITY=${JWT_REFRESH_TOKEN_VALIDITY}
-      - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS}
-      - ADMIN_ID=${ADMIN_ID}
-      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
-      - ADMIN_NICKNAME=${ADMIN_NICKNAME}
-    networks:
-      - app-network
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/${DB_NAME}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul
     depends_on:
       mysql:
         condition: service_healthy
@@ -39,24 +28,13 @@ services:
   green:
     image: ${DOCKER_USERNAME}/hamkke:${IMAGE_TAG:-latest}
     container_name: green
+    networks:
+      app-network:
+        aliases:
+          - backend
     environment:
       - SPRING_PROFILES_ACTIVE=prod
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/${DB_NAME}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
-      - SPRING_DATASOURCE_USERNAME=${DB_USERNAME}
-      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
-      - AWS_ACCESS_KEY=${AWS_ACCESS_KEY}
-      - AWS_SECRET_KEY=${AWS_SECRET_KEY}
-      - AWS_REGION=${AWS_REGION}
-      - AWS_S3_BUCKET=${AWS_S3_BUCKET}
-      - JWT_SECRET=${JWT_SECRET}
-      - JWT_ACCESS_TOKEN_VALIDITY=${JWT_ACCESS_TOKEN_VALIDITY}
-      - JWT_REFRESH_TOKEN_VALIDITY=${JWT_REFRESH_TOKEN_VALIDITY}
-      - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS}
-      - ADMIN_ID=${ADMIN_ID}
-      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
-      - ADMIN_NICKNAME=${ADMIN_NICKNAME}
-    networks:
-      - app-network
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/${DB_NAME}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul
     depends_on:
       mysql:
         condition: service_healthy
