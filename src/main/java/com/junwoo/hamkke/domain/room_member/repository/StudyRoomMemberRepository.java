@@ -37,4 +37,6 @@ public interface StudyRoomMemberRepository extends JpaRepository<StudyRoomMember
                         LIMIT 1
             """)
     Optional<StudyRoomMemberEntity> findOldestMember(@Param("roomId") Long roomId);
+
+    Optional<StudyRoomMemberEntity> findByUserId(Long userId);
 }

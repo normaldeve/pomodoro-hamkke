@@ -1,6 +1,7 @@
 package com.junwoo.hamkke.domain.room_member.listener;
 
 import com.junwoo.hamkke.common.exception.ErrorCode;
+import com.junwoo.hamkke.common.websocket.WebSocketConnectionTracker;
 import com.junwoo.hamkke.common.websocket.WebSocketDestination;
 import com.junwoo.hamkke.domain.dial.service.TimerStateService;
 import com.junwoo.hamkke.domain.room.entity.RoomStatus;
@@ -32,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class RoomMemberEventListener {
 
+    private final WebSocketConnectionTracker connectionTracker;
     private final StudyRoomRepository studyRoomRepository;
     private final StudyRoomMemberService studyRoomMemberService;
     private final UserRepository userRepository;
@@ -44,6 +46,9 @@ public class RoomMemberEventListener {
     public void onMemberLeft(MemberLeftRoomEvent event) {
         log.info("[RoomMemberEventListener] onMemberLeft() - roomId: {}, userId: {}, wasHost: {}, remainingMembers: {}",
                 event.roomId(), event.userId(), event.wasHost(), event.remainingMembers());
+
+        // 멤버가 퇴장 시에 WebSocket 추적을 해제 합니다.
+        connectionTracker.onUserLeftRoom(event.userId());
 
         if (event.remainingMembers() == 0) {
             // 방에 사용자가 남아 있지 않는 경우 -> 방 삭제

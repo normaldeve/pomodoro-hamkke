@@ -12,6 +12,8 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
+import java.security.Principal;
+
 /**
  * [TODO] 웹 소켓 메시지 전역 예외 처리 필요
  * @author junnukim1007gmail.com

@@ -1,6 +1,7 @@
 package com.junwoo.hamkke.domain.room_member.controller;
 
 import com.junwoo.hamkke.domain.auth.security.userdetail.CustomUserDetails;
+import com.junwoo.hamkke.domain.room_member.dto.ParticipateRoomInfo;
 import com.junwoo.hamkke.domain.room_member.dto.StudyRoomMemberResponse;
 import com.junwoo.hamkke.domain.room_member.dto.TransferHostRequests;
 import com.junwoo.hamkke.domain.room_member.service.FocusTimeService;
@@ -14,6 +15,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  *
@@ -51,11 +53,23 @@ public class StudyRoomMemberController {
             @PathVariable Long roomId,
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @Valid @RequestBody TransferHostRequests request
-            ) {
+    ) {
 
         Long currentHostId = userDetails.getUser().id();
         studyRoomMemberService.transferHost(roomId, currentHostId, request);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/me/participate")
+    public ResponseEntity<ParticipateRoomInfo> getParticipateRoomInfo(
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        Long userId = userDetails.getUser().id();
+
+        Optional<ParticipateRoomInfo> participateRoomInfo = studyRoomMemberService.getParticipateRoomInfo(userId);
+
+        return ResponseEntity.ok(participateRoomInfo.orElse(null));
+
     }
 }

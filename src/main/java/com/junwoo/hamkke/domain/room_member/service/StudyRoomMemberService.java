@@ -1,11 +1,8 @@
 package com.junwoo.hamkke.domain.room_member.service;
 
 import com.junwoo.hamkke.common.exception.ErrorCode;
-import com.junwoo.hamkke.domain.room_member.dto.EnterStudyRoomRequest;
-import com.junwoo.hamkke.domain.room_member.dto.ParticipantMemberInfo;
-import com.junwoo.hamkke.domain.room_member.dto.StudyRoomMemberResponse;
+import com.junwoo.hamkke.domain.room_member.dto.*;
 import com.junwoo.hamkke.domain.room.entity.StudyRoomEntity;
-import com.junwoo.hamkke.domain.room_member.dto.TransferHostRequests;
 import com.junwoo.hamkke.domain.room_member.dto.event.HostTransferredEvent;
 import com.junwoo.hamkke.domain.room_member.dto.event.MemberLeftRoomEvent;
 import com.junwoo.hamkke.domain.room_member.entity.StudyRoomMemberEntity;
@@ -99,7 +96,6 @@ public class StudyRoomMemberService {
         return ParticipantMemberInfo.from(user);
     }
 
-    // [TODO] 방에 남은 사용자가 없다면 방이 삭제되어야 한다.
     // 방에 사용자가 남아 있다면 방장 권한을 넘겨주어야 한다.
     public void leaveRoom(Long roomId, Long userId) {
 
@@ -168,5 +164,36 @@ public class StudyRoomMemberService {
                 roomId, oldestMember.getUserId());
 
         eventPublisher.publishEvent(new HostTransferredEvent(roomId, previousHostId, oldestMember.getUserId(), true));
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<ParticipateRoomInfo> getParticipateRoomInfo(Long userId) {
+
+        log.info("[StudyRoomMemberService] getCurrentRoom() : 사용자가 참여 중인 방 조회 - userId: {}", userId);
+
+        // 사용자가 참여 중인 방 조회
+        Optional<StudyRoomMemberEntity> memberOpt = studyRoomMemberRepository.findByUserId(userId);
+
+        if (memberOpt.isEmpty()) {
+            log.info("[StudyRoomMemberService] getCurrentRoom() : 참여 중인 방 없음 - userId: {}", userId);
+            return Optional.empty();
+        }
+
+        StudyRoomMemberEntity member = memberOpt.get();
+
+        // 방 정보 조회
+        StudyRoomEntity room = studyRoomRepository.findById(member.getStudyRoomId())
+                .orElseThrow(() -> new StudyRoomException(ErrorCode.CANNOT_FOUND_ROOM));
+
+        ParticipateRoomInfo response = ParticipateRoomInfo.builder()
+                .lastRoomId(room.getId())
+                .role(member.getRole())
+                .lastRoomJointAt(member.getCreatedAt())
+                .build();
+
+        log.info("[StudyRoomMemberService] getCurrentRoom() : 현재 참여 중인 방 정보 반환 - userId: {}, roomId: {}, role: {}",
+                userId, room.getId(), member.getRole());
+
+        return Optional.of(response);
     }
 }
