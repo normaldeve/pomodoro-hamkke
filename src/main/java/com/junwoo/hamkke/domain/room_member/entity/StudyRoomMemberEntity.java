@@ -54,4 +54,16 @@ public class StudyRoomMemberEntity extends BaseEntity {
     public void markParticipating(int currentSessionId) {
         this.currentSessionId = currentSessionId;
     }
+
+    public void promoteToHost() {
+        this.role = RoomMemberRole.HOST;
+    }
+
+    public void demoteToMember() {
+        this.role = RoomMemberRole.MEMBER;
+    }
+
+    public boolean isHost() {
+        return this.role == RoomMemberRole.HOST;
+    }
 }

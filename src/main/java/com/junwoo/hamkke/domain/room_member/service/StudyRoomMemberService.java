@@ -5,6 +5,9 @@ import com.junwoo.hamkke.domain.room_member.dto.EnterStudyRoomRequest;
 import com.junwoo.hamkke.domain.room_member.dto.ParticipantMemberInfo;
 import com.junwoo.hamkke.domain.room_member.dto.StudyRoomMemberResponse;
 import com.junwoo.hamkke.domain.room.entity.StudyRoomEntity;
+import com.junwoo.hamkke.domain.room_member.dto.TransferHostRequests;
+import com.junwoo.hamkke.domain.room_member.dto.event.HostTransferredEvent;
+import com.junwoo.hamkke.domain.room_member.dto.event.MemberLeftRoomEvent;
 import com.junwoo.hamkke.domain.room_member.entity.StudyRoomMemberEntity;
 import com.junwoo.hamkke.domain.room.exception.StudyRoomException;
 import com.junwoo.hamkke.domain.room_member.repository.StudyRoomMemberRepository;
@@ -13,11 +16,13 @@ import com.junwoo.hamkke.domain.user.entity.UserEntity;
 import com.junwoo.hamkke.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -35,6 +40,7 @@ public class StudyRoomMemberService {
     private final UserRepository userRepository;
     private final StudyRoomRepository studyRoomRepository;
     private final StudyRoomMemberRepository studyRoomMemberRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional(readOnly = true)
     public List<StudyRoomMemberResponse> getStudyRoomMembers(Long roomId) {
@@ -70,6 +76,7 @@ public class StudyRoomMemberService {
         UserEntity user = userRepository.findById(userId)
                 .orElseThrow(() -> new StudyRoomException(ErrorCode.CANNOT_FOUND_USER));
 
+        // [TODO]동시성 문제를 해결하기 위해 비관적 락을 사용 -> 테스트 코드로 검증하기
         StudyRoomEntity room = studyRoomRepository.findByIdForUpdate(roomId)
                 .orElseThrow(() -> new StudyRoomException(ErrorCode.CANNOT_FOUND_ROOM));
 
@@ -84,8 +91,7 @@ public class StudyRoomMemberService {
             throw new StudyRoomException(ErrorCode.ROOM_CAPACITY_EXCEEDED);
         }
 
-        StudyRoomMemberEntity member =
-                StudyRoomMemberEntity.registerMember(roomId, userId);
+        StudyRoomMemberEntity member = StudyRoomMemberEntity.registerMember(roomId, userId);
 
         studyRoomMemberRepository.save(member);
         room.addCurrentParticipant();
@@ -100,8 +106,67 @@ public class StudyRoomMemberService {
         StudyRoomEntity room = studyRoomRepository.findById(roomId)
                 .orElseThrow(() -> new StudyRoomException(ErrorCode.CANNOT_FOUND_ROOM));
 
-        room.removeCurrentParticipant();
+        StudyRoomMemberEntity leavingMember = studyRoomMemberRepository.findByStudyRoomIdAndUserId(roomId, userId)
+                .orElseThrow(() -> new StudyRoomException(ErrorCode.CANNOT_FOUND_USER));
+
+        boolean isHost = leavingMember.isHost();
 
         studyRoomMemberRepository.deleteByStudyRoomIdAndUserId(roomId, userId);
+        room.removeCurrentParticipant();
+
+        long remainingMembers = studyRoomMemberRepository.countByStudyRoomId(roomId);
+
+        log.info("[StudyRoomMemberService] 사용자가 방을 나갔습니다 - roomId: {}, userId: {}, isHost: {}, remainingMembers: {}",
+                roomId, userId, isHost, remainingMembers);
+
+        eventPublisher.publishEvent(new MemberLeftRoomEvent(roomId, userId, isHost, remainingMembers));
+    }
+
+    public void transferHost(Long roomId, Long currentHostId, TransferHostRequests request) {
+
+        if (currentHostId.equals(request.targetUserId())) {
+            throw new StudyRoomException(ErrorCode.CANNOT_TRANSFER_HOST_TO_SELF);
+        }
+
+        StudyRoomEntity room = studyRoomRepository.findById(roomId)
+                .orElseThrow(() -> new StudyRoomException(ErrorCode.CANNOT_FOUND_ROOM));
+
+        StudyRoomMemberEntity currentHost = studyRoomMemberRepository.findByStudyRoomIdAndUserId(roomId, currentHostId)
+                .orElseThrow(() -> new StudyRoomException(ErrorCode.CANNOT_FOUND_USER));
+
+        if (!currentHost.isHost()) {
+            throw new StudyRoomException(ErrorCode.ONLY_HOST_CAN_TRANSFER);
+        }
+
+        StudyRoomMemberEntity targetMember = studyRoomMemberRepository.findByStudyRoomIdAndUserId(roomId, request.targetUserId())
+                .orElseThrow(() -> new StudyRoomException(ErrorCode.CANNOT_FOUND_USER));
+
+        currentHost.demoteToMember();
+        targetMember.promoteToHost();
+        room.transferHost(request.targetUserId());
+
+        log.info("[StudyRoomMemberService] 방장 권한 수동 위임 - roomId: {}, from: {}, to: {}",
+                roomId, currentHostId, request.targetUserId());
+
+        eventPublisher.publishEvent(new HostTransferredEvent(roomId, currentHostId, request.targetUserId(), false));
+    }
+
+    // 가장 먼저 들어온 멤버에게 방장 권한을 자동 위임
+    public void transferHostToOldestMember(Long roomId) {
+        StudyRoomEntity room = studyRoomRepository.findById(roomId)
+                .orElseThrow(() -> new StudyRoomException(ErrorCode.CANNOT_FOUND_ROOM));
+
+        StudyRoomMemberEntity oldestMember = studyRoomMemberRepository.findOldestMember(roomId)
+                .orElseThrow(() -> new StudyRoomException(ErrorCode.CANNOT_TRANSFER_HOST_TO_SELF));
+
+        Long previousHostId = room.getHostId();
+
+        oldestMember.promoteToHost();
+        room.transferHost(oldestMember.getUserId());
+
+        log.info("[StudyRoomMemberService] 방장 권한 자동 위임 - roomId: {}, newHostId: {}",
+                roomId, oldestMember.getUserId());
+
+        eventPublisher.publishEvent(new HostTransferredEvent(roomId, previousHostId, oldestMember.getUserId(), true));
     }
 }

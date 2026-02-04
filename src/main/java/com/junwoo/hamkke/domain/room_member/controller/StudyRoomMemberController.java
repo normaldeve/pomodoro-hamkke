@@ -2,8 +2,10 @@ package com.junwoo.hamkke.domain.room_member.controller;
 
 import com.junwoo.hamkke.domain.auth.security.userdetail.CustomUserDetails;
 import com.junwoo.hamkke.domain.room_member.dto.StudyRoomMemberResponse;
+import com.junwoo.hamkke.domain.room_member.dto.TransferHostRequests;
 import com.junwoo.hamkke.domain.room_member.service.FocusTimeService;
 import com.junwoo.hamkke.domain.room_member.service.StudyRoomMemberService;
+import jakarta.validation.Valid;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,5 +44,18 @@ public class StudyRoomMemberController {
         Long userId = userDetails.getUser().id();
 
         return ResponseEntity.ok(focusTimeService.getTodayRoomFocusTime(userId, roomId));
+    }
+
+    @PostMapping("/{roomId}/transfer-host")
+    public ResponseEntity<Void> transferHost(
+            @PathVariable Long roomId,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @Valid @RequestBody TransferHostRequests request
+            ) {
+
+        Long currentHostId = userDetails.getUser().id();
+        studyRoomMemberService.transferHost(roomId, currentHostId, request);
+
+        return ResponseEntity.noContent().build();
     }
 }

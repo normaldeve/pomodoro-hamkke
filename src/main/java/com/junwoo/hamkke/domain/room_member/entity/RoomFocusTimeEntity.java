@@ -9,7 +9,7 @@ import lombok.*;
 import java.time.LocalDate;
 
 /**
- *
+ * 방에서 사용자 별 학습 시간을 기록하는 엔티티
  * @author junnukim1007gmail.com
  * @date 26. 1. 27.
  */

@@ -191,6 +191,33 @@ public class TimerStateService {
         tasks.put(roomId, task);
     }
 
+    /**
+     * 방 삭제 시 타이머 완전 정리
+     * - 스케줄러 종료
+     * - 타이머 상태 제거
+     */
+    public void cleanupTimer(Long roomId) {
+        log.info("[TimerStateService] cleanupTimer() : 방 삭제로 인한 타이머 정리 시작 - roomId: {}", roomId);
+
+        // 스케줄러 종료
+        ScheduledFuture<?> task = tasks.remove(roomId);
+        if (task != null) {
+            boolean cancelled = task.cancel(false);
+            log.info("[TimerStateService] cleanupTimer() : 스케줄러 취소 - roomId: {}, cancelled: {}", roomId, cancelled);
+        }
+
+        // 타이머 상태 제거
+        TimerState removedState = timerState.remove(roomId);
+        if (removedState != null) {
+            log.info("[TimerStateService] cleanupTimer() : 타이머 상태 제거 완료 - roomId: {}, phase: {}, running: {}",
+                    roomId, removedState.getPhase(), removedState.isRunning());
+        } else {
+            log.info("[TimerStateService] cleanupTimer() : 타이머 상태 없음 (이미 종료되었거나 시작 안함) - roomId: {}", roomId);
+        }
+
+        log.info("[TimerStateService] cleanupTimer() : 타이머 정리 완료 - roomId: {}", roomId);
+    }
+
     private void broadcast(TimerState state) {
         try {
             log.info("[TimerStateService] broadcast() : 웹소켓을 통해 데이터를 전달합니다 - roomId: {}, state: {}", state.getRoomId(), state);

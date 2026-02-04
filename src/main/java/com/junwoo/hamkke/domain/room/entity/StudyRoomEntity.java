@@ -85,4 +85,8 @@ public class StudyRoomEntity extends UpdatableBaseEntity {
     public void finishSession() {
         this.currentSession++;
     }
+
+    public void transferHost(Long newHostId) {
+        this.hostId = newHostId;
+    }
 }

@@ -32,7 +32,13 @@ public enum ErrorCode {
     ROOM_CAPACITY_EXCEEDED(HttpStatus.CONFLICT.value(), "해당 스터디룸은 이미 인원이 가득 찼습니다."),
     SECRET_ROOM_PASSWORD_INVALID(HttpStatus.BAD_REQUEST.value(), "비밀방 비밀번호가 잘못되었습니다"),
     CANNOT_FOUND_ROOM(HttpStatus.NOT_FOUND.value(), "스터디룸을 찾을 수 없습니다"),
-    SECRET_ROOM_NEED_PASSWORD(HttpStatus.BAD_REQUEST.value(), "비밀방은 비밀번호 입력이 필수입니다");
+    SECRET_ROOM_NEED_PASSWORD(HttpStatus.BAD_REQUEST.value(), "비밀방은 비밀번호 입력이 필수입니다"),
+
+    CANNOT_TRANSFER_HOST_TO_SELF(HttpStatus.BAD_REQUEST.value(), "자기 자신에게 방장 권한을 위임할 수 없습니다"),
+    ONLY_HOST_CAN_TRANSFER(HttpStatus.FORBIDDEN.value(), "방장만 권한을 위임할 수 있습니다"),
+    TARGET_USER_NOT_IN_ROOM(HttpStatus.BAD_REQUEST.value(), "대상 사용자가 방에 없습니다"),
+    CANNOT_DELETE_ACTIVE_ROOM(HttpStatus.CONFLICT.value(), "진행 중인 방은 삭제할 수 없습니다");
+
     private final int code;
     private final String message;
 
