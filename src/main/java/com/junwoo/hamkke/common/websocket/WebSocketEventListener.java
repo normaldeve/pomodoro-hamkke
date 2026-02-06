@@ -1,13 +1,11 @@
-// WebSocketEventListener.java
 package com.junwoo.hamkke.common.websocket;
 
 import com.junwoo.hamkke.domain.auth.security.userdetail.CustomUserDetails;
-import com.junwoo.hamkke.domain.room_member.service.StudyRoomMemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionConnectEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
@@ -34,14 +32,14 @@ public class WebSocketEventListener {
     public void handleWebSocketConnect(SessionConnectEvent event) {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
         String sessionId = headerAccessor.getSessionId();
-        Principal principal = headerAccessor.getUser();
+        Authentication authentication = (Authentication) headerAccessor.getUser();
 
-        if (principal == null) {
-            log.warn("[WebSocket] 연결 - 인증되지 않은 사용자 - sessionId: {}", sessionId);
+        if (authentication == null || !(authentication.getPrincipal() instanceof CustomUserDetails userDetails)) {
+            log.warn("[WebSocket] 인증 정보 없음");
             return;
         }
 
-        Long userId = extractUserId(principal);
+        Long userId = userDetails.getUser().id();
 
         if (userId == null) {
             log.error("[WebSocket] userId 추출 실패 - sessionId: {}", sessionId);
@@ -61,14 +59,14 @@ public class WebSocketEventListener {
     public void handleWebSocketDisconnect(SessionDisconnectEvent event) {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
         String sessionId = headerAccessor.getSessionId();
-        Principal principal = headerAccessor.getUser();
+        Authentication authentication = (Authentication) headerAccessor.getUser();
 
-        if (principal == null) {
-            log.debug("[WebSocket] 연결 해제 - 인증되지 않은 사용자 - sessionId: {}", sessionId);
+        if (authentication == null || !(authentication.getPrincipal() instanceof CustomUserDetails userDetails)) {
+            log.warn("[WebSocket] 인증 정보 없음");
             return;
         }
 
-        Long userId = extractUserId(principal);
+        Long userId = userDetails.getUser().id();
 
         if (userId == null) {
             log.error("[WebSocket] userId 추출 실패 - sessionId: {}", sessionId);
@@ -88,44 +86,20 @@ public class WebSocketEventListener {
     public void handleSubscribe(SessionSubscribeEvent event) {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
         String destination = headerAccessor.getDestination();
-        Principal principal = headerAccessor.getUser();
+        Authentication authentication = (Authentication) headerAccessor.getUser();
 
-        if (principal == null || destination == null) {
+        if (authentication == null || !(authentication.getPrincipal() instanceof CustomUserDetails userDetails)) {
+            log.warn("[WebSocket] 인증 정보 없음");
             return;
         }
 
-        Long userId = extractUserId(principal);
+        Long userId = userDetails.getUser().id();
         Long roomId = extractRoomIdFromDestination(destination);
 
         if (userId != null && roomId != null) {
             log.info("[WebSocket] 방 구독 - userId: {}, roomId: {}, destination: {}",
                     userId, roomId, destination);
             connectionTracker.onUserJoinedRoom(userId, roomId);
-        }
-    }
-
-    /**
-     * Principal에서 userId 추출
-     */
-    private Long extractUserId(Principal principal) {
-        try {
-            // Principal이 UsernamePasswordAuthenticationToken인 경우
-            if (principal instanceof UsernamePasswordAuthenticationToken auth) {
-                Object principalObj = auth.getPrincipal();
-
-                // CustomUserDetails에서 추출
-                if (principalObj instanceof CustomUserDetails userDetails) {
-                    return userDetails.getUser().id();
-                }
-            }
-
-            // 그 외의 경우 (혹시 모를 대비)
-            log.warn("[WebSocket] 예상치 못한 Principal 타입: {}", principal.getClass().getName());
-            return null;
-
-        } catch (Exception e) {
-            log.error("[WebSocket] userId 추출 중 오류: {}", e.getMessage());
-            return null;
         }
     }
 

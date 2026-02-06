@@ -1,5 +1,6 @@
 package com.junwoo.hamkke.domain.reflection.controller;
 
+import com.junwoo.hamkke.domain.auth.security.userdetail.CustomUserDetails;
 import com.junwoo.hamkke.domain.reflection.dto.CreateReflectionRequest;
 import com.junwoo.hamkke.domain.reflection.dto.ReflectionResponse;
 import com.junwoo.hamkke.domain.reflection.service.ReflectionService;
@@ -9,7 +10,10 @@ import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
+
+import java.security.Principal;
 
 /**
  *
@@ -27,10 +31,14 @@ public class ReflectionWsController {
     @MessageMapping("/study-room/{roomId}/reflection")
     public void createReflection(
             @DestinationVariable Long roomId,
-            @Payload CreateReflectionRequest request
-    ) {
+            @Payload CreateReflectionRequest request,
+            Principal principal
+            ) {
 
-        ReflectionResponse response = reflectionService.createReflection(roomId, request);
+        Authentication authentication = (Authentication) principal;
+        Long userId = ((CustomUserDetails) authentication.getPrincipal()).getUser().id();
+
+        ReflectionResponse response = reflectionService.createReflection(roomId, userId, request);
 
         try {
             messagingTemplate.convertAndSend(
@@ -41,6 +49,6 @@ public class ReflectionWsController {
             log.error("[WS] Reflection 전송 실패 error: {}", e.getMessage(), e);
         }
 
-        log.info("[WS] 회고 전송 - roomId={}, userId={}", roomId,request.userId());
+        log.info("[WS] 회고 전송 - roomId={}, userId={}", roomId, userId);
     }
 }

@@ -6,7 +6,6 @@ package com.junwoo.hamkke.domain.reflection.dto;
  * @date 26. 1. 28.
  */
 public record CreateReflectionRequest(
-        Long userId,
         Long sessionId,
         String content,
         Integer focusScore,

@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  *
@@ -28,13 +27,13 @@ public class ReflectionService {
     private final UserRepository userRepository;
     private final ReflectionRepository reflectionRepository;
 
-    public ReflectionResponse createReflection(Long roomId, CreateReflectionRequest request) {
+    public ReflectionResponse createReflection(Long roomId, Long userId, CreateReflectionRequest request) {
 
-        ReflectionEntity reflection = ReflectionEntity.createReflection(roomId, request.userId(), request.sessionId(), request.imageUrl(), request.content(), request.focusScore());
+        ReflectionEntity reflection = ReflectionEntity.createReflection(roomId, userId, request.sessionId(), request.imageUrl(), request.content(), request.focusScore());
 
         ReflectionEntity saved = reflectionRepository.save(reflection);
 
-        UserEntity user = userRepository.findById((request.userId()))
+        UserEntity user = userRepository.findById((userId))
                 .orElseThrow(() -> new UserException(ErrorCode.CANNOT_FOUND_USER));
 
         return ReflectionResponse.builder()

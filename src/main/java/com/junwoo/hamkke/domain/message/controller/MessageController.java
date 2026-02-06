@@ -1,6 +1,7 @@
 package com.junwoo.hamkke.domain.message.controller;
 
 import com.junwoo.hamkke.common.websocket.WebSocketDestination;
+import com.junwoo.hamkke.domain.auth.security.userdetail.CustomUserDetails;
 import com.junwoo.hamkke.domain.message.dto.MessageResponse;
 import com.junwoo.hamkke.domain.message.dto.SendMessageRequest;
 import com.junwoo.hamkke.domain.message.service.MessageService;
@@ -10,7 +11,10 @@ import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
+
+import java.security.Principal;
 
 /**
  *
@@ -28,10 +32,12 @@ public class MessageController {
     @MessageMapping("/study-room/{roomId}/messages")
     public void sendChannelMessage(
             @DestinationVariable Long roomId,
-            @Payload SendMessageRequest request
+            @Payload SendMessageRequest request,
+            Principal principal
     ) {
 
-        Long senderId = request.senderId();
+        Authentication authentication = (Authentication) principal;
+        Long senderId = ((CustomUserDetails) authentication.getPrincipal()).getUser().id();
 
         MessageResponse response = messageService.sendMessage(roomId, request, senderId);
 
