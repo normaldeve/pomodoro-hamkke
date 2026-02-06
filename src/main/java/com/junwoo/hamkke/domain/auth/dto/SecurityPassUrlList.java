@@ -20,6 +20,7 @@ public final class SecurityPassUrlList {
             "/api/notifications/**",
             "/api/study/all",
             "/actuator/health",
-            "/api/auth/me"
+            "/api/auth/me",
+            "/api/reflections/image"
     };
 }
