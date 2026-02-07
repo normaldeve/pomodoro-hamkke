@@ -21,6 +21,7 @@ public final class SecurityPassUrlList {
             "/api/study/all",
             "/actuator/health",
             "/api/auth/me",
-            "/api/reflections/image"
+            "/api/reflections/image",
+            "/api/study/permanent",
     };
 }

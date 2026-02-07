@@ -49,6 +49,9 @@ public class StudyRoomEntity extends UpdatableBaseEntity {
     @Enumerated(EnumType.STRING)
     private RoomStatus status;
 
+    // 상시 운영 방 여부
+    private boolean permanent;
+
     public static StudyRoomEntity createRoom(Long hostId, CreateStudyRoomRequest request) {
         return StudyRoomEntity.builder()
                 .title(request.title())
@@ -63,6 +66,32 @@ public class StudyRoomEntity extends UpdatableBaseEntity {
                 .hostId(hostId)
                 .status(RoomStatus.WAITING)
                 .timerType(request.timerType())
+                .permanent(false)
+                .build();
+    }
+
+    public static StudyRoomEntity createPermanentRoom(
+            String title,
+            int focusMinutes,
+            int breakMinutes,
+            TimerType timerType,
+            Set<String> hashtags
+    ) {
+        return StudyRoomEntity.builder()
+                .title(title)
+                .hashtags(hashtags)
+                .focusMinutes(focusMinutes)
+                .breakMinutes(breakMinutes)
+                .currentSession(1)
+                .totalSessions(Integer.MAX_VALUE) // 무한 반복
+                .currentParticipants(0)
+                .maxParticipants(100) // 충분히 큰 값
+                .secret(false)
+                .password(null)
+                .hostId(0L) // 시스템 방
+                .status(RoomStatus.WAITING)
+                .timerType(timerType)
+                .permanent(true)
                 .build();
     }
 

@@ -40,4 +40,27 @@ public class TimerState {
                 .phaseStartTime(System.currentTimeMillis())
                 .build();
     }
+
+    // 상시 운영 방용 정각 기준 타이머 생성
+    public static TimerState createPermanent(
+            Long roomId,
+            int focusMinutes,
+            int breakMinutes,
+            TimerPhase phase,
+            int remainingSeconds,
+            long phaseStartTime
+    ) {
+        return TimerState.builder()
+                .roomId(roomId)
+                .phase(phase)
+                .phaseDurationSeconds(phase == TimerPhase.FOCUS ? focusMinutes * 60 : breakMinutes * 60)
+                .remainingSeconds(remainingSeconds)
+                .defaultFocusMinutes(focusMinutes)
+                .defaultBreakMinutes(breakMinutes)
+                .totalSessions(Integer.MAX_VALUE)
+                .currentSession(1)
+                .running(true)
+                .phaseStartTime(phaseStartTime)
+                .build();
+    }
 }

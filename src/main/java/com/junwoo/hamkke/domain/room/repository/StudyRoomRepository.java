@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -23,5 +24,12 @@ public interface StudyRoomRepository extends JpaRepository<StudyRoomEntity, Long
     @Query("select r from StudyRoomEntity r where r.id = :roomId")
     Optional<StudyRoomEntity> findByIdForUpdate(@Param("roomId") Long roomId);
 
-    Page<StudyRoomEntity> findByStatusNot(RoomStatus status, Pageable pageable);
+    // 일반 방 조회 (상시 운영 방 제외)
+    Page<StudyRoomEntity> findByStatusNotAndPermanentFalse(RoomStatus status, Pageable pageable);
+
+    // 상시 운영 방 조회
+    List<StudyRoomEntity> findByPermanentTrue();
+
+    // 상시 운영 방 존재 여부
+    boolean existsByPermanentTrue();
 }

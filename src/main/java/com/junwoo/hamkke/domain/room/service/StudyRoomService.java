@@ -18,11 +18,14 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 /**
  *
  * @author junnukim1007gmail.com
  * @date 26. 1. 24.
  */
+// StudyRoomService.java 수정
 @Slf4j
 @Service
 @Transactional
@@ -46,7 +49,6 @@ public class StudyRoomService {
         savedRoom.addCurrentParticipant();
 
         return StudyRoomResponse.from(savedRoom);
-
     }
 
     @Transactional(readOnly = true)
@@ -58,14 +60,26 @@ public class StudyRoomService {
                 Sort.by("createdAt").descending()
         );
 
+        // 일반 방만 조회 (상시 운영 방 제외)
         return studyRoomRepository
-                .findByStatusNot(RoomStatus.FINISHED, pageable)
+                .findByStatusNotAndPermanentFalse(RoomStatus.FINISHED, pageable)
                 .map(StudyRoomResponse::from);
     }
 
     @Transactional(readOnly = true)
-    public StudyRoomResponse getStudyRoom(Long roomId) {
-        return StudyRoomResponse.from(studyRoomRepository.findById(roomId).orElseThrow(() -> new StudyRoomException(ErrorCode.CANNOT_FOUND_ROOM)));
+    public List<StudyRoomResponse> getPermanentRooms() {
+
+        // 상시 운영 방만 조회
+        return studyRoomRepository.findByPermanentTrue().stream()
+                .map(StudyRoomResponse::from)
+                .toList();
     }
 
+    @Transactional(readOnly = true)
+    public StudyRoomResponse getStudyRoom(Long roomId) {
+        return StudyRoomResponse.from(
+                studyRoomRepository.findById(roomId)
+                        .orElseThrow(() -> new StudyRoomException(ErrorCode.CANNOT_FOUND_ROOM))
+        );
+    }
 }

@@ -57,6 +57,7 @@ public class StudyRoomMemberService {
                 ).toList();
     }
 
+    // StudyRoomMemberService.java 일부 수정
     public ParticipantMemberInfo enterRoom(Long roomId, Long userId, EnterStudyRoomRequest request) {
 
         // 이미 입장한 멤버인지 확인
@@ -73,11 +74,12 @@ public class StudyRoomMemberService {
         UserEntity user = userRepository.findById(userId)
                 .orElseThrow(() -> new StudyRoomException(ErrorCode.CANNOT_FOUND_USER));
 
-        // [TODO]동시성 문제를 해결하기 위해 비관적 락을 사용 -> 테스트 코드로 검증하기
+        // [TODO] 사용자 수 동시성 문제를 위해 비관적 락 적용 테스트 코드 필요
         StudyRoomEntity room = studyRoomRepository.findByIdForUpdate(roomId)
                 .orElseThrow(() -> new StudyRoomException(ErrorCode.CANNOT_FOUND_ROOM));
 
-        if (room.isSecret()) {
+        // 상시 운영 방이 아닐 때만 비밀번호 확인
+        if (!room.isPermanent() && room.isSecret()) {
             if (request == null || request.password() == null ||
                     !request.password().equals(room.getPassword())) {
                 throw new StudyRoomException(ErrorCode.SECRET_ROOM_PASSWORD_INVALID);
@@ -88,6 +90,7 @@ public class StudyRoomMemberService {
             throw new StudyRoomException(ErrorCode.ROOM_CAPACITY_EXCEEDED);
         }
 
+        // 상시 운영 방은 모두 MEMBER로 등록 (HOST 없음)
         StudyRoomMemberEntity member = StudyRoomMemberEntity.registerMember(roomId, userId);
 
         studyRoomMemberRepository.save(member);

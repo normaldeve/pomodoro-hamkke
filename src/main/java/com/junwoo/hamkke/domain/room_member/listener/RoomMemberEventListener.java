@@ -28,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author junnukim1007gmail.com
  * @date 26. 2. 4.
  */
+// RoomMemberEventListener.java 수정
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -51,7 +52,7 @@ public class RoomMemberEventListener {
         connectionTracker.onUserLeftRoom(event.userId());
 
         if (event.remainingMembers() == 0) {
-            // 방에 사용자가 남아 있지 않는 경우 -> 방 삭제
+            // 방에 사용자가 남아 있지 않는 경우 -> 방 삭제 (상시 운영 방 제외)
             eventPublisher.publishEvent(new RoomEmptiedEvent(event.roomId(), event.userId()));
         } else if (event.wasHost()) {
             // 방장이 나갔지만 다른 멤버가 있는 경우 -> 방장 권한 위임
@@ -67,6 +68,13 @@ public class RoomMemberEventListener {
 
         StudyRoomEntity room = studyRoomRepository.findById(event.roomId())
                 .orElseThrow(() -> new StudyRoomException(ErrorCode.CANNOT_FOUND_ROOM));
+
+        // 상시 운영 방은 삭제하지 않고 계속 운영
+        if (room.isPermanent()) {
+            log.info("[RoomMemberEventListener] 상시 운영 방은 참여자가 0명이 되어도 계속 운영됩니다 - roomId: {}",
+                    event.roomId());
+            return;
+        }
 
         RoomStatus previousStatus = room.getStatus();
         room.changeStatus(RoomStatus.FINISHED);

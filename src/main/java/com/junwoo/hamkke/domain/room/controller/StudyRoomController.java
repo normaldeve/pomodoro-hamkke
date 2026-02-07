@@ -13,6 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  *
  * @author junnukim1007gmail.com
@@ -56,5 +58,10 @@ public class StudyRoomController {
     ) {
 
         return ResponseEntity.ok(studyRoomService.getStudyRoom(roomId));
+    }
+
+    @GetMapping("/permanent")
+    public ResponseEntity<List<StudyRoomResponse>> getPermanentRooms() {
+        return ResponseEntity.ok(studyRoomService.getPermanentRooms());
     }
 }
