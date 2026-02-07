@@ -58,27 +58,27 @@ public class PermanentRoomInitializer implements ApplicationRunner {
      */
     private void createPermanentRooms() {
         createAndStartPermanentRoom(
-                "🍅 뽀모도로 25분 입문",
+                "🍅 짧게짧게 공부하는 게 좋다면 여기예요!",
                 25, 5, TimerType.POMODORO,
-                Set.of("가볍게시작", "25분집중")
+                Set.of("시작이반이다")
         );
 
         createAndStartPermanentRoom(
-                "⚡ 집중력 UP 55분",
+                "⏳ 한 번 시작하면, 1시간은 공부해야죠",
                 55, 5, TimerType.POMODORO,
-                Set.of("55분몰입", "집중모드")
+                Set.of("중간은없다")
         );
 
         createAndStartPermanentRoom(
-                "🎯 몰입 도전 80분",
+                "🔥 이 방에 들어오려면, 마음의 준비는 필수예요",
                 80, 10, TimerType.FLIP,
-                Set.of("딥포커스", "80분집중")
+                Set.of("각오완료")
         );
 
         createAndStartPermanentRoom(
-                "🏆 끝까지 완주 110분",
+                "🏆 한 번 시작하면, 끝을 보는 스타일입니다",
                 110, 10, TimerType.FLIP,
-                Set.of("끝까지가자", "110분몰입")
+                Set.of("끝까지가자")
         );
     }
 
