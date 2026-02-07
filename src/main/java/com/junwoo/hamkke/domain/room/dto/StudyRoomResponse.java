@@ -28,6 +28,7 @@ public record StudyRoomResponse(
         Long hostId,
         RoomStatus status,
         TimerType timerType,
+        boolean isPermanent,
         LocalDateTime createdAt
 ) {
 
@@ -46,6 +47,7 @@ public record StudyRoomResponse(
                 .hostId(room.getHostId())
                 .status(room.getStatus())
                 .timerType(room.getTimerType())
+                .isPermanent(room.isPermanent())
                 .createdAt(room.getCreatedAt())
                 .build();
     }
