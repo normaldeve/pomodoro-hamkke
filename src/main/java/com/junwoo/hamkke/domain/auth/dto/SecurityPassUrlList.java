@@ -23,5 +23,6 @@ public final class SecurityPassUrlList {
             "/api/auth/me",
             "/api/reflections/image",
             "/api/study/permanent",
+            "/actuator/prometheus"
     };
 }
