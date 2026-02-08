@@ -35,6 +35,9 @@ public enum ErrorCode {
     CANNOT_FOUND_ROOM(HttpStatus.NOT_FOUND.value(), "스터디룸을 찾을 수 없습니다"),
     SECRET_ROOM_NEED_PASSWORD(HttpStatus.BAD_REQUEST.value(), "비밀방은 비밀번호 입력이 필수입니다"),
 
+    PLAN_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "계획을 찾을 수 없습니다"),
+    INVALID_INPUT_VALUE(HttpStatus.BAD_REQUEST.value(), "유효하지 않은 입력값입니다"),
+
     CANNOT_TRANSFER_HOST_TO_SELF(HttpStatus.BAD_REQUEST.value(), "자기 자신에게 방장 권한을 위임할 수 없습니다"),
     ONLY_HOST_CAN_TRANSFER(HttpStatus.FORBIDDEN.value(), "방장만 권한을 위임할 수 있습니다"),
     TARGET_USER_NOT_IN_ROOM(HttpStatus.BAD_REQUEST.value(), "대상 사용자가 방에 없습니다"),
