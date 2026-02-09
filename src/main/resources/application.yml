@@ -7,29 +7,3 @@ spring:
 
   config:
     import: optional:file:.env[.properties]
-
-  datasource:
-    url: ${DB_URL}
-    username: ${DB_USER_NAME}
-    password: ${DB_PASSWORD}
-    driver-class-name: com.mysql.cj.jdbc.Driver
-
-cors:
-  allowed-origins: ${FRONTEND_ORIGIN}
-
-cloud:
-  aws:
-    credentials:
-      access-key: ${AWS_ACCESS_KEY}
-      secret-key: ${AWS_SECRET_KEY}
-    region:
-      static: ap-northeast-2
-    stack:
-      auto: false
-    s3:
-      bucket: ${AWS_S3_BUCKET}
-
-admin:
-  id: ${ADMIN_ID}
-  password: ${ADMIN_PASSWORD}
-  nickname: ${ADMIN_NICKNAME}

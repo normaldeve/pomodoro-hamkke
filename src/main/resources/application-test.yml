@@ -21,3 +21,23 @@ jwt:
 logging:
   level:
     root: warn
+
+cors:
+  allowed-origins: localhost:3000
+
+cloud:
+  aws:
+    credentials:
+      access-key: test
+      secret-key: test
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false
+    s3:
+      bucket: test
+
+admin:
+  id: test
+  password: test
+  nickname: test

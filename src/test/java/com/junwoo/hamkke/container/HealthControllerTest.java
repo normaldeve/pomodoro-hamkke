@@ -14,7 +14,7 @@ class ApplicationIT extends IntegrationTest {
     UserRepository userRepository;
 
     @Test
-    void find_posts_by_title_containing_with_trim() {
+    void save_user_test() {
         UserEntity user = UserEntity.builder()
                 .username("test")
                 .build();
