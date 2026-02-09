@@ -14,7 +14,7 @@ spring:
       enabled: true
 
 jwt:
-  secret: ${JWT_SECRET}
+  secret: test-jwt-secret-key-for-hs256-32bytes!
   access-token-validity: 60000
   refresh-token-validity: 120000
 
