@@ -107,6 +107,9 @@ DROP COLUMN study_room_id;
    ========================================================= */
 
 ALTER TABLE study_room
+    MODIFY id BIGINT NOT NULL;
+
+ALTER TABLE study_room
 DROP PRIMARY KEY;
 
 ALTER TABLE study_room
