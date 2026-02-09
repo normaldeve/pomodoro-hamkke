@@ -1,17 +1,10 @@
 spring:
   datasource:
-    url: jdbc:h2:mem:testdb;MODE=MySQL
-    driver-class-name: org.h2.Driver
-    username: sa
-    password:
-
+    url: jdbc:tc:mysql:8.0.32:///test
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
   jpa:
     hibernate:
       ddl-auto: create-drop
-    properties:
-      hibernate:
-        format_sql: false
-        show_sql: false
 
   flyway:
     enabled: false
