@@ -68,3 +68,7 @@ cloud:
       auto: false
     s3:
       bucket: ${AWS_S3_BUCKET}
+
+discord:
+  webhook:
+    url: ${DISCORD_WEBHOOK_URL}

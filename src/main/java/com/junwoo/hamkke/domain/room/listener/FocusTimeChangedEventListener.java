@@ -1,17 +1,31 @@
 package com.junwoo.hamkke.domain.room.listener;
 
+import com.junwoo.hamkke.common.discord.DiscordNotifier;
 import com.junwoo.hamkke.common.exception.ErrorCode;
 import com.junwoo.hamkke.common.websocket.WebSocketDestination;
 import com.junwoo.hamkke.domain.dial.dto.event.FocusTimeChangedEvent;
+import com.junwoo.hamkke.domain.dial.dto.event.TimerPhaseChangeEvent;
 import com.junwoo.hamkke.domain.room.entity.StudyRoomEntity;
 import com.junwoo.hamkke.domain.room.exception.StudyRoomException;
 import com.junwoo.hamkke.domain.room.repository.StudyRoomRepository;
+import jakarta.persistence.OptimisticLockException;
+import jakarta.persistence.PessimisticLockException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.event.EventListener;
+import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Recover;
+import org.springframework.retry.annotation.Retryable;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
+
+import java.net.ConnectException;
+import java.net.SocketTimeoutException;
 
 /**
  *
@@ -25,9 +39,25 @@ public class FocusTimeChangedEventListener {
 
     private final SimpMessagingTemplate messagingTemplate;
     private final StudyRoomRepository studyRoomRepository;
+    private final DiscordNotifier discordNotifier;
 
-    @EventListener
-    @Transactional
+    @Async(value = "domainEventExecutor")
+    @TransactionalEventListener(
+            phase = TransactionPhase.AFTER_COMMIT,
+            fallbackExecution = true
+    )
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Retryable(
+            value = {
+                    OptimisticLockException.class,
+                    PessimisticLockException.class,
+                    CannotAcquireLockException.class,
+                    SocketTimeoutException.class,
+                    ConnectException.class
+            },
+            maxAttempts = 3,
+            backoff = @Backoff(delay = 100)
+    )
     public void handle(FocusTimeChangedEvent event) {
 
         StudyRoomEntity room = studyRoomRepository.findById(event.roomId())
@@ -36,5 +66,25 @@ public class FocusTimeChangedEventListener {
         room.changeFocusMinutes(event.focusTime());
 
         messagingTemplate.convertAndSend(WebSocketDestination.focusTime(event.roomId()),  event.focusTime());
+    }
+
+    @Recover
+    public void recover(
+            Exception e,
+            TimerPhaseChangeEvent event
+    ) {
+        discordNotifier.sendError(
+                "RoomStatusEventListener 재시도 실패",
+                """
+                roomId: %s
+                phase: %s
+                exception: %s
+                """.formatted(
+                        event.roomId(),
+                        event.phase(),
+                        e.getClass().getSimpleName()
+                )
+        );
+        log.error("[RoomStatusEventListener] 재시도 실패 - roomId={}, phase={}", event.roomId(), event.phase(), e);
     }
 }

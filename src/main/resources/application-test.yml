@@ -41,3 +41,7 @@ admin:
   id: test
   password: test
   nickname: test
+
+discord:
+  webhook:
+    url: test-discord-webhook-url

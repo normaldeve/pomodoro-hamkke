@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
 import java.util.UUID;
@@ -37,6 +38,7 @@ public class TimerStateService {
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(4);
 
     // 타이머 시작
+    @Transactional
     public void start(UUID roomId, TimerStartRequest request) {
         stop(roomId);
 

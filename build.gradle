@@ -67,6 +67,9 @@ dependencies {
     testImplementation 'org.testcontainers:junit-jupiter'
     testImplementation 'org.testcontainers:mysql'
     testImplementation 'org.testcontainers:jdbc'
+
+    // Retry
+    implementation 'org.springframework.retry:spring-retry'
 }
 
 tasks.named('test') {

@@ -2,6 +2,7 @@ package com.junwoo.hamkke.common;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
@@ -26,5 +27,4 @@ public class AsyncConfig {
         executor.initialize();
         return executor;
     }
-
 }

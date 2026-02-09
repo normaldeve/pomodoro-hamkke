@@ -4,6 +4,7 @@ import com.junwoo.hamkke.domain.dial.dto.NextFocusTimeUpdateRequest;
 import com.junwoo.hamkke.domain.dial.dto.TimerStartRequest;
 import com.junwoo.hamkke.domain.dial.service.TimerStateService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -16,6 +17,7 @@ import java.util.UUID;
  * @author junnukim1007gmail.com
  * @date 26. 1. 26.
  */
+@Slf4j
 @Controller
 @RequiredArgsConstructor
 public class TimerController {
@@ -27,8 +29,10 @@ public class TimerController {
             @DestinationVariable UUID roomId,
             @Payload TimerStartRequest request
     ) {
-
+        long start = System.currentTimeMillis();
         timerStateService.start(roomId, request);
+        long end = System.currentTimeMillis();
+        log.info("[타이머 시작 응답 시간] timer.start took {} ms", end - start);
     }
 
     @MessageMapping("/study-room/{roomId}/timer/pause")

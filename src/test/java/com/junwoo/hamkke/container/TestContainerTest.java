@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
 
-class ApplicationIT extends IntegrationTest {
+class TestContainerTest extends IntegrationTest {
 
     @Autowired
     UserRepository userRepository;

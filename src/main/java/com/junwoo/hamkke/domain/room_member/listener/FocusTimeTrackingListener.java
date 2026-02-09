@@ -1,19 +1,33 @@
 package com.junwoo.hamkke.domain.room_member.listener;
 
+import com.junwoo.hamkke.common.discord.DiscordNotifier;
 import com.junwoo.hamkke.domain.dial.dto.event.FocusTimeFinishedEvent;
 import com.junwoo.hamkke.domain.dial.dto.event.FocusTimeStartedEvent;
+import com.junwoo.hamkke.domain.dial.dto.event.TimerPhaseChangeEvent;
 import com.junwoo.hamkke.domain.room.entity.StudyRoomEntity;
 import com.junwoo.hamkke.domain.room.repository.StudyRoomRepository;
 import com.junwoo.hamkke.domain.room_member.entity.RoomFocusTimeEntity;
 import com.junwoo.hamkke.domain.room_member.entity.StudyRoomMemberEntity;
 import com.junwoo.hamkke.domain.room_member.repository.RoomFocusTimeRepository;
 import com.junwoo.hamkke.domain.room_member.repository.StudyRoomMemberRepository;
+import jakarta.persistence.OptimisticLockException;
+import jakarta.persistence.PessimisticLockException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
+import org.springframework.dao.CannotAcquireLockException;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Recover;
+import org.springframework.retry.annotation.Retryable;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 
+import java.net.ConnectException;
+import java.net.SocketTimeoutException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
@@ -32,6 +46,7 @@ public class FocusTimeTrackingListener {
     private final StudyRoomMemberRepository memberRepository;
     private final RoomFocusTimeRepository roomFocusTimeRepository;
     private final StudyRoomRepository studyRoomRepository;
+    private final DiscordNotifier discordNotifier;
 
     @EventListener
     @Transactional
@@ -78,8 +93,23 @@ public class FocusTimeTrackingListener {
                 event.roomId(), event.focusTime());
     }
 
-    @EventListener
-    @Transactional
+    @Async(value = "domainEventExecutor")
+    @TransactionalEventListener(
+            phase = TransactionPhase.AFTER_COMMIT,
+            fallbackExecution = true
+    )
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Retryable(
+            value = {
+                    OptimisticLockException.class,
+                    PessimisticLockException.class,
+                    CannotAcquireLockException.class,
+                    SocketTimeoutException.class,
+                    ConnectException.class
+            },
+            maxAttempts = 3,
+            backoff = @Backoff(delay = 100)
+    )
     public void onFocusPhaseStart(FocusTimeStartedEvent event) {
 
         log.info("[FocusTimeTracking] onFocusPhaseStart() : 집중 시간이 시작, 참여자 현재 세션 참여 상태로 변경 - currentSessionId: {}",
@@ -101,5 +131,25 @@ public class FocusTimeTrackingListener {
         for (StudyRoomMemberEntity member : members) {
             member.markParticipating(event.currentSessionId());
         }
+    }
+
+    @Recover
+    public void recover(
+            Exception e,
+            TimerPhaseChangeEvent event
+    ) {
+        discordNotifier.sendError(
+                "RoomStatusEventListener 재시도 실패",
+                """
+                roomId: %s
+                phase: %s
+                exception: %s
+                """.formatted(
+                        event.roomId(),
+                        event.phase(),
+                        e.getClass().getSimpleName()
+                )
+        );
+        log.error("[RoomStatusEventListener] 재시도 실패 - roomId={}, phase={}", event.roomId(), event.phase(), e);
     }
 }
