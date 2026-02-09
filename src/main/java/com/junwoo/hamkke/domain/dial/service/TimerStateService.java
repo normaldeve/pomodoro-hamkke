@@ -315,7 +315,7 @@ public class TimerStateService {
             if (state.getRemainingSeconds() <= 0) {
                 onPhaseFinished(state);
             }
-            broadcast(state);
+            broadcastWithOutLog(state);
         }, 1, 1, TimeUnit.SECONDS);
 
         tasks.put(roomId, task);
@@ -361,6 +361,14 @@ public class TimerStateService {
         try {
             log.info("[TimerStateService] broadcast() : 웹소켓을 통해 데이터를 전달합니다 - roomId: {}, state: {}",
                     state.getRoomId(), state);
+            messagingTemplate.convertAndSend(WebSocketDestination.timer(state.getRoomId()), state);
+        } catch (Exception e) {
+            log.error("[WS] 타이머 상태 전송 실패");
+        }
+    }
+
+    private void broadcastWithOutLog(TimerState state) {
+        try {
             messagingTemplate.convertAndSend(WebSocketDestination.timer(state.getRoomId()), state);
         } catch (Exception e) {
             log.error("[WS] 타이머 상태 전송 실패");

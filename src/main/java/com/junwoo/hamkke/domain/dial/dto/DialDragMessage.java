@@ -3,6 +3,7 @@ package com.junwoo.hamkke.domain.dial.dto;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  *
@@ -12,7 +13,7 @@ import java.time.LocalDateTime;
 @Data
 public class DialDragMessage {
     private DialDragType type;
-    private Long roomId;
+    private UUID roomId;
     private Integer minutes; // 1~60
     private LocalDateTime timestamp;
 

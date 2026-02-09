@@ -25,6 +25,6 @@ public class ReflectionEventListener {
 
         messagingTemplate.convertAndSend(WebSocketDestination.reflection(event.roomId()), event);
 
-        log.info("[ReflectionPromptEvent] onReflectionPrompt() WS 전송 - roomId={}, sessionId={}", event.roomId(), event.sessionId());
+        log.info("[ReflectionPromptEvent] onReflectionPrompt() 회고 작성 이벤트 WS 전송 - roomId={}, sessionId={}", event.roomId(), event.sessionId());
     }
 }
