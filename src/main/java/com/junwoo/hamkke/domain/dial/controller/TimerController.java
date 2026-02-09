@@ -7,8 +7,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Controller;
+
+import java.util.UUID;
 
 /**
  *
@@ -23,7 +24,7 @@ public class TimerController {
 
     @MessageMapping("/study-room/{roomId}/timer/start")
     public void startTimer(
-            @DestinationVariable Long roomId,
+            @DestinationVariable UUID roomId,
             @Payload TimerStartRequest request
     ) {
 
@@ -32,21 +33,21 @@ public class TimerController {
 
     @MessageMapping("/study-room/{roomId}/timer/pause")
     public void pauseTimer(
-            @DestinationVariable Long roomId
+            @DestinationVariable UUID roomId
     ) {
         timerStateService.pause(roomId);
     }
 
     @MessageMapping("/study-room/{roomId}/timer/resume")
     public void resumeTimer(
-            @DestinationVariable Long roomId
+            @DestinationVariable UUID roomId
     ) {
         timerStateService.resume(roomId);
     }
 
     @MessageMapping("/study-room/{roomId}/timer/next-focus")
     public void updateNextFocusTime(
-            @DestinationVariable Long roomId,
+            @DestinationVariable UUID roomId,
             @Payload NextFocusTimeUpdateRequest request
     ) {
 

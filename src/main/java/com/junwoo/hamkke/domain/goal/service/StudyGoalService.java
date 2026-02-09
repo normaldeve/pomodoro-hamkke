@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  *
@@ -34,7 +35,7 @@ public class StudyGoalService {
     private final StudyRoomRepository studyRoomRepository;
     private final StudyGoalRepository studyGoalRepository;
 
-    public StudyGoalResponse createGoal(Long roomId, Long userId, CreateStudyGoalRequest request) {
+    public StudyGoalResponse createGoal(UUID roomId, Long userId, CreateStudyGoalRequest request) {
 
         StudyRoomEntity studyRoom = studyRoomRepository.findById(roomId)
                 .orElseThrow(() -> new StudyRoomException(ErrorCode.CANNOT_FOUND_ROOM));
@@ -48,7 +49,7 @@ public class StudyGoalService {
     }
 
     @Transactional(readOnly = true)
-    public List<StudyGoalResponse> getMyGoals(Long roomId, Long userId) {
+    public List<StudyGoalResponse> getMyGoals(UUID roomId, Long userId) {
         return studyGoalRepository.findByStudyRoomIdAndUserId(roomId, userId)
                 .stream()
                 .map(StudyGoalResponse::from)

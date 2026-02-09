@@ -7,6 +7,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.*;
 
 /**
@@ -24,7 +25,7 @@ import java.util.concurrent.*;
 public class WebSocketConnectionTracker {
 
     // userId -> roomId 매핑
-    private final Map<Long, Long> userRoomMap = new ConcurrentHashMap<>();
+    private final Map<Long, UUID> userRoomMap = new ConcurrentHashMap<>();
 
     // userId -> 재연결 타이머 매핑
     private final Map<Long, ScheduledFuture<?>> disconnectTimers = new ConcurrentHashMap<>();
@@ -68,7 +69,7 @@ public class WebSocketConnectionTracker {
     /**
      * 사용자가 방에 입장했을 때 호출
      */
-    public void onUserJoinedRoom(Long userId, Long roomId) {
+    public void onUserJoinedRoom(Long userId, UUID roomId) {
         log.info("[ConnectionTracker] 사용자 방 입장 추적 시작 - userId: {}, roomId: {}", userId, roomId);
 
         userRoomMap.put(userId, roomId);
@@ -81,7 +82,7 @@ public class WebSocketConnectionTracker {
      * 사용자가 방에서 나갔을 때 호출
      */
     public void onUserLeftRoom(Long userId) {
-        Long roomId = userRoomMap.get(userId);
+        UUID roomId = userRoomMap.get(userId);
 
         if (roomId != null) {
             log.info("[ConnectionTracker] 사용자 방 퇴장 - userId: {}, roomId: {}", userId, roomId);
@@ -97,7 +98,7 @@ public class WebSocketConnectionTracker {
      * WebSocket 연결이 끊어졌을 때 호출
      */
     public void onWebSocketDisconnected(Long userId) {
-        Long roomId = userRoomMap.get(userId);
+        UUID roomId = userRoomMap.get(userId);
 
         if (roomId == null) {
             log.debug("[ConnectionTracker] 연결 종료 - 방에 참여 중이지 않은 사용자 - userId: {}", userId);
@@ -124,7 +125,7 @@ public class WebSocketConnectionTracker {
      * WebSocket 재연결 시 호출
      */
     public void onWebSocketReconnected(Long userId) {
-        Long roomId = userRoomMap.get(userId);
+        UUID roomId = userRoomMap.get(userId);
 
         if (roomId == null) {
             log.debug("[ConnectionTracker] 재연결 - 방에 참여 중이지 않은 사용자 - userId: {}", userId);
@@ -141,7 +142,7 @@ public class WebSocketConnectionTracker {
     /**
      * 자동 퇴장 처리
      */
-    private void handleAutoLeave(Long userId, Long roomId) {
+    private void handleAutoLeave(Long userId, UUID roomId) {
         try {
             // 타이머 제거
             disconnectTimers.remove(userId);

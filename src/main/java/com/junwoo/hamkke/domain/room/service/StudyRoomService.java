@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  *
@@ -76,7 +77,7 @@ public class StudyRoomService {
     }
 
     @Transactional(readOnly = true)
-    public StudyRoomResponse getStudyRoom(Long roomId) {
+    public StudyRoomResponse getStudyRoom(UUID roomId) {
         return StudyRoomResponse.from(
                 studyRoomRepository.findById(roomId)
                         .orElseThrow(() -> new StudyRoomException(ErrorCode.CANNOT_FOUND_ROOM))

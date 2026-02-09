@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 /**
  *
@@ -34,7 +35,7 @@ public interface ReflectionRepository extends JpaRepository<ReflectionEntity, Lo
     WHERE r.studyRoomId = :roomId
     ORDER BY r.createdAt ASC
     """)
-    List<ReflectionResponse> findRoomReflections(Long roomId);
+    List<ReflectionResponse> findRoomReflections(UUID roomId);
 
     // 특정 날짜의 회고 조회
     @Query("""

@@ -15,6 +15,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 
 import java.security.Principal;
+import java.util.UUID;
 
 /**
  * [TODO] 웹 소켓 메시지 전역 예외 처리 필요
@@ -31,7 +32,7 @@ public class StudyRoomMemberWsController {
 
     @MessageMapping("/study-room/{roomId}/members/enter")
     public void enterMember(
-            @DestinationVariable Long roomId,
+            @DestinationVariable UUID roomId,
             @Payload EnterStudyRoomRequest request,
             Principal principal
     ) {
@@ -50,7 +51,7 @@ public class StudyRoomMemberWsController {
 
     @MessageMapping("/study-room/{roomId}/members/exit")
     public void exitMember(
-            @DestinationVariable Long roomId,
+            @DestinationVariable UUID roomId,
             @Payload Long userId
     ) {
 

@@ -14,6 +14,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 
 import java.security.Principal;
+import java.util.UUID;
 
 /**
  *
@@ -30,7 +31,7 @@ public class ReflectionWsController {
 
     @MessageMapping("/study-room/{roomId}/reflection")
     public void createReflection(
-            @DestinationVariable Long roomId,
+            @DestinationVariable UUID roomId,
             @Payload CreateReflectionRequest request,
             Principal principal
             ) {

@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.UUID;
+
 /**
  *
  * @author junnukim1007gmail.com
@@ -13,7 +15,7 @@ import lombok.Setter;
 @Data
 @Builder
 public class TimerState {
-    private Long roomId;
+    private UUID roomId;
     private TimerPhase phase;
     private int phaseDurationSeconds;
     private int remainingSeconds;
@@ -26,7 +28,7 @@ public class TimerState {
     private boolean running;
     private long phaseStartTime;
 
-    public static TimerState createFocus(Long roomId, TimerStartRequest request) {
+    public static TimerState createFocus(UUID roomId, TimerStartRequest request) {
         return TimerState.builder()
                 .roomId(roomId)
                 .phase(TimerPhase.FOCUS)
@@ -43,7 +45,7 @@ public class TimerState {
 
     // 상시 운영 방용 정각 기준 타이머 생성
     public static TimerState createPermanent(
-            Long roomId,
+            UUID roomId,
             int focusMinutes,
             int breakMinutes,
             TimerPhase phase,

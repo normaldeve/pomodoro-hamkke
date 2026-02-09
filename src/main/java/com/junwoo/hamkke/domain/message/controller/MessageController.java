@@ -15,6 +15,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 
 import java.security.Principal;
+import java.util.UUID;
 
 /**
  *
@@ -31,7 +32,7 @@ public class MessageController {
 
     @MessageMapping("/study-room/{roomId}/messages")
     public void sendChannelMessage(
-            @DestinationVariable Long roomId,
+            @DestinationVariable UUID roomId,
             @Payload SendMessageRequest request,
             Principal principal
     ) {

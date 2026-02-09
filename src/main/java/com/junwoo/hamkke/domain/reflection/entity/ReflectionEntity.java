@@ -1,11 +1,10 @@
 package com.junwoo.hamkke.domain.reflection.entity;
 
 import com.junwoo.hamkke.common.entity.BaseEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
+import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.UUID;
 
 /**
  *
@@ -27,8 +26,12 @@ import lombok.*;
 @AllArgsConstructor
 public class ReflectionEntity extends BaseEntity {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    Long id;
+
     @Column(nullable = false)
-    private Long studyRoomId;
+    private UUID studyRoomId;
 
     @Column(nullable = false)
     private Long userId;
@@ -43,7 +46,7 @@ public class ReflectionEntity extends BaseEntity {
 
     private Integer focusScore;
 
-    public static ReflectionEntity createReflection(Long studyRoomId, Long userId, Long sessionId, String imageUrl, String content, Integer focusScore) {
+    public static ReflectionEntity createReflection(UUID studyRoomId, Long userId, Long sessionId, String imageUrl, String content, Integer focusScore) {
         return ReflectionEntity.builder()
                 .studyRoomId(studyRoomId)
                 .userId(userId)

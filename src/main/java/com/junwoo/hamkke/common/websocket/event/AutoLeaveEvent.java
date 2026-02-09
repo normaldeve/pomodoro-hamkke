@@ -1,5 +1,7 @@
 package com.junwoo.hamkke.common.websocket.event;
 
+import java.util.UUID;
+
 /**
  *
  * @author junnukim1007gmail.com
@@ -7,10 +9,10 @@ package com.junwoo.hamkke.common.websocket.event;
  */
 public record AutoLeaveEvent(
         Long userId,
-        Long roomId,
+        UUID roomId,
         String reason
 ) {
-    public AutoLeaveEvent(Long userId, Long roomId) {
+    public AutoLeaveEvent(Long userId, UUID roomId) {
         this(userId, roomId, "WebSocket 재연결 타임아웃");
     }
 }

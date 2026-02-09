@@ -15,6 +15,8 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 /**
  *
  * @author junnukim1007gmail.com
@@ -28,7 +30,7 @@ public class MessageService {
     private final UserRepository userRepository;
     private final MessageRepository messageRepository;
 
-    public MessageResponse sendMessage(Long roomId, SendMessageRequest request, Long senderId) {
+    public MessageResponse sendMessage(UUID roomId, SendMessageRequest request, Long senderId) {
 
         MessageEntity message = MessageEntity.createMessage(roomId, senderId, request.content());
 
@@ -41,7 +43,7 @@ public class MessageService {
     }
 
     @Transactional(readOnly = true)
-    public Slice<MessageResponse> getMessages(Long roomId, Long lastMessageId, int size) {
+    public Slice<MessageResponse> getMessages(UUID roomId, Long lastMessageId, int size) {
 
         Pageable pageable = PageRequest.of(0, size);
 

@@ -20,6 +20,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -36,7 +37,7 @@ public class ReflectionService {
     private final ReflectionRepository reflectionRepository;
     private final StudyRoomRepository studyRoomRepository;
 
-    public ReflectionResponse createReflection(Long roomId, Long userId, CreateReflectionRequest request) {
+    public ReflectionResponse createReflection(UUID roomId, Long userId, CreateReflectionRequest request) {
 
         ReflectionEntity reflection = ReflectionEntity.createReflection(roomId, userId, request.sessionId(), request.imageUrl(), request.content(), request.focusScore());
 
@@ -59,7 +60,7 @@ public class ReflectionService {
     }
 
     @Transactional(readOnly = true)
-    public List<ReflectionResponse> getRoomReflections(Long roomId) {
+    public List<ReflectionResponse> getRoomReflections(UUID roomId) {
 
         return reflectionRepository.findRoomReflections(roomId);
     }
@@ -107,7 +108,7 @@ public class ReflectionService {
                 .distinct()
                 .toList();
 
-        List<Long> roomIds = reflections.stream()
+        List<UUID> roomIds = reflections.stream()
                 .map(ReflectionEntity::getStudyRoomId)
                 .distinct()
                 .toList();
@@ -116,7 +117,7 @@ public class ReflectionService {
         Map<Long, UserEntity> userMap = userRepository.findAllById(userIds).stream()
                 .collect(Collectors.toMap(UserEntity::getId, u -> u));
 
-        Map<Long, StudyRoomEntity> roomMap = studyRoomRepository.findAllById(roomIds).stream()
+        Map<UUID, StudyRoomEntity> roomMap = studyRoomRepository.findAllById(roomIds).stream()
                 .collect(Collectors.toMap(StudyRoomEntity::getId, r -> r));
 
         // Response 생성

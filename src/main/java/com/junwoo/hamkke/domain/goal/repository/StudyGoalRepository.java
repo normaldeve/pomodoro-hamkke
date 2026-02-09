@@ -4,6 +4,7 @@ import com.junwoo.hamkke.domain.goal.entity.StudyGoalEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  *
@@ -12,6 +13,6 @@ import java.util.List;
  */
 public interface StudyGoalRepository extends JpaRepository<StudyGoalEntity, Long> {
 
-    List<StudyGoalEntity> findByStudyRoomIdAndUserId(Long studyRoomId, Long userId);
+    List<StudyGoalEntity> findByStudyRoomIdAndUserId(UUID studyRoomId, Long userId);
 
 }

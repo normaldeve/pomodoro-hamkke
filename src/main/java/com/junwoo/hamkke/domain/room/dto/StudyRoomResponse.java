@@ -7,6 +7,7 @@ import lombok.Builder;
 
 import java.time.LocalDateTime;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  *
@@ -15,7 +16,7 @@ import java.util.Set;
  */
 @Builder
 public record StudyRoomResponse(
-        Long roomId,
+        UUID roomId,
         String title,
         Set<String> hashtags,
         int focusMinutes,

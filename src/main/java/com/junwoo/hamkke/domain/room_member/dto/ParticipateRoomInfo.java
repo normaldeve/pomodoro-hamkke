@@ -4,6 +4,7 @@ import com.junwoo.hamkke.domain.room_member.entity.RoomMemberRole;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  *
@@ -12,7 +13,7 @@ import java.time.LocalDateTime;
  */
 @Builder
 public record ParticipateRoomInfo(
-        Long lastRoomId,
+        UUID lastRoomId,
         RoomMemberRole role,
         LocalDateTime lastRoomJointAt
 ) {

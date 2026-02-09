@@ -1,10 +1,7 @@
 package com.junwoo.hamkke.domain.stat.entity;
 
 import com.junwoo.hamkke.common.entity.BaseEntity;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Index;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -29,6 +26,10 @@ import java.time.LocalDate;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class UserDailyStudyStat extends BaseEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    Long id;
 
     private Long userId;
 

@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  *
@@ -15,19 +16,19 @@ import java.util.Optional;
  */
 public interface StudyRoomMemberRepository extends JpaRepository<StudyRoomMemberEntity, Long> {
 
-    List<StudyRoomMemberEntity> findByStudyRoomIdOrderByRoleAscCreatedAtAsc(Long studyRoomId);
+    List<StudyRoomMemberEntity> findByStudyRoomIdOrderByRoleAscCreatedAtAsc(UUID studyRoomId);
 
-    boolean existsByStudyRoomIdAndUserId(Long studyRoomId, Long userId);
+    boolean existsByStudyRoomIdAndUserId(UUID studyRoomId, Long userId);
 
-    void deleteByStudyRoomIdAndUserId(Long roomId, Long userId);
+    void deleteByStudyRoomIdAndUserId(UUID roomId, Long userId);
 
-    List<StudyRoomMemberEntity> findAllByStudyRoomId(Long roomId);
+    List<StudyRoomMemberEntity> findAllByStudyRoomId(UUID roomId);
 
     boolean existsByUserId(Long userId);
 
-    long countByStudyRoomId(Long studyRoomId);
+    long countByStudyRoomId(UUID studyRoomId);
 
-    Optional<StudyRoomMemberEntity> findByStudyRoomIdAndUserId(Long studyRoomId, Long userId);
+    Optional<StudyRoomMemberEntity> findByStudyRoomIdAndUserId(UUID studyRoomId, Long userId);
 
     @Query("""
                         SELECT m FROM StudyRoomMemberEntity  m
@@ -36,7 +37,7 @@ public interface StudyRoomMemberRepository extends JpaRepository<StudyRoomMember
                         ORDER BY m.createdAt ASC
                         LIMIT 1
             """)
-    Optional<StudyRoomMemberEntity> findOldestMember(@Param("roomId") Long roomId);
+    Optional<StudyRoomMemberEntity> findOldestMember(@Param("roomId") UUID roomId);
 
     Optional<StudyRoomMemberEntity> findByUserId(Long userId);
 }

@@ -14,6 +14,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.*;
 
 /**
@@ -31,12 +32,12 @@ public class TimerStateService {
     private final ApplicationEventPublisher eventPublisher;
     private final StudyRoomRepository studyRoomRepository;
 
-    private final Map<Long, TimerState> timerState = new ConcurrentHashMap<>();
-    private final Map<Long, ScheduledFuture<?>> tasks = new ConcurrentHashMap<>();
+    private final Map<UUID, TimerState> timerState = new ConcurrentHashMap<>();
+    private final Map<UUID, ScheduledFuture<?>> tasks = new ConcurrentHashMap<>();
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(4);
 
     // 타이머 시작
-    public void start(Long roomId, TimerStartRequest request) {
+    public void start(UUID roomId, TimerStartRequest request) {
         stop(roomId);
 
         log.info("[TimerStateService] start() : 타이머를 시작합니다 - roomId: {}", roomId);
@@ -53,7 +54,7 @@ public class TimerStateService {
     }
 
     // 새로 추가: 상시 운영 방 타이머 시작 (정각 기준)
-    public void startPermanent(Long roomId, int focusMinutes, int breakMinutes) {
+    public void startPermanent(UUID roomId, int focusMinutes, int breakMinutes) {
         stop(roomId);
 
         log.info("[TimerStateService] startPermanent() : 상시 운영 방 타이머 시작 - roomId: {}, focus: {}분, break: {}분",
@@ -242,7 +243,7 @@ public class TimerStateService {
     }
 
     // 다음 집중 시간 업데이트 (상시 운영 방은 불가)
-    public void updateNextFocusTime(Long roomId, int focusMinutes) {
+    public void updateNextFocusTime(UUID roomId, int focusMinutes) {
         log.info("[TimerStateService] updateNextFocusTime() : 다음 집중 시간 설정을 변경합니다 - roomId: {}", roomId);
 
         // 상시 운영 방은 집중 시간 변경 불가
@@ -263,7 +264,7 @@ public class TimerStateService {
     }
 
     // 타이머 정지
-    public void pause(Long roomId) {
+    public void pause(UUID roomId) {
         log.info("[TimerStateService] pause() : 타이머를 일시정지 합니다 - roomId: {}", roomId);
 
         TimerState state = timerState.get(roomId);
@@ -277,7 +278,7 @@ public class TimerStateService {
     }
 
     // 타이머 재개
-    public void resume(Long roomId) {
+    public void resume(UUID roomId) {
         log.info("[TimerStateService] resume() : 타이머를 재개합니다 - roomId: {}", roomId);
 
         TimerState state = timerState.get(roomId);
@@ -292,7 +293,7 @@ public class TimerStateService {
     }
 
     // 타이머 스케줄러 삭제
-    public void stop(Long roomId) {
+    public void stop(UUID roomId) {
         ScheduledFuture<?> task = tasks.remove(roomId);
         if (task != null) {
             task.cancel(false);
@@ -300,7 +301,7 @@ public class TimerStateService {
     }
 
     // 타이머 스케줄러 시작
-    private void startTick(Long roomId) {
+    private void startTick(UUID roomId) {
         log.info("[TimerStateService] startTick() : 스케줄러 시작 - roomId: {}", roomId);
 
         ScheduledFuture<?> task = scheduler.scheduleAtFixedRate(() -> {
@@ -325,7 +326,7 @@ public class TimerStateService {
      * - 스케줄러 종료
      * - 타이머 상태 제거
      */
-    public void cleanupTimer(Long roomId) {
+    public void cleanupTimer(UUID roomId) {
         log.info("[TimerStateService] cleanupTimer() : 방 삭제로 인한 타이머 정리 시작 - roomId: {}", roomId);
 
         // 스케줄러 종료
@@ -350,7 +351,7 @@ public class TimerStateService {
     }
 
     // 상시 운영 방 여부 확인
-    private boolean isPermanentRoom(Long roomId) {
+    private boolean isPermanentRoom(UUID roomId) {
         return studyRoomRepository.findById(roomId)
                 .map(StudyRoomEntity::isPermanent)
                 .orElse(false);

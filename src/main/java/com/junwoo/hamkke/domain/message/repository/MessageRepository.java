@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.UUID;
+
 /**
  *
  * @author junnukim1007gmail.com
@@ -32,7 +34,7 @@ public interface MessageRepository extends JpaRepository<MessageEntity, Long> {
         order by m.id desc
     """)
     Slice<MessageResponse> findRoomMessages(
-            @Param("roomId") Long roomId,
+            @Param("roomId") UUID roomId,
             @Param("lastMessageId") Long lastMessageId,
             Pageable pageable
     );

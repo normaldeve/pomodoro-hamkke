@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -40,7 +41,7 @@ public class StudyRoomMemberService {
     private final ApplicationEventPublisher eventPublisher;
 
     @Transactional(readOnly = true)
-    public List<StudyRoomMemberResponse> getStudyRoomMembers(Long roomId) {
+    public List<StudyRoomMemberResponse> getStudyRoomMembers(UUID roomId) {
 
         List<StudyRoomMemberEntity> members = studyRoomMemberRepository.findByStudyRoomIdOrderByRoleAscCreatedAtAsc(roomId);
 
@@ -58,7 +59,7 @@ public class StudyRoomMemberService {
     }
 
     // StudyRoomMemberService.java 일부 수정
-    public ParticipantMemberInfo enterRoom(Long roomId, Long userId, EnterStudyRoomRequest request) {
+    public ParticipantMemberInfo enterRoom(UUID roomId, Long userId, EnterStudyRoomRequest request) {
 
         // 이미 입장한 멤버인지 확인
         if (studyRoomMemberRepository.existsByStudyRoomIdAndUserId(roomId, userId)) {
@@ -100,7 +101,7 @@ public class StudyRoomMemberService {
     }
 
     // 방에 사용자가 남아 있다면 방장 권한을 넘겨주어야 한다.
-    public void leaveRoom(Long roomId, Long userId) {
+    public void leaveRoom(UUID roomId, Long userId) {
 
         StudyRoomEntity room = studyRoomRepository.findById(roomId)
                 .orElseThrow(() -> new StudyRoomException(ErrorCode.CANNOT_FOUND_ROOM));
@@ -121,7 +122,7 @@ public class StudyRoomMemberService {
         eventPublisher.publishEvent(new MemberLeftRoomEvent(roomId, userId, isHost, remainingMembers));
     }
 
-    public void transferHost(Long roomId, Long currentHostId, TransferHostRequests request) {
+    public void transferHost(UUID roomId, Long currentHostId, TransferHostRequests request) {
 
         if (currentHostId.equals(request.targetUserId())) {
             throw new StudyRoomException(ErrorCode.CANNOT_TRANSFER_HOST_TO_SELF);
@@ -151,7 +152,7 @@ public class StudyRoomMemberService {
     }
 
     // 가장 먼저 들어온 멤버에게 방장 권한을 자동 위임
-    public void transferHostToOldestMember(Long roomId) {
+    public void transferHostToOldestMember(UUID roomId) {
         StudyRoomEntity room = studyRoomRepository.findById(roomId)
                 .orElseThrow(() -> new StudyRoomException(ErrorCode.CANNOT_FOUND_ROOM));
 

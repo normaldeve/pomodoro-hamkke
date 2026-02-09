@@ -12,6 +12,7 @@ import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 
 import java.security.Principal;
+import java.util.UUID;
 
 /**
  * WebSocket 연결/해제 이벤트 처리
@@ -94,7 +95,7 @@ public class WebSocketEventListener {
         }
 
         Long userId = userDetails.getUser().id();
-        Long roomId = extractRoomIdFromDestination(destination);
+        UUID roomId = extractRoomIdFromDestination(destination);
 
         if (userId != null && roomId != null) {
             log.info("[WebSocket] 방 구독 - userId: {}, roomId: {}, destination: {}",
@@ -104,10 +105,10 @@ public class WebSocketEventListener {
     }
 
     /**
-     * destination에서 roomId 추출
-     * 예: /topic/study-room/123/messages -> 123
+     * destination에서 roomId(UUID) 추출
+     * 예: /topic/study-room/550e8400-e29b-41d4-a716-446655440000/messages
      */
-    private Long extractRoomIdFromDestination(String destination) {
+    private UUID extractRoomIdFromDestination(String destination) {
         try {
             if (destination == null || !destination.contains("study-room")) {
                 return null;
@@ -117,9 +118,11 @@ public class WebSocketEventListener {
 
             for (int i = 0; i < parts.length - 1; i++) {
                 if ("study-room".equals(parts[i])) {
-                    return Long.parseLong(parts[i + 1]);
+                    return UUID.fromString(parts[i + 1]);
                 }
             }
+        } catch (IllegalArgumentException e) {
+            log.error("[WebSocket] 잘못된 UUID 형식 - destination: {}", destination, e);
         } catch (Exception e) {
             log.error("[WebSocket] roomId 추출 실패 - destination: {}", destination, e);
         }

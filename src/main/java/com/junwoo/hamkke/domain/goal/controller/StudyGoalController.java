@@ -12,6 +12,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  *
@@ -27,7 +28,7 @@ public class StudyGoalController {
 
     @PostMapping("/{roomId}")
     public ResponseEntity<StudyGoalResponse> createGoal(
-            @PathVariable Long roomId,
+            @PathVariable UUID roomId,
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody @Valid CreateStudyGoalRequest request
     ) {
@@ -39,7 +40,7 @@ public class StudyGoalController {
 
     @GetMapping("/{roomId}")
     public ResponseEntity<List<StudyGoalResponse>> getMyGoals(
-            @PathVariable Long roomId,
+            @PathVariable UUID roomId,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
 

@@ -5,6 +5,7 @@ import com.junwoo.hamkke.domain.user.entity.UserEntity;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  *
@@ -14,7 +15,7 @@ import java.time.LocalDateTime;
 @Builder
 public record MessageResponse(
         Long messageId,
-        Long roomId,
+        UUID roomId,
         Long senderId,
         String senderNickname,
         String senderProfileUrl,

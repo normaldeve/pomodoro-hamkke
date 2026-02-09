@@ -14,6 +14,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  *
@@ -54,7 +55,7 @@ public class StudyRoomController {
 
     @GetMapping("/{roomId}")
     public ResponseEntity<StudyRoomResponse> getStudyRoom(
-            @PathVariable Long roomId
+            @PathVariable UUID roomId
     ) {
 
         return ResponseEntity.ok(studyRoomService.getStudyRoom(roomId));

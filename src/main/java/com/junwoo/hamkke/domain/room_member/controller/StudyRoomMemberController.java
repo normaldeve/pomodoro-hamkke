@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  *
@@ -33,14 +34,14 @@ public class StudyRoomMemberController {
 
     @GetMapping("{roomId}")
     public ResponseEntity<List<StudyRoomMemberResponse>> getStudyRoomMembers(
-            @PathVariable Long roomId
+            @PathVariable UUID roomId
     ) {
         return ResponseEntity.ok(studyRoomMemberService.getStudyRoomMembers(roomId));
     }
 
     @GetMapping("/{roomId}/focus-time/total")
     public ResponseEntity<Integer> getTodayRoomFocusTime(
-            @PathVariable Long roomId,
+            @PathVariable UUID roomId,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
         Long userId = userDetails.getUser().id();
@@ -50,7 +51,7 @@ public class StudyRoomMemberController {
 
     @PostMapping("/{roomId}/transfer-host")
     public ResponseEntity<Void> transferHost(
-            @PathVariable Long roomId,
+            @PathVariable UUID roomId,
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @Valid @RequestBody TransferHostRequests request
     ) {

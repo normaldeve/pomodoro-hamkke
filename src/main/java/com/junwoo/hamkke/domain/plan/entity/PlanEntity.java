@@ -28,6 +28,10 @@ import java.time.LocalTime;
 @AllArgsConstructor
 public class PlanEntity extends UpdatableBaseEntity {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    Long id;
+
     @Column(name = "user_id", nullable = false)
     private Long userId;
 

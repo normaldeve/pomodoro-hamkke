@@ -12,17 +12,18 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  *
  * @author junnukim1007gmail.com
  * @date 26. 1. 24.
  */
-public interface StudyRoomRepository extends JpaRepository<StudyRoomEntity, Long> {
+public interface StudyRoomRepository extends JpaRepository<StudyRoomEntity, UUID> {
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select r from StudyRoomEntity r where r.id = :roomId")
-    Optional<StudyRoomEntity> findByIdForUpdate(@Param("roomId") Long roomId);
+    Optional<StudyRoomEntity> findByIdForUpdate(@Param("roomId") UUID roomId);
 
     // 일반 방 조회 (상시 운영 방 제외)
     Page<StudyRoomEntity> findByStatusNotAndPermanentFalse(RoomStatus status, Pageable pageable);

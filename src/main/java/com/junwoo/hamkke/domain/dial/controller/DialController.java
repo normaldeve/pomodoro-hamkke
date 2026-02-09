@@ -10,6 +10,8 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Controller;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
+import java.util.UUID;
+
 /**
  *
  * @author junnukim1007gmail.com
@@ -24,7 +26,7 @@ public class DialController {
 
     @MessageMapping("/study-room/{roomId}/timer/dial-drag")
     public void handleDialDrag(
-            @DestinationVariable Long roomId,
+            @DestinationVariable UUID roomId,
             @Payload DialDragMessage message
     ) {
         try {

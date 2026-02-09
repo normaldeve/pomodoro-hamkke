@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 /**
  *
@@ -18,7 +19,7 @@ public class FocusTimeService {
 
     private final RoomFocusTimeRepository focusTimeRepository;
 
-    public int getTodayRoomFocusTime(Long userId, Long roomId) {
+    public int getTodayRoomFocusTime(Long userId, UUID roomId) {
         RoomFocusTimeEntity focusTime = focusTimeRepository.findByUserIdAndStudyRoomIdAndFocusDate(userId, roomId, LocalDate.now())
                 .orElse(null);
 

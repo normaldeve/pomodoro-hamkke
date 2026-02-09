@@ -1,9 +1,10 @@
 package com.junwoo.hamkke.domain.message.entity;
 
 import com.junwoo.hamkke.common.entity.BaseEntity;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.UUID;
 
 /**
  *
@@ -18,13 +19,17 @@ import lombok.*;
 @AllArgsConstructor
 public class MessageEntity extends BaseEntity {
 
-    private Long roomId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    Long id;
+
+    private UUID roomId;
 
     private Long senderId;
 
     private String content;
 
-    public static MessageEntity createMessage(Long roomId, Long senderId, String content) {
+    public static MessageEntity createMessage(UUID roomId, Long senderId, String content) {
         return MessageEntity.builder()
                 .roomId(roomId)
                 .senderId(senderId)

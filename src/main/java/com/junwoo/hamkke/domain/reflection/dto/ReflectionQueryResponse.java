@@ -4,6 +4,7 @@ import com.junwoo.hamkke.domain.user.dto.UserInfo;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  *
@@ -22,5 +23,5 @@ public record ReflectionQueryResponse(
         RoomInfo room
 ) {
     @Builder
-    public record RoomInfo(Long roomId, String roomName) { }
+    public record RoomInfo(UUID roomId, String roomName) { }
 }

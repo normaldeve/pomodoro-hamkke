@@ -7,6 +7,8 @@ import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 /**
  *
  * @author junnukim1007gmail.com
@@ -21,7 +23,7 @@ public class MessageAPIController {
 
     @GetMapping("/{roomId}")
     public ResponseEntity<Slice<MessageResponse>> getMessages(
-            @PathVariable Long roomId,
+            @PathVariable UUID roomId,
             @RequestParam(required = false) Long lastMessageId,
             @RequestParam(defaultValue = "30") int size
     ) {

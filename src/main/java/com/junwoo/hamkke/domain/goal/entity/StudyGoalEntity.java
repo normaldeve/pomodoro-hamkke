@@ -2,10 +2,10 @@ package com.junwoo.hamkke.domain.goal.entity;
 
 import com.junwoo.hamkke.common.entity.UpdatableBaseEntity;
 import com.junwoo.hamkke.domain.goal.dto.CreateStudyGoalRequest;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.UUID;
 
 /**
  *
@@ -20,7 +20,11 @@ import lombok.*;
 @AllArgsConstructor
 public class StudyGoalEntity extends UpdatableBaseEntity {
 
-    private Long studyRoomId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    Long id;
+
+    private UUID studyRoomId;
 
     private Long userId;
 
@@ -32,7 +36,7 @@ public class StudyGoalEntity extends UpdatableBaseEntity {
         this.completed = !this.completed;
     }
 
-    public static StudyGoalEntity createGoal(Long roomId, Long userId, CreateStudyGoalRequest request) {
+    public static StudyGoalEntity createGoal(UUID roomId, Long userId, CreateStudyGoalRequest request) {
         return StudyGoalEntity.builder()
                 .studyRoomId(roomId)
                 .userId(userId)

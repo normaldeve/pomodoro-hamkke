@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDate;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  *
@@ -13,5 +14,5 @@ import java.util.Optional;
  */
 public interface RoomFocusTimeRepository extends JpaRepository<RoomFocusTimeEntity, Long> {
 
-    Optional<RoomFocusTimeEntity> findByUserIdAndStudyRoomIdAndFocusDate(Long userId, Long studyRoomId, LocalDate focusDate);
+    Optional<RoomFocusTimeEntity> findByUserIdAndStudyRoomIdAndFocusDate(Long userId, UUID studyRoomId, LocalDate focusDate);
 }

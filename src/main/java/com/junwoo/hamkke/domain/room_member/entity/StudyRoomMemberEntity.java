@@ -4,6 +4,8 @@ import com.junwoo.hamkke.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.UUID;
+
 /**
  *
  * @author junnukim1007gmail.com
@@ -24,7 +26,11 @@ import lombok.*;
 @AllArgsConstructor
 public class StudyRoomMemberEntity extends BaseEntity {
 
-    private Long studyRoomId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    Long id;
+
+    private UUID studyRoomId;
 
     private Long userId;
 
@@ -33,7 +39,7 @@ public class StudyRoomMemberEntity extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private RoomMemberRole role;
 
-    public static StudyRoomMemberEntity registerHost(Long studyRoomId, Long userId) {
+    public static StudyRoomMemberEntity registerHost(UUID studyRoomId, Long userId) {
         return StudyRoomMemberEntity.builder()
                 .studyRoomId(studyRoomId)
                 .userId(userId)
@@ -42,7 +48,7 @@ public class StudyRoomMemberEntity extends BaseEntity {
                 .build();
     }
 
-    public static StudyRoomMemberEntity registerMember(Long studyRoomId, Long userId) {
+    public static StudyRoomMemberEntity registerMember(UUID studyRoomId, Long userId) {
         return StudyRoomMemberEntity.builder()
                 .studyRoomId(studyRoomId)
                 .userId(userId)

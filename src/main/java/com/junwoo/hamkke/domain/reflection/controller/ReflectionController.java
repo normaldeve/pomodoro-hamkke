@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 /**
  *
@@ -41,7 +42,7 @@ public class ReflectionController {
 
     @GetMapping("/{roomId}")
     public ResponseEntity<List<ReflectionResponse>> getRoomReflections(
-            @PathVariable Long roomId
+            @PathVariable UUID roomId
     ) {
         List<ReflectionResponse> response = reflectionService.getRoomReflections(roomId);
 
