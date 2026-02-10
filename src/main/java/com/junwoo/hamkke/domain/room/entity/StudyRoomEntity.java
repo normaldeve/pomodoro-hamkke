@@ -108,6 +108,14 @@ public class StudyRoomEntity extends UpdatableBaseEntity {
         this.currentParticipants--;
     }
 
+    public void totalSessionFinish() {
+        this.status = RoomStatus.FINISHED;
+    }
+
+    public void changeBreakStatus() {
+        this.status = RoomStatus.BREAK;
+    }
+
     public void changeStatus(RoomStatus status) {
         this.status = status;
     }
@@ -118,6 +126,7 @@ public class StudyRoomEntity extends UpdatableBaseEntity {
 
     public void finishSession() {
         this.currentSession++;
+        this.status = RoomStatus.FOCUS;
     }
 
     public void transferHost(Long newHostId) {

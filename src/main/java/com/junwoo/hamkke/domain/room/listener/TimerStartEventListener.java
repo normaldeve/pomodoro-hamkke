@@ -3,8 +3,8 @@ package com.junwoo.hamkke.domain.room.listener;
 import com.junwoo.hamkke.common.discord.DiscordNotifier;
 import com.junwoo.hamkke.common.exception.ErrorCode;
 import com.junwoo.hamkke.common.websocket.WebSocketDestination;
-import com.junwoo.hamkke.domain.dial.dto.event.TimerPhaseChangeEvent;
 import com.junwoo.hamkke.domain.dial.dto.event.TimerStartEvent;
+import com.junwoo.hamkke.domain.room.dto.RoomInfoMessage;
 import com.junwoo.hamkke.domain.room.entity.StudyRoomEntity;
 import com.junwoo.hamkke.domain.room.exception.StudyRoomException;
 import com.junwoo.hamkke.domain.room.repository.StudyRoomRepository;
@@ -65,29 +65,32 @@ public class TimerStartEventListener {
         StudyRoomEntity room = studyRoomRepository.findById(event.roomId())
                 .orElseThrow(() -> new StudyRoomException(ErrorCode.CANNOT_FOUND_ROOM));
 
+        log.info("[TimerStartEventListener] 방 변경 이후 - roomId: {}, status: {}, focusTime: {}", event.roomId(), room.getStatus(), room.getFocusMinutes());
         room.statTimer(event.focusTime());
+        log.info("[TimerStartEventListener] 방 변경 이후 - roomId: {}, status: {}, focusTime: {}", event.roomId(), room.getStatus(), room.getFocusMinutes());
+
+        RoomInfoMessage roomInfo = new RoomInfoMessage(room.getStatus(), room.getCurrentSession(), room.getTotalSessions());
 
         messagingTemplate.convertAndSend(WebSocketDestination.focusTime(room.getId()), room.getFocusMinutes());
-        messagingTemplate.convertAndSend(WebSocketDestination.roomStatus(room.getId()), room.getStatus());
+        messagingTemplate.convertAndSend(WebSocketDestination.roomStatus(room.getId()), roomInfo);
+        log.info("[TimerStartEventListener] 방 정보 데이터를 전송합니다: roomId = {}, currentSession = {}, totalSessions = {}", room.getId(), room.getCurrentSession(), room.getTotalSessions());
     }
 
     @Recover
     public void recover(
             Exception e,
-            TimerPhaseChangeEvent event
+            TimerStartEvent event
     ) {
         discordNotifier.sendError(
                 "RoomStatusEventListener 재시도 실패",
                 """
                 roomId: %s
-                phase: %s
                 exception: %s
                 """.formatted(
                         event.roomId(),
-                        event.phase(),
                         e.getClass().getSimpleName()
                 )
         );
-        log.error("[RoomStatusEventListener] 재시도 실패 - roomId={}, phase={}", event.roomId(), event.phase(), e);
+        log.error("[RoomStatusEventListener] 재시도 실패 - roomId={}", event.roomId(), e);
     }
 }

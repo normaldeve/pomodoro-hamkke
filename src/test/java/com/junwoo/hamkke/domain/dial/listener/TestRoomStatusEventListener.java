@@ -1,9 +1,6 @@
 package com.junwoo.hamkke.domain.dial.listener;
 
-import com.junwoo.hamkke.domain.dial.dto.event.TimerPhaseChangeEvent;
 import org.springframework.boot.test.context.TestComponent;
-import org.springframework.context.event.EventListener;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionPhase;

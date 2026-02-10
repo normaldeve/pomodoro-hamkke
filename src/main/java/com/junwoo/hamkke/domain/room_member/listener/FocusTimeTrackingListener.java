@@ -3,7 +3,6 @@ package com.junwoo.hamkke.domain.room_member.listener;
 import com.junwoo.hamkke.common.discord.DiscordNotifier;
 import com.junwoo.hamkke.domain.dial.dto.event.FocusTimeFinishedEvent;
 import com.junwoo.hamkke.domain.dial.dto.event.FocusTimeStartedEvent;
-import com.junwoo.hamkke.domain.dial.dto.event.TimerPhaseChangeEvent;
 import com.junwoo.hamkke.domain.room.repository.StudyRoomRepository;
 import com.junwoo.hamkke.domain.room_member.entity.RoomFocusTimeEntity;
 import com.junwoo.hamkke.domain.room_member.entity.StudyRoomMemberEntity;
@@ -113,20 +112,18 @@ public class FocusTimeTrackingListener {
     @Recover
     public void recover(
             Exception e,
-            TimerPhaseChangeEvent event
+            FocusTimeStartedEvent event
     ) {
         discordNotifier.sendError(
                 "RoomStatusEventListener 재시도 실패",
                 """
                 roomId: %s
-                phase: %s
                 exception: %s
                 """.formatted(
                         event.roomId(),
-                        event.phase(),
                         e.getClass().getSimpleName()
                 )
         );
-        log.error("[RoomStatusEventListener] 재시도 실패 - roomId={}, phase={}", event.roomId(), event.phase(), e);
+        log.error("[RoomStatusEventListener] 재시도 실패 - roomId={}, phase={}", event.roomId(), e);
     }
 }

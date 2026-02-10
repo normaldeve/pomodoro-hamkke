@@ -46,7 +46,6 @@ public class TimerStateService {
         TimerState state = TimerState.createFocus(roomId, request);
         timerState.put(roomId, state);
         startTick(roomId);
-        broadcast(state);
 
         log.info("[TimerStateService] start() :타이머 시작 관련 이벤트를 호출합니다 - roomId: {}", roomId);
         eventPublisher.publishEvent(new TimerStartEvent(roomId, state.getDefaultFocusMinutes()));
@@ -74,12 +73,11 @@ public class TimerStateService {
 
         timerState.put(roomId, state);
         startTick(roomId);
-        broadcast(state);
 
         log.info("[TimerStateService] startPermanent() : 상시 운영 방 타이머 시작 완료 - roomId: {}, phase: {}, remaining: {}초",
                 roomId, calc.phase(), calc.remainingSeconds());
 
-        eventPublisher.publishEvent(new TimerPhaseChangeEvent(roomId, calc.phase()));
+        eventPublisher.publishEvent(new TimerStartEvent(roomId, state.getDefaultFocusMinutes()));
 
         if (calc.phase() == TimerPhase.FOCUS) {
             eventPublisher.publishEvent(new FocusTimeStartedEvent(roomId, 1));
@@ -147,19 +145,9 @@ public class TimerStateService {
     private void onFocusFinished(TimerState state) {
         log.info("[TimerStateService] onFocusFinished() : 집중 종료 - roomId: {}", state.getRoomId());
 
-        eventPublisher.publishEvent(new FocusTimeFinishedEvent(
-                state.getRoomId(),
-                state.getDefaultFocusMinutes(),
-                state.getCurrentSession()
-        ));
+        eventPublisher.publishEvent(new FocusTimeFinishedEvent(state.getRoomId(), state.getDefaultFocusMinutes(), state.getCurrentSession()));
 
-        // 상시 운영 방이 아닐 때만 회고 이벤트 발행
-        if (!isPermanentRoom(state.getRoomId())) {
-            eventPublisher.publishEvent(new ReflectionCreateEvent(
-                    state.getRoomId(),
-                    state.getCurrentSession()
-            ));
-        }
+        eventPublisher.publishEvent(new ReflectionCreateEvent(state.getRoomId(), state.getCurrentSession()));
 
         // 상시 운영 방이 아니고 총 세션 완료 시 종료
         if (!isPermanentRoom(state.getRoomId()) &&
@@ -178,16 +166,16 @@ public class TimerStateService {
         state.setPhaseDurationSeconds(state.getDefaultBreakMinutes() * 60);
         state.setRemainingSeconds(state.getDefaultBreakMinutes() * 60);
         state.setPhaseStartTime(System.currentTimeMillis());
-        broadcast(state);
 
-        log.info("[TimerStateService] switchToBreak() : 타이머 상태 변경 이벤트를 생성합니다 - roomId: {}, phase: {}",
-                state.getRoomId(), TimerPhase.BREAK);
-        eventPublisher.publishEvent(new TimerPhaseChangeEvent(state.getRoomId(), TimerPhase.BREAK));
+        log.info("[TimerStateService] switchToBreak() : 타이머 상태 변경 이벤트를 생성합니다 - roomId: {}, phase: {}", state.getRoomId(), TimerPhase.BREAK);
+        eventPublisher.publishEvent(new StartBreakTimeEvent(state.getRoomId()));
     }
 
     private void onBreakFinished(TimerState state) {
-        log.info("[TimerStateService] onBreakFinished() : 휴식 종료 - roomId: {}", state.getRoomId());
         startNextFocus(state);
+
+        log.info("[TimerStateService] onBreakFinished() : 휴식이 종료되며 세션이 종료되었습니다 - roomId: {}", state.getRoomId());
+        eventPublisher.publishEvent(new SessionFinishedEvent(state.getRoomId()));
     }
 
     public void startNextFocus(TimerState state) {
@@ -199,10 +187,9 @@ public class TimerStateService {
             state.setCurrentSession(state.getCurrentSession() + 1);
         }
 
-        eventPublisher.publishEvent(new FocusTimeStartedEvent(
-                state.getRoomId(),
-                state.getCurrentSession()
-        ));
+        log.info("[TimerStateService] startNextFocus() : 다음 세션 이벤트를 생성합니다 - roomId: {}, session: {}",
+                state.getRoomId(), state.getCurrentSession());
+        eventPublisher.publishEvent(new FocusTimeStartedEvent(state.getRoomId(), state.getCurrentSession()));
 
         // 변경된 집중 시간이 있다면 해당 시간으로 변경 (일반 방만)
         int focusMinutes = state.getDefaultFocusMinutes();
@@ -215,31 +202,17 @@ public class TimerStateService {
         state.setPhaseDurationSeconds(focusMinutes * 60);
         state.setRemainingSeconds(focusMinutes * 60);
         state.setPhaseStartTime(System.currentTimeMillis());
-        broadcast(state);
-
-        log.info("[TimerStateService] startNextFocus() : 다음 세션 이벤트를 생성합니다 - roomId: {}, session: {}",
-                state.getRoomId(), state.getCurrentSession());
-
-        // 상시 운영 방이 아닐 때만 세션 진행 이벤트 발행
-        if (!isPermanentRoom(state.getRoomId())) {
-            eventPublisher.publishEvent(new RoomSessionAdvancedEvent(state.getRoomId()));
-        }
-
-        eventPublisher.publishEvent(new TimerPhaseChangeEvent(state.getRoomId(), TimerPhase.FOCUS));
     }
 
     // 전체 세션 이후 타이머 종료
     private void finishTimer(TimerState state) {
-        log.info("[TimerStateService] finishTimer() : 타이머 완료 roomId: {}, 총 세션: {}",
-                state.getRoomId(), state.getTotalSessions());
+        log.info("[TimerStateService] finishTimer() : 타이머 완료 roomId: {}, 총 세션: {}", state.getRoomId(), state.getTotalSessions());
 
         state.setRunning(false);
         stop(state.getRoomId());
-        broadcast(state);
 
-        log.info("TimerStateService] finishTimer() : 타이머 상태 변경 이벤트를 생성합니다 - roomId: {}, phase: {}",
-                state.getRoomId(), TimerPhase.FINISHED);
-        eventPublisher.publishEvent(new TimerPhaseChangeEvent(state.getRoomId(), TimerPhase.FINISHED));
+        log.info("TimerStateService] finishTimer() : 타이머 상태 변경 이벤트를 생성합니다 - roomId: {}, phase: {}", state.getRoomId(), TimerPhase.FINISHED);
+        eventPublisher.publishEvent(new TotalSessionFinishedEvent(state.getRoomId()));
     }
 
     // 다음 집중 시간 업데이트 (상시 운영 방은 불가)
@@ -258,7 +231,6 @@ public class TimerStateService {
         }
 
         state.setNextFocusMinutes(focusMinutes);
-        broadcast(state);
 
         eventPublisher.publishEvent(new FocusTimeChangedEvent(roomId, focusMinutes));
     }
@@ -274,7 +246,6 @@ public class TimerStateService {
 
         state.setRunning(false);
         stop(roomId);
-        broadcast(state);
     }
 
     // 타이머 재개
@@ -289,7 +260,6 @@ public class TimerStateService {
         state.setRunning(true);
         state.setPhaseStartTime(System.currentTimeMillis());
         startTick(roomId);
-        broadcast(state);
     }
 
     // 타이머 스케줄러 삭제
@@ -357,16 +327,6 @@ public class TimerStateService {
         return studyRoomRepository.findById(roomId)
                 .map(StudyRoomEntity::isPermanent)
                 .orElse(false);
-    }
-
-    private void broadcast(TimerState state) {
-        try {
-            log.info("[TimerStateService] broadcast() : 웹소켓을 통해 데이터를 전달합니다 - roomId: {}, state: {}",
-                    state.getRoomId(), state);
-            messagingTemplate.convertAndSend(WebSocketDestination.timer(state.getRoomId()), state);
-        } catch (Exception e) {
-            log.error("[WS] 타이머 상태 전송 실패");
-        }
     }
 
     private void broadcastTick(TimerTickMessage tick) {

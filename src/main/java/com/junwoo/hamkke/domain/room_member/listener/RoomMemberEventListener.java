@@ -76,7 +76,7 @@ public class RoomMemberEventListener {
         }
 
         RoomStatus previousStatus = room.getStatus();
-        room.changeStatus(RoomStatus.FINISHED);
+        room.totalSessionFinish();
 
         // 타이머 정리
         timerStateService.cleanupTimer(event.roomId());

@@ -4,7 +4,6 @@ import com.junwoo.hamkke.common.discord.DiscordNotifier;
 import com.junwoo.hamkke.common.exception.ErrorCode;
 import com.junwoo.hamkke.common.websocket.WebSocketDestination;
 import com.junwoo.hamkke.domain.dial.dto.event.FocusTimeChangedEvent;
-import com.junwoo.hamkke.domain.dial.dto.event.TimerPhaseChangeEvent;
 import com.junwoo.hamkke.domain.room.entity.StudyRoomEntity;
 import com.junwoo.hamkke.domain.room.exception.StudyRoomException;
 import com.junwoo.hamkke.domain.room.repository.StudyRoomRepository;
@@ -74,20 +73,18 @@ public class FocusTimeChangedEventListener {
     @Recover
     public void recover(
             Exception e,
-            TimerPhaseChangeEvent event
+            FocusTimeChangedEvent event
     ) {
         discordNotifier.sendError(
                 "RoomStatusEventListener 재시도 실패",
                 """
                 roomId: %s
-                phase: %s
                 exception: %s
                 """.formatted(
                         event.roomId(),
-                        event.phase(),
                         e.getClass().getSimpleName()
                 )
         );
-        log.error("[RoomStatusEventListener] 재시도 실패 - roomId={}, phase={}", event.roomId(), event.phase(), e);
+        log.error("[RoomStatusEventListener] 재시도 실패 - roomId={}", event.roomId(), e);
     }
 }
