@@ -2,6 +2,8 @@ package com.junwoo.hamkke.domain.dial.dto;
 
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.UUID;
 
@@ -13,7 +15,6 @@ import java.util.UUID;
 @Data
 @Builder
 public class TimerState {
-
     private UUID roomId;
     private TimerPhase phase;
     private int phaseDurationSeconds;
@@ -22,25 +23,27 @@ public class TimerState {
     private int defaultBreakMinutes;
     private int totalSessions;
     private int currentSession;
+    // 방장이 다음 집중 세션의 시간을 수정할 수 있고 이는 필수가 아닙니다.
     private Integer nextFocusMinutes;
     private boolean running;
     private long phaseStartTime;
 
-    public static TimerState createFocus(UUID roomId, TimerStartRequest req) {
+    public static TimerState createFocus(UUID roomId, TimerStartRequest request) {
         return TimerState.builder()
                 .roomId(roomId)
                 .phase(TimerPhase.FOCUS)
-                .phaseDurationSeconds(req.focusMinutes() * 60)
-                .remainingSeconds(req.focusMinutes() * 60)
-                .defaultFocusMinutes(req.focusMinutes())
-                .defaultBreakMinutes(req.breakMinutes())
-                .totalSessions(req.totalSessions())
+                .phaseDurationSeconds(request.focusMinutes() * 60)
+                .remainingSeconds(request.focusMinutes() * 60)
+                .defaultFocusMinutes(request.focusMinutes())
+                .defaultBreakMinutes(request.breakMinutes())
+                .totalSessions(request.totalSessions())
                 .currentSession(1)
                 .running(true)
                 .phaseStartTime(System.currentTimeMillis())
                 .build();
     }
 
+    // 상시 운영 방용 정각 기준 타이머 생성
     public static TimerState createPermanent(
             UUID roomId,
             int focusMinutes,
@@ -52,11 +55,7 @@ public class TimerState {
         return TimerState.builder()
                 .roomId(roomId)
                 .phase(phase)
-                .phaseDurationSeconds(
-                        phase == TimerPhase.FOCUS
-                                ? focusMinutes * 60
-                                : breakMinutes * 60
-                )
+                .phaseDurationSeconds(phase == TimerPhase.FOCUS ? focusMinutes * 60 : breakMinutes * 60)
                 .remainingSeconds(remainingSeconds)
                 .defaultFocusMinutes(focusMinutes)
                 .defaultBreakMinutes(breakMinutes)
@@ -65,53 +64,5 @@ public class TimerState {
                 .running(true)
                 .phaseStartTime(phaseStartTime)
                 .build();
-    }
-
-    public void switchToBreak() {
-        phase = TimerPhase.BREAK;
-        phaseDurationSeconds = defaultBreakMinutes * 60;
-        remainingSeconds = phaseDurationSeconds;
-        phaseStartTime = System.currentTimeMillis();
-    }
-
-    public void switchToFocus() {
-        phase = TimerPhase.FOCUS;
-        phaseDurationSeconds = defaultFocusMinutes * 60;
-        remainingSeconds = phaseDurationSeconds;
-        phaseStartTime = System.currentTimeMillis();
-    }
-
-    public void switchPhase(TimerPhase next) {
-        phase = next;
-        phaseDurationSeconds =
-                next == TimerPhase.FOCUS
-                        ? defaultFocusMinutes * 60
-                        : defaultBreakMinutes * 60;
-        remainingSeconds = phaseDurationSeconds;
-        phaseStartTime = System.currentTimeMillis();
-    }
-
-    public void advanceSession() {
-        currentSession++;
-    }
-
-    public void pause() {
-        running = false;
-    }
-
-    public void resume() {
-        running = true;
-        phaseStartTime = System.currentTimeMillis();
-    }
-
-    public void finish() {
-        running = false;
-    }
-
-    public void switchToFocus(int focusMinutes) {
-        phase = TimerPhase.FOCUS;
-        phaseDurationSeconds = focusMinutes * 60;
-        remainingSeconds = phaseDurationSeconds;
-        phaseStartTime = System.currentTimeMillis();
     }
 }

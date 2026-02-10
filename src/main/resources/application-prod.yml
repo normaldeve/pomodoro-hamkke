@@ -17,6 +17,7 @@ spring:
         format_sql: true
     show-sql: false
 
+
   # Flyway 설정
   flyway:
     enabled: true

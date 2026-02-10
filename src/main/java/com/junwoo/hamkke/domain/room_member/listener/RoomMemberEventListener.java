@@ -79,7 +79,7 @@ public class RoomMemberEventListener {
         room.changeStatus(RoomStatus.FINISHED);
 
         // 타이머 정리
-        timerStateService.cleanup(event.roomId());
+        timerStateService.cleanupTimer(event.roomId());
 
         log.info("[RoomMemberEventListener] 마지막 멤버가 나가서 방을 삭제합니다 - roomId: {}, 이전 상태: {}",
                 event.roomId(), previousStatus);

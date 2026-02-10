@@ -29,7 +29,7 @@ public class TimerController {
             @DestinationVariable UUID roomId,
             @Payload TimerStartRequest request
     ) {
-        timerStateService.start(roomId, request, false);
+        timerStateService.start(roomId, request);
     }
 
     @MessageMapping("/study-room/{roomId}/timer/pause")

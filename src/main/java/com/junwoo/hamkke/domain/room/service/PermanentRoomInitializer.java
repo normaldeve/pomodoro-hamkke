@@ -108,10 +108,7 @@ public class PermanentRoomInitializer implements ApplicationRunner {
 
         log.info("[PermanentRoomInitializer] 상시 운영 방 생성 완료 - roomId: {}, title: {}", savedRoom.getId(), title);
 
-        // 타이머 시작
-        TimerStartRequest request = new TimerStartRequest(focusMinutes, breakMinutes, room.getTotalSessions());
-
-        timerStateService.start(savedRoom.getId(), request, true);
+        timerStateService.startPermanent(savedRoom.getId(), focusMinutes, breakMinutes);
 
         log.info("[PermanentRoomInitializer] 타이머 시작 완료 - roomId: {}", savedRoom.getId());
     }
@@ -128,9 +125,7 @@ public class PermanentRoomInitializer implements ApplicationRunner {
             log.info("[PermanentRoomInitializer] 타이머 재시작 - roomId: {}, title: {}, focus: {}분, break: {}분",
                     room.getId(), room.getTitle(), room.getFocusMinutes(), room.getBreakMinutes());
 
-            TimerStartRequest request = new TimerStartRequest(room.getFocusMinutes(), room.getBreakMinutes(), room.getTotalSessions());
-
-            timerStateService.start(room.getId(), request, true);
+            timerStateService.startPermanent(room.getId(), room.getFocusMinutes(), room.getBreakMinutes());
 
             log.info("[PermanentRoomInitializer] 타이머 재시작 완료 - roomId: {}", room.getId());
         }

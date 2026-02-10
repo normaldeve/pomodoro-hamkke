@@ -29,6 +29,10 @@ public final class WebSocketDestination {
         return BASE_PATH + "/" + roomId + "/timer";
     }
 
+    public static String tick(UUID roomId) {
+        return BASE_PATH + "/" + roomId + "/timer";
+    }
+
     public static String focusTime(UUID roomId) {
         return BASE_PATH + "/" + roomId + "/focus-time";
     }
