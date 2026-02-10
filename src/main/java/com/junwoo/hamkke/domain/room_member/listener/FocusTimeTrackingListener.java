@@ -45,8 +45,12 @@ public class FocusTimeTrackingListener {
     private final StudyRoomRepository studyRoomRepository;
     private final DiscordNotifier discordNotifier;
 
-    @EventListener
-    @Transactional
+    @Async(value = "domainEventExecutor")
+    @TransactionalEventListener(
+            phase = TransactionPhase.AFTER_COMMIT,
+            fallbackExecution = true
+    )
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void onFocusPhaseEnd(FocusTimeFinishedEvent event) {
 
         log.info("[FocusTimeTracking] FOCUS 정상 종료 - roomId: {}", event.roomId());

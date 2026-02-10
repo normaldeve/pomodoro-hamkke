@@ -2,7 +2,6 @@ package com.junwoo.hamkke.domain.room.listener;
 
 import com.junwoo.hamkke.common.exception.ErrorCode;
 import com.junwoo.hamkke.common.websocket.WebSocketDestination;
-import com.junwoo.hamkke.domain.dial.dto.event.StartBreakTimeEvent;
 import com.junwoo.hamkke.domain.dial.dto.event.TotalSessionFinishedEvent;
 import com.junwoo.hamkke.domain.room.dto.RoomInfoMessage;
 import com.junwoo.hamkke.domain.room.entity.StudyRoomEntity;
@@ -10,10 +9,13 @@ import com.junwoo.hamkke.domain.room.exception.StudyRoomException;
 import com.junwoo.hamkke.domain.room.repository.StudyRoomRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 /**
  *
@@ -28,8 +30,12 @@ public class TotalSessionFinishedEventListener {
     private final SimpMessagingTemplate messagingTemplate;
     private final StudyRoomRepository studyRoomRepository;
 
-    @EventListener
-    @Transactional
+    @Async(value = "domainEventExecutor")
+    @TransactionalEventListener(
+            phase = TransactionPhase.AFTER_COMMIT,
+            fallbackExecution = true
+    )
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void handle(TotalSessionFinishedEvent event) {
         log.info("[TotalSessionFinishedEventListener] 전체 세션이 종료되어, 방 상태를 FINISHED로 변경합니다 - roomId: {}", event.roomId());
 

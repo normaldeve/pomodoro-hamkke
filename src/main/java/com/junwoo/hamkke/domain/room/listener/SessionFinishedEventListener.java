@@ -11,8 +11,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 /**
  *
@@ -27,8 +31,12 @@ public class SessionFinishedEventListener {
     private final SimpMessagingTemplate messagingTemplate;
     private final StudyRoomRepository studyRoomRepository;
 
-    @EventListener
-    @Transactional
+    @Async(value = "domainEventExecutor")
+    @TransactionalEventListener(
+            phase = TransactionPhase.AFTER_COMMIT,
+            fallbackExecution = true
+    )
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void handleTimerPhaseChanged(SessionFinishedEvent event) {
         log.info("[SessionFinishedEventListener] 세션이 종료되는 이벤트를 수신하여 방 상태를 변경합니다 - roomId: {}", event.roomId());
 

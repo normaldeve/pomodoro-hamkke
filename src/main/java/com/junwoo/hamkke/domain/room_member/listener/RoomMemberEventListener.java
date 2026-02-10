@@ -20,8 +20,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 /**
  *
@@ -42,8 +46,12 @@ public class RoomMemberEventListener {
     private final SimpMessagingTemplate messagingTemplate;
     private final ApplicationEventPublisher eventPublisher;
 
-    @EventListener
-    @Transactional
+    @Async(value = "domainEventExecutor")
+    @TransactionalEventListener(
+            phase = TransactionPhase.AFTER_COMMIT,
+            fallbackExecution = true
+    )
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void onMemberLeft(MemberLeftRoomEvent event) {
         log.info("[RoomMemberEventListener] onMemberLeft() - roomId: {}, userId: {}, wasHost: {}, remainingMembers: {}",
                 event.roomId(), event.userId(), event.wasHost(), event.remainingMembers());
@@ -60,8 +68,12 @@ public class RoomMemberEventListener {
         }
     }
 
-    @EventListener
-    @Transactional
+    @Async(value = "domainEventExecutor")
+    @TransactionalEventListener(
+            phase = TransactionPhase.AFTER_COMMIT,
+            fallbackExecution = true
+    )
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void onRoomEmptied(RoomEmptiedEvent event) {
         log.info("[RoomMemberEventListener] onRoomEmptied() - roomId: {}, lastMemberId: {}",
                 event.roomId(), event.lastMemberId());
@@ -84,15 +96,15 @@ public class RoomMemberEventListener {
         log.info("[RoomMemberEventListener] 마지막 멤버가 나가서 방을 삭제합니다 - roomId: {}, 이전 상태: {}",
                 event.roomId(), previousStatus);
 
-        try {
-            messagingTemplate.convertAndSend(WebSocketDestination.roomStatus(event.roomId()), RoomStatus.FINISHED);
-        } catch (Exception e) {
-            log.error("[WS] 방 삭제 상태 전송 실패 - roomId: {}", event.roomId(), e);
-        }
+        messagingTemplate.convertAndSend(WebSocketDestination.roomStatus(event.roomId()), RoomStatus.FINISHED);
     }
 
-    @EventListener
-    @Transactional(readOnly = true)
+    @Async(value = "domainEventExecutor")
+    @TransactionalEventListener(
+            phase = TransactionPhase.AFTER_COMMIT,
+            fallbackExecution = true
+    )
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void onHostTransferred(HostTransferredEvent event) {
         log.info("[RoomMemberEventListener] onHostTransferred() - roomId: {}, from: {}, to: {}, auto: {}",
                 event.roomId(), event.previousHostId(), event.newHostId(), event.isAutoTransfer());
@@ -113,14 +125,6 @@ public class RoomMemberEventListener {
                 event.isAutoTransfer()
         );
 
-        try {
-            messagingTemplate.convertAndSend(WebSocketDestination.member(event.roomId()), response);
-
-            log.info("[RoomMemberEventListener] 방장 변경 알림 전송 완료 - roomId: {}, {} -> {}",
-                    event.roomId(), previousHost.getNickname(), newHost.getNickname());
-        } catch (Exception e) {
-            log.error("[WS] 방장 변경 알림 전송 실패 - roomId: {}, newHostId: {}",
-                    event.roomId(), event.newHostId(), e);
-        }
+        messagingTemplate.convertAndSend(WebSocketDestination.member(event.roomId()), response);
     }
 }
