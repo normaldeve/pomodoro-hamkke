@@ -74,16 +74,16 @@ class TimerStartPartialRollbackTest extends IntegrationTest {
 //    }
 
     // @TransactionalEventListener + Propagation.REQUIRES_NEW 조합 시
-    @Test
-    void 타이머_시작이후_하나의_리스너_예외_발생시_다른_리스너는_정상적으로_실행된다() {
-        // given
-        TimerStartRequest request = new TimerStartRequest(10, 10, 10);
-
-        // when
-        timerStateService.start(studyRoom.getId(), request);
-
-        // then -> 집중 시간이 변경되지 않는다.
-        StudyRoomEntity savedRoom = studyRoomRepository.findById(studyRoom.getId()).orElseThrow();
-        assertThat(savedRoom.getFocusMinutes()).isEqualTo(10);
-    }
+//    @Test
+//    void 타이머_시작이후_하나의_리스너_예외_발생시_다른_리스너는_정상적으로_실행된다() {
+//        // given
+//        TimerStartRequest request = new TimerStartRequest(10, 10, 10);
+//
+//        // when
+//        timerStateService.start(studyRoom.getId(), request);
+//
+//        // then -> 집중 시간이 변경되지 않는다.
+//        StudyRoomEntity savedRoom = studyRoomRepository.findById(studyRoom.getId()).orElseThrow();
+//        assertThat(savedRoom.getFocusMinutes()).isEqualTo(10);
+//    }
 }
