@@ -4,7 +4,7 @@ import com.junwoo.hamkke.common.discord.DiscordNotifier;
 import com.junwoo.hamkke.common.exception.ErrorCode;
 import com.junwoo.hamkke.common.websocket.WebSocketDestination;
 import com.junwoo.hamkke.domain.dial.dto.event.TimerPhaseChangeEvent;
-import com.junwoo.hamkke.domain.room.entity.RoomStatus;
+import com.junwoo.hamkke.domain.dial.dto.event.TimerStartEvent;
 import com.junwoo.hamkke.domain.room.entity.StudyRoomEntity;
 import com.junwoo.hamkke.domain.room.exception.StudyRoomException;
 import com.junwoo.hamkke.domain.room.repository.StudyRoomRepository;
@@ -30,12 +30,12 @@ import java.net.SocketTimeoutException;
 /**
  *
  * @author junnukim1007gmail.com
- * @date 26. 1. 26.
+ * @date 26. 2. 10.
  */
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class RoomStatusEventListener {
+public class TimerStartEventListener {
 
     private final SimpMessagingTemplate messagingTemplate;
     private final StudyRoomRepository studyRoomRepository;
@@ -58,21 +58,17 @@ public class RoomStatusEventListener {
             maxAttempts = 3,
             backoff = @Backoff(delay = 100)
     )
-    public void handle(TimerPhaseChangeEvent event) {
-        log.info("[RoomStatusEventListener] handle() : TimerPhaseChangeEvent 이벤트를 처리합니다 - roomId: {}, phase: {}", event.roomId(), event.phase());
+    public void handle(TimerStartEvent event) {
+
+        log.info("[TimerStartEventListener] 타이머 시작 이벤트를 처리합니다: roomId = {}, focusTime = {}", event.roomId(), event.focusTime());
+
         StudyRoomEntity room = studyRoomRepository.findById(event.roomId())
                 .orElseThrow(() -> new StudyRoomException(ErrorCode.CANNOT_FOUND_ROOM));
 
-        RoomStatus newStatus = switch (event.phase()) {
-            case FOCUS -> RoomStatus.FOCUS;
-            case BREAK -> RoomStatus.BREAK;
-            case FINISHED -> RoomStatus.FINISHED;
-            case IDLE -> RoomStatus.WAITING;
-        };
+        room.statTimer(event.focusTime());
 
-        room.changeStatus(newStatus);
-
-        messagingTemplate.convertAndSend(WebSocketDestination.roomStatus(room.getId()), newStatus);
+        messagingTemplate.convertAndSend(WebSocketDestination.focusTime(room.getId()), room.getFocusMinutes());
+        messagingTemplate.convertAndSend(WebSocketDestination.roomStatus(room.getId()), room.getStatus());
     }
 
     @Recover

@@ -5,7 +5,6 @@ import com.junwoo.hamkke.domain.dial.dto.TimerPhase;
 import com.junwoo.hamkke.domain.dial.dto.event.*;
 import com.junwoo.hamkke.domain.dial.dto.TimerStartRequest;
 import com.junwoo.hamkke.domain.dial.dto.TimerState;
-import com.junwoo.hamkke.domain.room.entity.StudyRoomEntity;
 import com.junwoo.hamkke.domain.room.repository.StudyRoomRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -50,9 +49,8 @@ public class TimerStateService {
         broadcast(state);
 
         log.info("[TimerStateService] start() :타이머 시작 관련 이벤트를 호출합니다 - roomId: {}", roomId);
-        eventPublisher.publishEvent(new TimerPhaseChangeEvent(state.getRoomId(), TimerPhase.FOCUS));
+        eventPublisher.publishEvent(new TimerStartEvent(state.getRoomId(), state.getDefaultFocusMinutes()));
         eventPublisher.publishEvent(new FocusTimeStartedEvent(state.getRoomId(), state.getCurrentSession()));
-        eventPublisher.publishEvent(new FocusTimeChangedEvent(roomId, state.getDefaultFocusMinutes()));
     }
 
     // 새로 추가: 상시 운영 방 타이머 시작 (정각 기준)
@@ -155,17 +153,11 @@ public class TimerStateService {
                 state.getCurrentSession()
         ));
 
-        // 상시 운영 방이 아닐 때만 회고 이벤트 발행
-        if (!isPermanentRoom(state.getRoomId())) {
-            eventPublisher.publishEvent(new ReflectionCreateEvent(
-                    state.getRoomId(),
-                    state.getCurrentSession()
-            ));
-        }
+        // 회고 이벤트 발행
+        eventPublisher.publishEvent(new ReflectionCreateEvent(state.getRoomId(), state.getCurrentSession()));
 
-        // 상시 운영 방이 아니고 총 세션 완료 시 종료
-        if (!isPermanentRoom(state.getRoomId()) &&
-                state.getCurrentSession() >= state.getTotalSessions()) {
+        // 총 세션 완료 시 종료
+        if (state.getCurrentSession() >= state.getTotalSessions()) {
             finishTimer(state);
             return;
         }
@@ -196,19 +188,17 @@ public class TimerStateService {
         log.info("[TimerStateService] startNextFocus() : 다음 세션 시작 - roomId: {}, session: {} -> {}",
                 state.getRoomId(), state.getCurrentSession(), state.getCurrentSession() + 1);
 
-        // 상시 운영 방이 아닐 때만 세션 증가
-        if (!isPermanentRoom(state.getRoomId())) {
-            state.setCurrentSession(state.getCurrentSession() + 1);
-        }
+        state.setCurrentSession(state.getCurrentSession() + 1);
 
         eventPublisher.publishEvent(new FocusTimeStartedEvent(
                 state.getRoomId(),
                 state.getCurrentSession()
         ));
 
-        // 변경된 집중 시간이 있다면 해당 시간으로 변경 (일반 방만)
+        // 변경된 집중 시간이 있다면 해당 시간으로 변경
         int focusMinutes = state.getDefaultFocusMinutes();
-        if (!isPermanentRoom(state.getRoomId()) && state.getNextFocusMinutes() != null) {
+
+        if (state.getNextFocusMinutes() != null) {
             focusMinutes = state.getNextFocusMinutes();
         }
 
@@ -222,10 +212,7 @@ public class TimerStateService {
         log.info("[TimerStateService] startNextFocus() : 다음 세션 이벤트를 생성합니다 - roomId: {}, session: {}",
                 state.getRoomId(), state.getCurrentSession());
 
-        // 상시 운영 방이 아닐 때만 세션 진행 이벤트 발행
-        if (!isPermanentRoom(state.getRoomId())) {
-            eventPublisher.publishEvent(new RoomSessionAdvancedEvent(state.getRoomId()));
-        }
+        eventPublisher.publishEvent(new RoomSessionAdvancedEvent(state.getRoomId()));
 
         eventPublisher.publishEvent(new TimerPhaseChangeEvent(state.getRoomId(), TimerPhase.FOCUS));
     }
@@ -247,12 +234,6 @@ public class TimerStateService {
     // 다음 집중 시간 업데이트 (상시 운영 방은 불가)
     public void updateNextFocusTime(UUID roomId, int focusMinutes) {
         log.info("[TimerStateService] updateNextFocusTime() : 다음 집중 시간 설정을 변경합니다 - roomId: {}", roomId);
-
-        // 상시 운영 방은 집중 시간 변경 불가
-        if (isPermanentRoom(roomId)) {
-            log.warn("[TimerStateService] updateNextFocusTime() : 상시 운영 방은 집중 시간 변경 불가 - roomId: {}", roomId);
-            return;
-        }
 
         TimerState state = timerState.get(roomId);
         if (state == null || state.getPhase() != TimerPhase.BREAK) {
@@ -350,13 +331,6 @@ public class TimerStateService {
         }
 
         log.info("[TimerStateService] cleanupTimer() : 타이머 정리 완료 - roomId: {}", roomId);
-    }
-
-    // 상시 운영 방 여부 확인
-    private boolean isPermanentRoom(UUID roomId) {
-        return studyRoomRepository.findById(roomId)
-                .map(StudyRoomEntity::isPermanent)
-                .orElse(false);
     }
 
     private void broadcast(TimerState state) {

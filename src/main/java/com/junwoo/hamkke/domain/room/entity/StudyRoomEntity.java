@@ -123,4 +123,9 @@ public class StudyRoomEntity extends UpdatableBaseEntity {
     public void transferHost(Long newHostId) {
         this.hostId = newHostId;
     }
+
+    public void statTimer(int focusMinutes) {
+        this.focusMinutes = focusMinutes;
+        this.status = RoomStatus.FOCUS;
+    }
 }

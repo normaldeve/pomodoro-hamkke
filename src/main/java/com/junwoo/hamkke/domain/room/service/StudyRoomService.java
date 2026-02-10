@@ -33,7 +33,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class StudyRoomService {
 
-    private final static int PAGE_SIZE = 4;
+    private final static int PAGE_SIZE = 10;
     private final StudyRoomRepository studyRoomRepository;
     private final StudyRoomMemberRepository studyRoomMemberRepository;
 

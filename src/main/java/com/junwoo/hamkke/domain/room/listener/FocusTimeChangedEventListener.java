@@ -60,12 +60,15 @@ public class FocusTimeChangedEventListener {
     )
     public void handle(FocusTimeChangedEvent event) {
 
+        log.info("[FocusTimeChangedEventListener] 집중 시간을 변경합니다: focusTime = {}", event.focusTime());
+
         StudyRoomEntity room = studyRoomRepository.findById(event.roomId())
                 .orElseThrow(() -> new StudyRoomException(ErrorCode.CANNOT_FOUND_ROOM));
 
         room.changeFocusMinutes(event.focusTime());
 
         messagingTemplate.convertAndSend(WebSocketDestination.focusTime(event.roomId()),  event.focusTime());
+
     }
 
     @Recover

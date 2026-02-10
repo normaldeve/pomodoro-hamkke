@@ -4,7 +4,6 @@ import com.junwoo.hamkke.common.discord.DiscordNotifier;
 import com.junwoo.hamkke.domain.dial.dto.event.FocusTimeFinishedEvent;
 import com.junwoo.hamkke.domain.dial.dto.event.FocusTimeStartedEvent;
 import com.junwoo.hamkke.domain.dial.dto.event.TimerPhaseChangeEvent;
-import com.junwoo.hamkke.domain.room.entity.StudyRoomEntity;
 import com.junwoo.hamkke.domain.room.repository.StudyRoomRepository;
 import com.junwoo.hamkke.domain.room_member.entity.RoomFocusTimeEntity;
 import com.junwoo.hamkke.domain.room_member.entity.StudyRoomMemberEntity;
@@ -30,7 +29,6 @@ import java.net.ConnectException;
 import java.net.SocketTimeoutException;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * [TODO] 아래와 같은 방식으로 사용자 필드 업데이트 시 문제가 발생하지는 않을까? -> 테스트 필요!!!!!
@@ -63,18 +61,8 @@ public class FocusTimeTrackingListener {
             return;
         }
 
-        // 상시 운영 방 여부 확인
-        boolean isPermanentRoom = studyRoomRepository.findById(event.roomId())
-                .map(StudyRoomEntity::isPermanent)
-                .orElse(false);
-
         for (StudyRoomMemberEntity member : members) {
             log.info("[FocusTimeTrackingListener] onFocusPhaseEnd() : 참여자 집중 시간 설정 - member {}", member.getId());
-
-            // 상시 운영 방이 아닐 때만 세션 ID 체크
-            if (!isPermanentRoom && !Objects.equals(member.getCurrentSessionId(), event.currentSessionId())) {
-                continue;
-            }
 
             RoomFocusTimeEntity roomFocusTime = roomFocusTimeRepository
                     .findByUserIdAndStudyRoomIdAndFocusDate(member.getUserId(), event.roomId(), today)
@@ -114,17 +102,6 @@ public class FocusTimeTrackingListener {
 
         log.info("[FocusTimeTracking] onFocusPhaseStart() : 집중 시간이 시작, 참여자 현재 세션 참여 상태로 변경 - currentSessionId: {}",
                 event.currentSessionId());
-
-        // 상시 운영 방 여부 확인
-        boolean isPermanentRoom = studyRoomRepository.findById(event.roomId())
-                .map(StudyRoomEntity::isPermanent)
-                .orElse(false);
-
-        // 상시 운영 방은 세션 ID 업데이트 불필요
-        if (isPermanentRoom) {
-            log.info("[FocusTimeTracking] 상시 운영 방은 세션 ID 업데이트 스킵 - roomId: {}", event.roomId());
-            return;
-        }
 
         List<StudyRoomMemberEntity> members = memberRepository.findAllByStudyRoomId(event.roomId());
 
