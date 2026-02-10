@@ -1,5 +1,6 @@
 package com.junwoo.hamkke.domain.room.service;
 
+import com.junwoo.hamkke.domain.dial.dto.TimerStartRequest;
 import com.junwoo.hamkke.domain.dial.service.TimerStateService;
 import com.junwoo.hamkke.domain.room.entity.StudyRoomEntity;
 import com.junwoo.hamkke.domain.room.entity.TimerType;
@@ -105,11 +106,12 @@ public class PermanentRoomInitializer implements ApplicationRunner {
 
         StudyRoomEntity savedRoom = studyRoomRepository.save(room);
 
-        log.info("[PermanentRoomInitializer] 상시 운영 방 생성 완료 - roomId: {}, title: {}",
-                savedRoom.getId(), title);
+        log.info("[PermanentRoomInitializer] 상시 운영 방 생성 완료 - roomId: {}, title: {}", savedRoom.getId(), title);
 
         // 타이머 시작
-        timerStateService.startPermanent(savedRoom.getId(), focusMinutes, breakMinutes);
+        TimerStartRequest request = new TimerStartRequest(focusMinutes, breakMinutes, room.getTotalSessions());
+
+        timerStateService.start(savedRoom.getId(), request, true);
 
         log.info("[PermanentRoomInitializer] 타이머 시작 완료 - roomId: {}", savedRoom.getId());
     }
@@ -126,11 +128,9 @@ public class PermanentRoomInitializer implements ApplicationRunner {
             log.info("[PermanentRoomInitializer] 타이머 재시작 - roomId: {}, title: {}, focus: {}분, break: {}분",
                     room.getId(), room.getTitle(), room.getFocusMinutes(), room.getBreakMinutes());
 
-            timerStateService.startPermanent(
-                    room.getId(),
-                    room.getFocusMinutes(),
-                    room.getBreakMinutes()
-            );
+            TimerStartRequest request = new TimerStartRequest(room.getFocusMinutes(), room.getBreakMinutes(), room.getTotalSessions());
+
+            timerStateService.start(room.getId(), request, true);
 
             log.info("[PermanentRoomInitializer] 타이머 재시작 완료 - roomId: {}", room.getId());
         }

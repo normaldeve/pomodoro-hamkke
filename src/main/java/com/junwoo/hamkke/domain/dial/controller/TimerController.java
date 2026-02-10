@@ -29,10 +29,7 @@ public class TimerController {
             @DestinationVariable UUID roomId,
             @Payload TimerStartRequest request
     ) {
-        long start = System.currentTimeMillis();
-        timerStateService.start(roomId, request);
-        long end = System.currentTimeMillis();
-        log.info("[타이머 시작 응답 시간] timer.start took {} ms", end - start);
+        timerStateService.start(roomId, request, false);
     }
 
     @MessageMapping("/study-room/{roomId}/timer/pause")

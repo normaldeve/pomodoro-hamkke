@@ -71,8 +71,7 @@ public class RoomMemberEventListener {
 
         // 상시 운영 방은 삭제하지 않고 계속 운영
         if (room.isPermanent()) {
-            log.info("[RoomMemberEventListener] 상시 운영 방은 참여자가 0명이 되어도 계속 운영됩니다 - roomId: {}",
-                    event.roomId());
+            log.info("[RoomMemberEventListener] 상시 운영 방은 참여자가 0명이 되어도 계속 운영됩니다 - roomId: {}", event.roomId());
             return;
         }
 
@@ -80,7 +79,7 @@ public class RoomMemberEventListener {
         room.changeStatus(RoomStatus.FINISHED);
 
         // 타이머 정리
-        timerStateService.cleanupTimer(event.roomId());
+        timerStateService.cleanup(event.roomId());
 
         log.info("[RoomMemberEventListener] 마지막 멤버가 나가서 방을 삭제합니다 - roomId: {}, 이전 상태: {}",
                 event.roomId(), previousStatus);
