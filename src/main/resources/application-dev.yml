@@ -11,6 +11,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
+    show-sql: false
 
   flyway:
     enabled: false
@@ -29,7 +30,7 @@ jwt:
 logging:
   level:
     com.junwoo.hamkke: debug
-    org.hibernate.sql: info
+    org.hibernate.SQL: debug
     org.springframework.security: info
 
 cors:

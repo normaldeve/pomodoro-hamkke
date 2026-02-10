@@ -65,7 +65,7 @@ public class TimerStartEventListener {
         StudyRoomEntity room = studyRoomRepository.findById(event.roomId())
                 .orElseThrow(() -> new StudyRoomException(ErrorCode.CANNOT_FOUND_ROOM));
 
-        log.info("[TimerStartEventListener] 방 변경 이후 - roomId: {}, status: {}, focusTime: {}", event.roomId(), room.getStatus(), room.getFocusMinutes());
+        log.info("[TimerStartEventListener] 방 변경 이전 - roomId: {}, status: {}, focusTime: {}", event.roomId(), room.getStatus(), room.getFocusMinutes());
         room.statTimer(event.focusTime());
         log.info("[TimerStartEventListener] 방 변경 이후 - roomId: {}, status: {}, focusTime: {}", event.roomId(), room.getStatus(), room.getFocusMinutes());
 

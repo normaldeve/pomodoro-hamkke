@@ -49,7 +49,7 @@ public class TimerStateService {
 
         log.info("[TimerStateService] start() :타이머 시작 관련 이벤트를 호출합니다 - roomId: {}", roomId);
         eventPublisher.publishEvent(new TimerStartEvent(roomId, state.getDefaultFocusMinutes()));
-        eventPublisher.publishEvent(new FocusTimeChangedEvent(roomId, state.getDefaultFocusMinutes()));
+        eventPublisher.publishEvent(new FocusTimeStartedEvent(roomId, 1));
     }
 
     // 새로 추가: 상시 운영 방 타이머 시작 (정각 기준)
@@ -77,10 +77,11 @@ public class TimerStateService {
         log.info("[TimerStateService] startPermanent() : 상시 운영 방 타이머 시작 완료 - roomId: {}, phase: {}, remaining: {}초",
                 roomId, calc.phase(), calc.remainingSeconds());
 
-        eventPublisher.publishEvent(new TimerStartEvent(roomId, state.getDefaultFocusMinutes()));
-
         if (calc.phase() == TimerPhase.FOCUS) {
+            eventPublisher.publishEvent(new TimerStartEvent(roomId, state.getDefaultFocusMinutes()));
             eventPublisher.publishEvent(new FocusTimeStartedEvent(roomId, 1));
+        } else {
+            eventPublisher.publishEvent(new StartBreakTimeEvent(roomId));
         }
 
         eventPublisher.publishEvent(new FocusTimeChangedEvent(roomId, focusMinutes));

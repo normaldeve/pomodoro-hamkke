@@ -116,10 +116,6 @@ public class StudyRoomEntity extends UpdatableBaseEntity {
         this.status = RoomStatus.BREAK;
     }
 
-    public void changeStatus(RoomStatus status) {
-        this.status = status;
-    }
-
     public void changeFocusMinutes(int focusMinutes) {
         this.focusMinutes = focusMinutes;
     }
