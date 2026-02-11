@@ -66,4 +66,8 @@ public class PlanEntity extends UpdatableBaseEntity {
     public void complete() {
         this.completed = true;
     }
+
+    public void unComplete() {
+        this.completed = false;
+    }
 }

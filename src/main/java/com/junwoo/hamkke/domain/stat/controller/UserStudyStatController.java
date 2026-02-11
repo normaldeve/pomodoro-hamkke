@@ -1,7 +1,9 @@
 package com.junwoo.hamkke.domain.stat.controller;
 
 import com.junwoo.hamkke.domain.auth.security.userdetail.CustomUserDetails;
+import com.junwoo.hamkke.domain.stat.dto.MonthlyStudyStatResponse;
 import com.junwoo.hamkke.domain.stat.dto.StudyHeatmapResponse;
+import com.junwoo.hamkke.domain.stat.dto.StudyTimeSummaryResponse;
 import com.junwoo.hamkke.domain.stat.service.UserStudyStatService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +34,28 @@ public class UserStudyStatController {
 
         StudyHeatmapResponse response = studyStatService.getYearlyStudyRecords(userId, year);
 
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/summary")
+    public ResponseEntity<StudyTimeSummaryResponse> getStudyTimeSummary(
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        Long userId = userDetails.getUser().id();
+
+        StudyTimeSummaryResponse response = studyStatService.getStudyTimeSummary(userId);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/monthly")
+    public ResponseEntity<MonthlyStudyStatResponse> getMonthlyStatistics(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestParam int year,
+            @RequestParam int month
+    ) {
+        Long userId = userDetails.getUser().id();
+        MonthlyStudyStatResponse response = studyStatService.getMonthlyStatistics(userId, year, month);
         return ResponseEntity.ok(response);
     }
 }

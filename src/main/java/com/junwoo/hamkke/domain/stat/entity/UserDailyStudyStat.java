@@ -1,6 +1,7 @@
 package com.junwoo.hamkke.domain.stat.entity;
 
 import com.junwoo.hamkke.common.entity.BaseEntity;
+import com.junwoo.hamkke.common.entity.UpdatableBaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -25,7 +26,7 @@ import java.time.LocalDate;
 )
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class UserDailyStudyStat extends BaseEntity {
+public class UserDailyStudyStat extends UpdatableBaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

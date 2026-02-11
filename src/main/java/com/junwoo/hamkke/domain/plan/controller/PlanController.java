@@ -61,7 +61,7 @@ public class PlanController {
     /**
      * 계획 완료 상태 토글
      */
-    @PatchMapping("/{planId}/toggle")
+    @PatchMapping("/{planId}/toggle/completed")
     public ResponseEntity<PlanResponse> togglePlanCompleted(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long planId
@@ -69,6 +69,20 @@ public class PlanController {
         Long userId = userDetails.getUser().id();
 
         PlanResponse response = planService.togglePlanCompleted(userId, planId);
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * 계획 미완료 상태 토글
+     */
+    @PatchMapping("/{planId}/toggle/uncompleted")
+    public ResponseEntity<PlanResponse> togglePlanUncompleted(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @PathVariable Long planId
+    ) {
+        Long userId = userDetails.getUser().id();
+
+        PlanResponse response = planService.togglePlanUnCompleted(userId, planId);
         return ResponseEntity.ok(response);
     }
 

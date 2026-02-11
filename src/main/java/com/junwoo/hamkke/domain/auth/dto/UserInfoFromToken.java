@@ -4,6 +4,9 @@ import com.junwoo.hamkke.domain.user.entity.Role;
 import com.junwoo.hamkke.domain.user.entity.UserEntity;
 import lombok.Builder;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 /**
  *
  * @author junnukim1007gmail.com
@@ -15,7 +18,8 @@ public record UserInfoFromToken(
         String username,
         String nickname,
         String profileUrl,
-        Role role
+        Role role,
+        LocalDateTime createdAt
 ) {
 
     public static UserInfoFromToken of(UserEntity entity) {
@@ -25,6 +29,7 @@ public record UserInfoFromToken(
                 .nickname(entity.getNickname())
                 .profileUrl(entity.getProfileUrl())
                 .role(entity.getRole())
+                .createdAt(entity.getCreatedAt())
                 .build();
     }
 }

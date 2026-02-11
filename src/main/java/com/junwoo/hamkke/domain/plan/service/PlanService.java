@@ -77,6 +77,16 @@ public class PlanService {
     }
 
     /**
+     * 계획 미완료 상태 토글
+     */
+    @Transactional
+    public PlanResponse togglePlanUnCompleted(Long userId, Long planId) {
+        PlanEntity plan = getPlanByIdAndUserId(planId, userId);
+        plan.unComplete();
+        return PlanResponse.from(plan);
+    }
+
+    /**
      * 계획 삭제
      */
     @Transactional
