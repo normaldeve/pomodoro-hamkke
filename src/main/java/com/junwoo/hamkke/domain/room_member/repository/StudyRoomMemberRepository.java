@@ -18,8 +18,6 @@ public interface StudyRoomMemberRepository extends JpaRepository<StudyRoomMember
 
     List<StudyRoomMemberEntity> findByStudyRoomIdOrderByRoleAscCreatedAtAsc(UUID studyRoomId);
 
-    boolean existsByStudyRoomIdAndUserId(UUID studyRoomId, Long userId);
-
     void deleteByStudyRoomIdAndUserId(UUID roomId, Long userId);
 
     List<StudyRoomMemberEntity> findAllByStudyRoomId(UUID roomId);

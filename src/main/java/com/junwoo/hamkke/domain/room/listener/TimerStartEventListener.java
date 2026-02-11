@@ -28,7 +28,7 @@ import java.net.ConnectException;
 import java.net.SocketTimeoutException;
 
 /**
- *
+ * 타이머 시작 시 발생하는 이벤트 처리
  * @author junnukim1007gmail.com
  * @date 26. 2. 10.
  */

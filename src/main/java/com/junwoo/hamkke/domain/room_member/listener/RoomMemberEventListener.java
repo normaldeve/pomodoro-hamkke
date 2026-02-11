@@ -93,8 +93,7 @@ public class RoomMemberEventListener {
         // 타이머 정리
         timerStateService.cleanupTimer(event.roomId());
 
-        log.info("[RoomMemberEventListener] 마지막 멤버가 나가서 방을 삭제합니다 - roomId: {}, 이전 상태: {}",
-                event.roomId(), previousStatus);
+        log.info("[RoomMemberEventListener] 마지막 멤버가 나가서 방을 삭제합니다 - roomId: {}, 이전 상태: {}", event.roomId(), previousStatus);
 
         messagingTemplate.convertAndSend(WebSocketDestination.roomStatus(event.roomId()), RoomStatus.FINISHED);
     }
@@ -118,10 +117,8 @@ public class RoomMemberEventListener {
         HostTransferredResponse response = HostTransferredResponse.of(
                 previousHost.getId(),
                 previousHost.getNickname(),
-                previousHost.getProfileUrl(),
                 newHost.getId(),
                 newHost.getNickname(),
-                newHost.getProfileUrl(),
                 event.isAutoTransfer()
         );
 

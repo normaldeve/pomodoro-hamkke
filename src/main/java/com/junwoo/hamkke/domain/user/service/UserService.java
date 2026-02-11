@@ -39,6 +39,7 @@ public class UserService {
     public SignupResponse signup(SignupRequest request) {
 
         userValidator.checkNicknameDuplicate(request.nickname());
+        userValidator.checkUsernameDuplicate(request.username());
 
         UserEntity user = UserEntity.createUser(request, passwordEncoder);
 
@@ -91,13 +92,5 @@ public class UserService {
         return userRepository.searchUsers(myId, keyword).stream()
                 .map(UserSearchResponse::from)
                 .toList();
-    }
-
-    @Transactional(readOnly = true)
-    public UserInfo getUserInfo(Long userId) {
-        UserEntity user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserException(ErrorCode.CANNOT_FOUND_USER));
-
-        return UserInfo.from(user);
     }
 }

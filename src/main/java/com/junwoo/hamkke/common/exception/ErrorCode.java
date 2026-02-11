@@ -17,7 +17,7 @@ public enum ErrorCode {
     CANNOT_FOUND_USER(HttpStatus.BAD_REQUEST.value(), "사용자를 찾을 수 없습니다"),
 
     ALREADY_EXISTS_NICKNAME(HttpStatus.CONFLICT.value(), "이미 존재하는 닉네임입니다"),
-    ALREADY_EXISTS_EMAIL(HttpStatus.CONFLICT.value(), "이미 존재하는 이메일입니다"),
+    ALREADY_EXISTS_USERNAME(HttpStatus.CONFLICT.value(), "이미 존재하는 아이디입니다"),
 
     EMPTY_FILE(HttpStatus.BAD_REQUEST.value(), "업로드할 파일이 없습니다"),
     FILE_SIZE_EXCEEDED(HttpStatus.BAD_REQUEST.value(), "파일 크기는 10MB를 초과할 수 없습니다"),
@@ -37,6 +37,8 @@ public enum ErrorCode {
 
     PLAN_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "계획을 찾을 수 없습니다"),
     INVALID_INPUT_VALUE(HttpStatus.BAD_REQUEST.value(), "유효하지 않은 입력값입니다"),
+    INVALID_PLAN_TIME_RANGE(HttpStatus.BAD_REQUEST.value(), "종료 시간은 시작 시간보다 이후여야 합니다"),
+    PLAN_TIME_CONFLICT(HttpStatus.CONFLICT.value(), "이미 해당 시간에 일정이 존재합니다"),
 
     CANNOT_TRANSFER_HOST_TO_SELF(HttpStatus.BAD_REQUEST.value(), "자기 자신에게 방장 권한을 위임할 수 없습니다"),
     ONLY_HOST_CAN_TRANSFER(HttpStatus.FORBIDDEN.value(), "방장만 권한을 위임할 수 있습니다"),

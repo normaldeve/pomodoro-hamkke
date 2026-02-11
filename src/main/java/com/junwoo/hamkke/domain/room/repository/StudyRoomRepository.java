@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -21,10 +22,6 @@ import java.util.UUID;
  */
 public interface StudyRoomRepository extends JpaRepository<StudyRoomEntity, UUID> {
 
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("select r from StudyRoomEntity r where r.id = :roomId")
-    Optional<StudyRoomEntity> findByIdForUpdate(@Param("roomId") UUID roomId);
-
     // 일반 방 조회 (상시 운영 방 제외)
     Page<StudyRoomEntity> findByStatusNotAndPermanentFalse(RoomStatus status, Pageable pageable);
 
@@ -33,4 +30,13 @@ public interface StudyRoomRepository extends JpaRepository<StudyRoomEntity, UUID
 
     // 상시 운영 방 존재 여부
     boolean existsByPermanentTrue();
+
+    @Modifying
+    @Query("""
+    update StudyRoomEntity r
+    set r.currentParticipants = r.currentParticipants + 1
+    where r.id = :roomId
+    and r.currentParticipants < r.maxParticipants
+""")
+    int increaseIfNotFull(UUID roomId);
 }

@@ -128,17 +128,4 @@ public class PlanController {
         List<PlanResponse> response = planService.getPlansByDateRange(userId, startDate, endDate);
         return ResponseEntity.ok(response);
     }
-
-    /**
-     * 미완료 계획 개수 조회
-     */
-    @GetMapping("/incomplete/count")
-    public ResponseEntity<Long> getIncompleteCount(
-            @AuthenticationPrincipal CustomUserDetails userDetails
-    ) {
-        Long userId = userDetails.getUser().id();
-
-        long count = planService.getIncompleteCount(userId);
-        return ResponseEntity.ok(count);
-    }
 }

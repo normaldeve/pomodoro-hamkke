@@ -9,7 +9,6 @@ import com.junwoo.hamkke.domain.room.exception.StudyRoomException;
 import com.junwoo.hamkke.domain.room.repository.StudyRoomRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -19,7 +18,7 @@ import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 /**
- *
+ * 쉬는 시간이 시작하면 발생하는 이벤트 처리
  * @author junnukim1007gmail.com
  * @date 26. 2. 10.
  */

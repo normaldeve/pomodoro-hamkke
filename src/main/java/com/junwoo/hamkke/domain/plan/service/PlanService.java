@@ -25,13 +25,15 @@ import java.util.List;
 public class PlanService {
 
     private final PlanRepository planRepository;
+    private final PlanValidation planValidation;
 
     /**
      * 계획 생성
      */
     @Transactional
     public PlanResponse createPlan(Long userId, CreatePlanRequest request) {
-        validateTimeRange(request.startTime(), request.endTime());
+        planValidation.validateTimeRange(request.startTime(), request.endTime());
+        planValidation.validateOverlap(userId, request.planDate(), request.startTime(), request.endTime());
 
         PlanEntity plan = PlanEntity.builder()
                 .userId(userId)
@@ -51,9 +53,11 @@ public class PlanService {
      */
     @Transactional
     public PlanResponse updatePlan(Long userId, Long planId, UpdatePlanRequest request) {
-        validateTimeRange(request.startTime(), request.endTime());
+        planValidation.validateTimeRange(request.startTime(), request.endTime());
+        planValidation.validateOverlapForUpdate(userId, planId, request.planDate(), request.startTime(), request.endTime());
 
-        PlanEntity plan = getPlanByIdAndUserId(planId, userId);
+        PlanEntity plan = planRepository.findByIdAndUserId(planId, userId)
+                .orElseThrow(() -> new PlanException(ErrorCode.PLAN_NOT_FOUND));
 
         plan.updatePlan(
                 request.title(),
@@ -71,7 +75,8 @@ public class PlanService {
      */
     @Transactional
     public PlanResponse togglePlanCompleted(Long userId, Long planId) {
-        PlanEntity plan = getPlanByIdAndUserId(planId, userId);
+        PlanEntity plan = planRepository.findByIdAndUserId(planId, userId)
+                .orElseThrow(() -> new PlanException(ErrorCode.PLAN_NOT_FOUND));
         plan.complete();
         return PlanResponse.from(plan);
     }
@@ -81,7 +86,8 @@ public class PlanService {
      */
     @Transactional
     public PlanResponse togglePlanUnCompleted(Long userId, Long planId) {
-        PlanEntity plan = getPlanByIdAndUserId(planId, userId);
+        PlanEntity plan = planRepository.findByIdAndUserId(planId, userId)
+                .orElseThrow(() -> new PlanException(ErrorCode.PLAN_NOT_FOUND));
         plan.unComplete();
         return PlanResponse.from(plan);
     }
@@ -91,7 +97,8 @@ public class PlanService {
      */
     @Transactional
     public void deletePlan(Long userId, Long planId) {
-        PlanEntity plan = getPlanByIdAndUserId(planId, userId);
+        PlanEntity plan = planRepository.findByIdAndUserId(planId, userId)
+                .orElseThrow(() -> new PlanException(ErrorCode.PLAN_NOT_FOUND));
         planRepository.delete(plan);
     }
 
@@ -117,29 +124,5 @@ public class PlanService {
                 .stream()
                 .map(PlanResponse::from)
                 .toList();
-    }
-
-    /**
-     * 미완료 계획 개수 조회
-     */
-    public long getIncompleteCount(Long userId) {
-        return planRepository.countIncompleteByUserId(userId, LocalDate.now());
-    }
-
-    /**
-     * 계획 조회 (권한 검증 포함)
-     */
-    private PlanEntity getPlanByIdAndUserId(Long planId, Long userId) {
-        return planRepository.findByIdAndUserId(planId, userId)
-                .orElseThrow(() -> new PlanException(ErrorCode.PLAN_NOT_FOUND));
-    }
-
-    /**
-     * 시간 범위 유효성 검증
-     */
-    private void validateTimeRange(java.time.LocalTime startTime, java.time.LocalTime endTime) {
-        if (!startTime.isBefore(endTime)) {
-            throw new PlanException(ErrorCode.INVALID_INPUT_VALUE);
-        }
     }
 }

@@ -28,9 +28,11 @@ public class UserValidator {
         }
     }
 
-    public void validateUserExists(Long userId) {
-        if (!userRepository.existsById(userId)) {
-            throw new UserException(ErrorCode.CANNOT_FOUND_USER);
+    public void checkUsernameDuplicate(String username) {
+        if (userRepository.existsByUsername(username)) {
+            log.error("[UserValidator] 회원 가입 실패 - 이미 존재하는 아이디: {}", username);
+
+            throw new UserException(ErrorCode.ALREADY_EXISTS_USERNAME);
         }
     }
 }

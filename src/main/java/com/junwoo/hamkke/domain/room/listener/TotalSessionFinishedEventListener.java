@@ -18,7 +18,7 @@ import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 /**
- *
+ * 전체 세션이 종료되었을 때 발생하는 이벤트 처리
  * @author junnukim1007gmail.com
  * @date 26. 2. 10.
  */

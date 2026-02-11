@@ -61,41 +61,33 @@ public class StudyRoomMemberService {
     // StudyRoomMemberService.java 일부 수정
     public ParticipantMemberInfo enterRoom(UUID roomId, Long userId, EnterStudyRoomRequest request) {
 
-        // 이미 입장한 멤버인지 확인
-        if (studyRoomMemberRepository.existsByStudyRoomIdAndUserId(roomId, userId)) {
-            throw new StudyRoomException(ErrorCode.ALREADY_IN_ROOM);
-        }
-
-        // 다른 방에 들어가 있는 사용자인지 확인
-        if (studyRoomMemberRepository.existsByUserId(userId)) {
-            log.error("[StudyRoomMemberService] 이미 다른 스터디에 들어가 있는 사용자입니다!!!");
-            throw new StudyRoomException(ErrorCode.ALREADY_IN_ANOTHER_ROOM);
-        }
-
         UserEntity user = userRepository.findById(userId)
                 .orElseThrow(() -> new StudyRoomException(ErrorCode.CANNOT_FOUND_USER));
 
-        // [TODO] 사용자 수 동시성 문제를 위해 비관적 락 적용 테스트 코드 필요
-        StudyRoomEntity room = studyRoomRepository.findByIdForUpdate(roomId)
+        // 다른 방에 들어가 있는 사용자인지 확인
+        if (studyRoomMemberRepository.existsByUserId(userId)) {
+            log.error("[StudyRoomMemberService] 이미 다른 스터디에 들어가 있는 사용자입니다");
+            throw new StudyRoomException(ErrorCode.ALREADY_IN_ANOTHER_ROOM);
+        }
+
+        StudyRoomEntity room = studyRoomRepository.findById(roomId)
                 .orElseThrow(() -> new StudyRoomException(ErrorCode.CANNOT_FOUND_ROOM));
 
-        // 상시 운영 방이 아닐 때만 비밀번호 확인
-        if (!room.isPermanent() && room.isSecret()) {
-            if (request == null || request.password() == null ||
-                    !request.password().equals(room.getPassword())) {
+        if (room.isSecret()) {
+            if (request == null || request.password() == null || !request.password().equals(room.getPassword())) {
                 throw new StudyRoomException(ErrorCode.SECRET_ROOM_PASSWORD_INVALID);
             }
         }
 
-        if (room.getCurrentParticipants() >= room.getMaxParticipants()) {
+        int updated = studyRoomRepository.increaseIfNotFull(roomId);
+
+        if (updated == 0) {
             throw new StudyRoomException(ErrorCode.ROOM_CAPACITY_EXCEEDED);
         }
 
-        // 상시 운영 방은 모두 MEMBER로 등록 (HOST 없음)
         StudyRoomMemberEntity member = StudyRoomMemberEntity.registerMember(roomId, userId);
 
         studyRoomMemberRepository.save(member);
-        room.addCurrentParticipant();
 
         return ParticipantMemberInfo.from(user);
     }

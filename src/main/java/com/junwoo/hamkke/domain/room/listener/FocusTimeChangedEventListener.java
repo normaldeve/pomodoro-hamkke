@@ -27,7 +27,7 @@ import java.net.ConnectException;
 import java.net.SocketTimeoutException;
 
 /**
- *
+ * 사용자가 집중 시간을 변경하면 발생하는 이벤트 처리
  * @author junnukim1007gmail.com
  * @date 26. 1. 26.
  */

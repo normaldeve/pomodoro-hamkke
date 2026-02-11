@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,6 +16,23 @@ import java.util.Optional;
  * @date 26. 2. 8.
  */
 public interface PlanRepository extends JpaRepository<PlanEntity, Long> {
+
+    // 겹치는 일정이 있는지 검증하는 로직 -> Create 용
+    boolean existsByUserIdAndPlanDateAndStartTimeLessThanAndEndTimeGreaterThan(
+            Long userId,
+            LocalDate planDate,
+            LocalTime endTime,
+            LocalTime startTime
+    );
+
+    // 본인 id를 제외하고 겹치는 일정이 있는지 검증하는 로직 -> Update 용
+    boolean existsByUserIdAndPlanDateAndIdNotAndStartTimeLessThanAndEndTimeGreaterThan(
+            Long userId,
+            LocalDate planDate,
+            Long planId,
+            LocalTime endTime,
+            LocalTime startTime
+    );
 
     /**
      * 사용자의 특정 날짜 계획 조회
