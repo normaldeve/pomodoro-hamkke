@@ -1,50 +1,44 @@
 package com.junwoo.hamkke.domain.dial.calculator;
 
 import com.junwoo.hamkke.domain.dial.dto.TimerPhase;
+import org.springframework.stereotype.Component;
 
+@Component
 public class PermanentTimerCalculator {
 
-    private PermanentTimerCalculator() {}
+    public PermanentTimerCalculation calculatePermanentTimerState(int focusMinutes, int breakMinutes) {
 
-    public static Result calculate(int focusMinutes, int breakMinutes) {
+        int cycleMinutes = focusMinutes + breakMinutes;
+        int cycleDurationSeconds = cycleMinutes * 60;
 
-        int focusSeconds = focusMinutes * 60;
-        int breakSeconds = breakMinutes * 60;
-        int cycleSeconds = focusSeconds + breakSeconds;
+        // 현재 시간에서 분/초 추출
+        long now = System.currentTimeMillis();
+        int currentMinute = (int) ((now / 1000 / 60) % 60);
+        int currentSecond = (int) ((now / 1000) % 60);
 
-        long nowMillis = System.currentTimeMillis();
-        long nowSeconds = nowMillis / 1000;
+        // 정각 기준으로 몇 초 경과했는지
+        int elapsedSecondsInHour = currentMinute * 60 + currentSecond;
 
-        // 정각 기준: 현재 시간에서 분 + 초
-        int secondsInHour =
-                (int) ((nowSeconds / 60 % 60) * 60 + (nowSeconds % 60));
-
-        int elapsedInCycle = secondsInHour % cycleSeconds;
+        // 현재 사이클 내에서 몇 초 경과했는지
+        int elapsedInCycle = elapsedSecondsInHour % cycleDurationSeconds;
 
         TimerPhase phase;
         int remainingSeconds;
         long phaseStartTime;
 
-        if (elapsedInCycle < focusSeconds) {
-            // FOCUS 구간
+        if (elapsedInCycle < focusMinutes * 60) {
+            // 집중 시간 중
             phase = TimerPhase.FOCUS;
-            remainingSeconds = focusSeconds - elapsedInCycle;
-            phaseStartTime = nowMillis - (elapsedInCycle * 1000L);
+            remainingSeconds = (focusMinutes * 60) - elapsedInCycle;
+            phaseStartTime = now - (elapsedInCycle * 1000L);
         } else {
-            // BREAK 구간
+            // 휴식 시간 중
             phase = TimerPhase.BREAK;
-            int elapsedInBreak = elapsedInCycle - focusSeconds;
-            remainingSeconds = breakSeconds - elapsedInBreak;
-            phaseStartTime = nowMillis - (elapsedInBreak * 1000L);
+            int elapsedInBreak = elapsedInCycle - (focusMinutes * 60);
+            remainingSeconds = (breakMinutes * 60) - elapsedInBreak;
+            phaseStartTime = now - (elapsedInBreak * 1000L);
         }
 
-        return new Result(phase, remainingSeconds, phaseStartTime);
+        return new PermanentTimerCalculation(phase, remainingSeconds, phaseStartTime);
     }
-
-    // 결과 DTO (내부 전용)
-    public record Result(
-            TimerPhase phase,
-            int remainingSeconds,
-            long phaseStartTime
-    ) {}
 }

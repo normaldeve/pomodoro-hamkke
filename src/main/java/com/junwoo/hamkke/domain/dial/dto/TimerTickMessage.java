@@ -13,14 +13,16 @@ import java.util.UUID;
 public record TimerTickMessage(
         UUID roomId,
         TimerPhase phase,
-        int remainingSeconds
+        int remainingSeconds,
+        boolean running
 ) {
 
-    public static TimerTickMessage from(TimerState state) {
+    public static TimerTickMessage from(TimerState state, int remainingSeconds) {
         return TimerTickMessage.builder()
                 .roomId(state.getRoomId())
                 .phase(state.getPhase())
-                .remainingSeconds(state.getRemainingSeconds())
+                .remainingSeconds(remainingSeconds)
+                .running(state.isRunning())
                 .build();
     }
 }

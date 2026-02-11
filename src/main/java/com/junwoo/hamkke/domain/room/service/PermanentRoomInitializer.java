@@ -1,6 +1,5 @@
 package com.junwoo.hamkke.domain.room.service;
 
-import com.junwoo.hamkke.domain.dial.dto.TimerStartRequest;
 import com.junwoo.hamkke.domain.dial.service.TimerStateService;
 import com.junwoo.hamkke.domain.room.entity.StudyRoomEntity;
 import com.junwoo.hamkke.domain.room.entity.TimerType;
@@ -20,8 +19,6 @@ import java.util.Set;
  * - 서버 최초 시작: 4개 상시 운영 방 생성 및 타이머 시작
  * - 서버 재시작: 기존 상시 운영 방의 타이머 재시작
  *
- * [TODO] 해당 파일을 여기서 관리하는게 맞을까?
- *
  * @author junnukim1007gmail.com
  * @date 26. 2. 7.
  */
@@ -36,9 +33,7 @@ public class PermanentRoomInitializer implements ApplicationRunner {
     @Override
     @Transactional
     public void run(ApplicationArguments args) {
-        log.info("==========================================");
         log.info("[PermanentRoomInitializer] 상시 운영 방 초기화 시작");
-        log.info("==========================================");
 
         // 이미 존재하는지 확인
         if (studyRoomRepository.existsByPermanentTrue()) {
@@ -48,10 +43,7 @@ public class PermanentRoomInitializer implements ApplicationRunner {
             log.info("[PermanentRoomInitializer] 최초 실행 - 상시 운영 방 생성");
             createPermanentRooms();
         }
-
-        log.info("==========================================");
         log.info("[PermanentRoomInitializer] 상시 운영 방 초기화 완료");
-        log.info("==========================================");
     }
 
     /**
