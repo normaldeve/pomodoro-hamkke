@@ -1,15 +1,16 @@
 package com.junwoo.hamkke.domain.auth.service;
 
-import com.junwoo.hamkke.domain.auth.dto.RefreshTokenEntry;
+import com.junwoo.hamkke.domain.auth.entity.RefreshTokenEntity;
+import com.junwoo.hamkke.domain.auth.repository.RefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.time.LocalDateTime;
 
 /**
+ * Refresh Token 관리 서비스 (DB 기반)
  *
  * @author junnukim1007gmail.com
  * @date 26. 1. 12.
@@ -19,87 +20,80 @@ import java.util.concurrent.ConcurrentHashMap;
 @RequiredArgsConstructor
 public class RefreshTokenProvider {
 
-    private static final String PREFIX = "refresh:";
+    private final RefreshTokenRepository refreshTokenRepository;
 
-    private final Map<String, RefreshTokenEntry> store = new ConcurrentHashMap<>();
-
+    /**
+     * Refresh Token 저장 또는 갱신
+     */
+    @Transactional
     public void save(String username, String refreshToken, long ttlMillis) {
-        long expireAt = System.currentTimeMillis() + ttlMillis;
+        LocalDateTime expireAt = LocalDateTime.now().plusSeconds(ttlMillis / 1000);
 
-        store.put(PREFIX + username, new RefreshTokenEntry(refreshToken, expireAt));
-
-        log.info("[RefreshTokenService] Refresh Token 저장 - username={}", username);
+        refreshTokenRepository.findByUsername(username)
+                .ifPresentOrElse(
+                        // 기존 토큰이 있으면 갱신
+                        existingToken -> {
+                            existingToken.updateToken(refreshToken, expireAt);
+                            log.info("[RefreshTokenProvider] Refresh Token 갱신 - username={}", username);
+                        },
+                        // 없으면 새로 생성
+                        () -> {
+                            RefreshTokenEntity newToken = RefreshTokenEntity.builder()
+                                    .username(username)
+                                    .token(refreshToken)
+                                    .expireAt(expireAt)
+                                    .build();
+                            refreshTokenRepository.save(newToken);
+                            log.info("[RefreshTokenProvider] Refresh Token 저장 - username={}", username);
+                        }
+                );
     }
 
+    /**
+     * Refresh Token 조회
+     */
+    @Transactional(readOnly = true)
     public String get(String username) {
-        String key = PREFIX + username;
-        RefreshTokenEntry entry = store.get(key);
-
-        if (entry == null) {
-            log.info("[RefreshTokenService] Refresh Token 조회 실패 - username={}", username);
-            return null;
-        }
-
-        if (System.currentTimeMillis() > entry.getExpireAt()) {
-            store.remove(key);
-            log.info("[RefreshTokenService] Refresh Token 만료 - username={}", username);
-            return null;
-        }
-
-        log.info("[RefreshTokenService] Refresh Token 조회 성공 - username={}", username);
-        return entry.getToken();
+        return refreshTokenRepository.findByUsername(username)
+                .filter(token -> !token.isExpired())
+                .map(RefreshTokenEntity::getToken)
+                .orElseGet(() -> {
+                    log.info("[RefreshTokenProvider] Refresh Token 조회 실패 또는 만료 - username={}", username);
+                    return null;
+                });
     }
 
+    /**
+     * Refresh Token 삭제
+     */
+    @Transactional
     public void delete(String username) {
-        RefreshTokenEntry removed = store.remove(PREFIX + username);
-
-        if (removed != null) {
-            log.info("[RefreshTokenService] Refresh Token 삭제 - username={}", username);
-        } else {
-            log.info("[RefreshTokenService] Refresh Token 삭제 요청 (존재하지 않음) - username={}", username);
-        }
+        refreshTokenRepository.findByUsername(username)
+                .ifPresentOrElse(
+                        token -> {
+                            refreshTokenRepository.delete(token);
+                            log.info("[RefreshTokenProvider] Refresh Token 삭제 - username={}", username);
+                        },
+                        () -> log.info("[RefreshTokenProvider] Refresh Token 삭제 요청 (존재하지 않음) - username={}", username)
+                );
     }
 
+    /**
+     * 만료된 토큰 정리
+     */
+    @Transactional
     public void cleanupExpiredTokens() {
-        long now = System.currentTimeMillis();
+        LocalDateTime now = LocalDateTime.now();
 
-        int totalBefore = store.size();
+        long expiredCount = refreshTokenRepository.countExpiredTokens(now);
 
-        // 삭제 대상 수집
-        Map<String, RefreshTokenEntry> expiredTokens = new ConcurrentHashMap<>();
-
-        store.forEach((key, entry) -> {
-            if (now > entry.getExpireAt()) {
-                expiredTokens.put(key, entry);
-            }
-        });
-
-        if (expiredTokens.isEmpty()) {
-            log.debug("[RefreshTokenCleanup] 만료된 토큰 없음 (total={})", totalBefore);
+        if (expiredCount == 0) {
+            log.debug("[RefreshTokenCleanup] 만료된 토큰 없음");
             return;
         }
 
-        // 삭제 대상 로그 (너무 많으면 일부만)
-        expiredTokens.entrySet().stream()
-                .limit(5)
-                .forEach(e -> {
-                    String username = e.getKey().replace(PREFIX, "");
-                    RefreshTokenEntry entry = e.getValue();
+        int deletedCount = refreshTokenRepository.deleteExpiredTokens(now);
 
-                    log.debug("[RefreshTokenCleanup] 삭제 대상 - username={}, expireAt={}", username, entry.getExpireAt());
-                });
-
-        // 실제 삭제
-        expiredTokens.keySet().forEach(store::remove);
-
-        int deletedCount = expiredTokens.size();
-        int totalAfter = store.size();
-
-        log.info(
-                "[RefreshTokenCleanup] 완료 - before={}, deleted={}, after={}",
-                totalBefore,
-                deletedCount,
-                totalAfter
-        );
+        log.info("[RefreshTokenCleanup] 완료 - deleted={}", deletedCount);
     }
 }

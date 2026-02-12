@@ -47,7 +47,7 @@ server:
 jwt:
   secret: ${JWT_SECRET}
   access-token-validity: ${JWT_ACCESS_TOKEN_VALIDITY:1800000}
-  refresh-token-validity: ${JWT_REFRESH_TOKEN_VALIDITY:604800000}
+  refresh-token-validity: ${JWT_REFRESH_TOKEN_VALIDITY:2592000000}
 
 # Admin 계정
 admin:
