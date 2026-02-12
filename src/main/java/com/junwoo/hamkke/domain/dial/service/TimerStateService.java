@@ -207,9 +207,7 @@ public class TimerStateService {
             }
 
             int remaining = state.calculateRemainingSeconds();
-            tickBroadcaster.sendTick(
-                    TimerTickMessage.from(state, remaining)
-            );
+            tickBroadcaster.sendTick(TimerTickMessage.from(state, remaining));
         });
     }
 

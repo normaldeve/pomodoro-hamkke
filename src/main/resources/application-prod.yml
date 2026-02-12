@@ -73,3 +73,7 @@ cloud:
 discord:
   webhook:
     url: ${DISCORD_WEBHOOK_URL}
+
+firebase:
+  config:
+    path: ${FIREBASE_CONFIG_PATH}

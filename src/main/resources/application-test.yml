@@ -45,3 +45,7 @@ admin:
 discord:
   webhook:
     url: test-discord-webhook-url
+
+firebase:
+  config:
+    path: test_path

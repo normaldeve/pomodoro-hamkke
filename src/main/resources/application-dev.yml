@@ -7,7 +7,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: create-drop
     properties:
       hibernate:
         format_sql: true
@@ -56,3 +56,7 @@ admin:
 discord:
   webhook:
     url: ${DISCORD_WEBHOOK_URL}
+
+firebase:
+  config:
+    path: ${FIREBASE_CONFIG_PATH}

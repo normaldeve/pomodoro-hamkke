@@ -17,7 +17,6 @@ public final class SecurityPassUrlList {
             "/api/auth/refresh",
             "/api/auth/logout",
             "/ws/**",
-            "/api/notifications/**",
             "/api/study/all",
             "/actuator/health",
             "/api/auth/me",

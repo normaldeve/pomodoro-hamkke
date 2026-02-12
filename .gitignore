@@ -42,3 +42,6 @@ out/
 ### Docker Compose ###
 docker-compose.dev.yml
 /k6/
+
+### Firebase ###
+**/firebase
