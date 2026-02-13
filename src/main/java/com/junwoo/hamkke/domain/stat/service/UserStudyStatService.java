@@ -3,6 +3,7 @@ package com.junwoo.hamkke.domain.stat.service;
 import com.junwoo.hamkke.domain.stat.dto.MonthlyStudyStatResponse;
 import com.junwoo.hamkke.domain.stat.dto.StudyHeatmapResponse;
 import com.junwoo.hamkke.domain.stat.dto.StudyTimeSummaryResponse;
+import com.junwoo.hamkke.domain.stat.dto.TodayStudyTimeResponse;
 import com.junwoo.hamkke.domain.stat.entity.UserDailyStudyStat;
 import com.junwoo.hamkke.domain.stat.repository.UserDailyStudyStatRepository;
 import lombok.RequiredArgsConstructor;
@@ -62,6 +63,15 @@ public class UserStudyStatService {
                 .thisWeekMinutes(thisWeekMinutes)
                 .thisMonthMinutes(thisMonthMinutes)
                 .consecutiveDays(consecutiveDays)
+                .build();
+    }
+
+    public TodayStudyTimeResponse getTodayStudyTime(Long userId) {
+        LocalDate today = LocalDate.now();
+        int todayMinutes = dailyStatRepository.sumMinutesByPeriod(userId, today, today);
+
+        return TodayStudyTimeResponse.builder()
+                .todayMinutes(todayMinutes)
                 .build();
     }
 

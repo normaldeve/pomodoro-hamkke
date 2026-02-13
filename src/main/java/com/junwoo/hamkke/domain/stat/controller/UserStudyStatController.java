@@ -4,6 +4,7 @@ import com.junwoo.hamkke.domain.auth.security.userdetail.CustomUserDetails;
 import com.junwoo.hamkke.domain.stat.dto.MonthlyStudyStatResponse;
 import com.junwoo.hamkke.domain.stat.dto.StudyHeatmapResponse;
 import com.junwoo.hamkke.domain.stat.dto.StudyTimeSummaryResponse;
+import com.junwoo.hamkke.domain.stat.dto.TodayStudyTimeResponse;
 import com.junwoo.hamkke.domain.stat.service.UserStudyStatService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -56,6 +57,15 @@ public class UserStudyStatController {
     ) {
         Long userId = userDetails.getUser().id();
         MonthlyStudyStatResponse response = studyStatService.getMonthlyStatistics(userId, year, month);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/today")
+    public ResponseEntity<TodayStudyTimeResponse> getTodayStudyTime(
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        Long userId = userDetails.getUser().id();
+        TodayStudyTimeResponse response = studyStatService.getTodayStudyTime(userId);
         return ResponseEntity.ok(response);
     }
 }
