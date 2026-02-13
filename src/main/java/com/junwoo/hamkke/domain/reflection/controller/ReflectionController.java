@@ -49,6 +49,18 @@ public class ReflectionController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/{roomId}/my")
+    public ResponseEntity<List<ReflectionResponse>> getMyRoomReflections(
+            @PathVariable UUID roomId,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        Long userId = userDetails.getUser().id();
+
+        List<ReflectionResponse> response = reflectionService.getMyRoomReflections(roomId, userId);
+
+        return ResponseEntity.ok(response);
+    }
+
     /**
      * 내 회고 조회
      * - date만 있으면: 특정 날 조회

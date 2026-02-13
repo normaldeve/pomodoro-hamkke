@@ -39,6 +39,30 @@ public interface ReflectionRepository extends JpaRepository<ReflectionEntity, Lo
     """)
     List<ReflectionResponse> findRoomReflections(UUID roomId);
 
+    @Query("""
+    SELECT new com.junwoo.hamkke.domain.reflection.dto.ReflectionResponse(
+        r.id,
+        r.sessionId,
+        u.id,
+        r.content,
+        u.nickname,
+        u.profileUrl,
+        r.focusScore,
+        r.imageUrl,
+        r.isPrivate,
+        r.createdAt
+    )
+    FROM ReflectionEntity r
+    JOIN UserEntity u ON r.userId = u.id
+    WHERE r.studyRoomId = :roomId
+    AND r.userId = :userId
+    ORDER BY r.createdAt ASC
+    """)
+    List<ReflectionResponse> findMyRoomReflections(
+            @Param("roomId") UUID roomId,
+            @Param("userId") Long userId
+    );
+
     // 특정 날짜의 회고 조회
     @Query("""
     SELECT r

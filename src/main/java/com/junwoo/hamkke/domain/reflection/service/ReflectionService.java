@@ -67,6 +67,12 @@ public class ReflectionService {
         return reflectionRepository.findRoomReflections(roomId);
     }
 
+    @Transactional(readOnly = true)
+    public List<ReflectionResponse> getMyRoomReflections(UUID roomId, Long userId) {
+
+        return reflectionRepository.findMyRoomReflections(roomId, userId);
+    }
+
     /**
      * 회고 조회 (특정 날/특정 월/전체)
      * - date가 있으면 특정 날
