@@ -108,6 +108,17 @@ public class TimerState {
         return (int) Math.max(0, phaseDurationSeconds - elapsed);
     }
 
+    public int calculateElapsedSeconds() {
+        if (running) {
+            return (int) Math.max(0, accumulatedSeconds + (System.currentTimeMillis() - phaseStartTime) / 1000);
+        }
+        return (int) Math.max(0, accumulatedSeconds);
+    }
+
+    public int getFocusDurationSeconds() {
+        return defaultFocusMinutes * 60;
+    }
+
     public boolean isPhaseFinished() {
         return calculateRemainingSeconds() <= 0;
     }

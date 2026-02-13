@@ -38,6 +38,7 @@ public class StudyRoomMemberService {
     private final UserRepository userRepository;
     private final StudyRoomRepository studyRoomRepository;
     private final StudyRoomMemberRepository studyRoomMemberRepository;
+    private final FocusTimeService focusTimeService;
     private final ApplicationEventPublisher eventPublisher;
 
     @Transactional(readOnly = true)
@@ -88,6 +89,7 @@ public class StudyRoomMemberService {
         StudyRoomMemberEntity member = StudyRoomMemberEntity.registerMember(roomId, userId);
 
         studyRoomMemberRepository.save(member);
+        focusTimeService.markParticipationForLateJoin(member);
 
         return ParticipantMemberInfo.from(user);
     }
@@ -103,6 +105,7 @@ public class StudyRoomMemberService {
 
         boolean isHost = leavingMember.isHost();
 
+        focusTimeService.settleFocusTimeOnLeave(leavingMember);
         studyRoomMemberRepository.deleteByStudyRoomIdAndUserId(roomId, userId);
         room.removeCurrentParticipant();
 

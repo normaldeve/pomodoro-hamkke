@@ -43,7 +43,7 @@ public class AuthService {
             throw new AuthException(ErrorCode.INVALID_REFRESH_TOKEN);
         }
 
-        AuthDTO user = userService.findByNickname(username);
+        AuthDTO user = userService.findByUsername(username);
         String newAccessToken = jwtTokenProvider.createAccessToken(user);
 
         log.info("[AuthService] Access Token 재발급 성공 - username={}", username);

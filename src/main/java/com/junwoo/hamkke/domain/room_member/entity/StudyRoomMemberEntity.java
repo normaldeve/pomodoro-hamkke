@@ -36,6 +36,8 @@ public class StudyRoomMemberEntity extends BaseEntity {
 
     private int currentSessionId;
 
+    private Integer focusJoinElapsedSeconds;
+
     @Enumerated(EnumType.STRING)
     private RoomMemberRole role;
 
@@ -44,6 +46,7 @@ public class StudyRoomMemberEntity extends BaseEntity {
                 .studyRoomId(studyRoomId)
                 .userId(userId)
                 .currentSessionId(0)
+                .focusJoinElapsedSeconds(null)
                 .role(RoomMemberRole.HOST)
                 .build();
     }
@@ -53,12 +56,19 @@ public class StudyRoomMemberEntity extends BaseEntity {
                 .studyRoomId(studyRoomId)
                 .userId(userId)
                 .currentSessionId(0)
+                .focusJoinElapsedSeconds(null)
                 .role(RoomMemberRole.MEMBER)
                 .build();
     }
 
-    public void markParticipating(int currentSessionId) {
+    public void markParticipating(int currentSessionId, int focusJoinElapsedSeconds) {
         this.currentSessionId = currentSessionId;
+        this.focusJoinElapsedSeconds = Math.max(0, focusJoinElapsedSeconds);
+    }
+
+    public void clearParticipation() {
+        this.currentSessionId = 0;
+        this.focusJoinElapsedSeconds = null;
     }
 
     public void promoteToHost() {

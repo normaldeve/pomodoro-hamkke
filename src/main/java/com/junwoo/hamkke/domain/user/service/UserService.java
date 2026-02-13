@@ -80,8 +80,8 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public AuthDTO findByNickname(String  nickname) {
-        UserEntity userEntity = userRepository.findByNickname(nickname)
+    public AuthDTO findByUsername(String  username) {
+        UserEntity userEntity = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UserException(ErrorCode.CANNOT_FOUND_USER));
 
         return AuthDTO.from(userEntity);

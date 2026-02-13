@@ -16,7 +16,7 @@ import java.util.UUID;
 import java.util.concurrent.*;
 
 /**
- * [TODO] 상시 운영 방 책임이 추가되면서 코드 베이스 개선 필요
+ *
  * @author junnukim1007gmail.com
  * @date 26. 1. 25.
  */
@@ -129,9 +129,10 @@ public class TimerStateService {
     }
 
     public void startNextFocus(TimerState state) {
-        log.info("[TimerStateService] startNextFocus() : 다음 세션 시작 - roomId: {}, session: {}", state.getRoomId(), state.moveToNextFocusSession());
 
         int session = state.moveToNextFocusSession();
+
+        log.info("[TimerStateService] startNextFocus() : 다음 세션 시작 - roomId: {}, session: {}", state.getRoomId(), state.getCurrentSession());
 
         log.info("[TimerStateService] startNextFocus() : 다음 세션 이벤트를 생성합니다 - roomId: {}, session: {}", state.getRoomId(), state.getCurrentSession());
         eventPublisher.publishEvent(new FocusTimeStartedEvent(state.getRoomId(), session));
@@ -155,9 +156,13 @@ public class TimerStateService {
         TimerState state = timerState.get(roomId);
         if(state == null) return;
 
-        state.updateNextFocusMinutes(focusMinutes);
+        boolean updated = state.updateNextFocusMinutes(focusMinutes);
+        if (!updated) {
+            log.warn("[TimerStateService] updateNextFocusTime() : 휴식 시간이 아니어서 다음 집중 시간 변경을 건너뜁니다 - roomId: {}", roomId);
+            return;
+        }
 
-        eventPublisher.publishEvent(new FocusTimeChangedEvent(roomId, state.getNextFocusMinutes()));
+        eventPublisher.publishEvent(new FocusTimeChangedEvent(roomId, focusMinutes));
     }
 
     // 타이머 정지
@@ -223,8 +228,23 @@ public class TimerStateService {
         stop(roomId);
 
         // 타이머 상태 제거
-        TimerState removedState = timerState.remove(roomId);
+        timerState.remove(roomId);
 
         log.info("[TimerStateService] cleanupTimer() : 타이머 정리 완료 - roomId: {}", roomId);
+    }
+
+    @Transactional(readOnly = true)
+    public TimerRuntimeSnapshot getTimerSnapshot(UUID roomId) {
+        TimerState state = timerState.get(roomId);
+        if (state == null) {
+            return null;
+        }
+
+        return new TimerRuntimeSnapshot(
+                state.getPhase(),
+                state.getCurrentSession(),
+                state.calculateElapsedSeconds(),
+                state.getFocusDurationSeconds()
+        );
     }
 }

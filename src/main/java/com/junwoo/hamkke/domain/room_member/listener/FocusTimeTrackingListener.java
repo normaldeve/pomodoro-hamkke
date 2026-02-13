@@ -3,16 +3,13 @@ package com.junwoo.hamkke.domain.room_member.listener;
 import com.junwoo.hamkke.common.discord.DiscordNotifier;
 import com.junwoo.hamkke.domain.dial.dto.event.FocusTimeFinishedEvent;
 import com.junwoo.hamkke.domain.dial.dto.event.FocusTimeStartedEvent;
-import com.junwoo.hamkke.domain.room.repository.StudyRoomRepository;
-import com.junwoo.hamkke.domain.room_member.entity.RoomFocusTimeEntity;
 import com.junwoo.hamkke.domain.room_member.entity.StudyRoomMemberEntity;
-import com.junwoo.hamkke.domain.room_member.repository.RoomFocusTimeRepository;
 import com.junwoo.hamkke.domain.room_member.repository.StudyRoomMemberRepository;
+import com.junwoo.hamkke.domain.room_member.service.FocusTimeService;
 import jakarta.persistence.OptimisticLockException;
 import jakarta.persistence.PessimisticLockException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.event.EventListener;
 import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
@@ -26,8 +23,8 @@ import org.springframework.transaction.event.TransactionalEventListener;
 
 import java.net.ConnectException;
 import java.net.SocketTimeoutException;
-import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * [TODO] 아래와 같은 방식으로 사용자 필드 업데이트 시 문제가 발생하지는 않을까? -> 테스트 필요!!!!!
@@ -41,8 +38,7 @@ import java.util.List;
 public class FocusTimeTrackingListener {
 
     private final StudyRoomMemberRepository memberRepository;
-    private final RoomFocusTimeRepository roomFocusTimeRepository;
-    private final StudyRoomRepository studyRoomRepository;
+    private final FocusTimeService focusTimeService;
     private final DiscordNotifier discordNotifier;
 
     @Async(value = "domainEventExecutor")
@@ -55,8 +51,6 @@ public class FocusTimeTrackingListener {
 
         log.info("[FocusTimeTracking] FOCUS 정상 종료 - roomId: {}", event.roomId());
 
-        LocalDate today = LocalDate.now();
-
         List<StudyRoomMemberEntity> members = memberRepository.findAllByStudyRoomId(event.roomId());
 
         if (members.isEmpty()) {
@@ -64,20 +58,18 @@ public class FocusTimeTrackingListener {
             return;
         }
 
+        int fullFocusSeconds = event.focusTime() * 60;
+
         for (StudyRoomMemberEntity member : members) {
-            log.info("[FocusTimeTrackingListener] onFocusPhaseEnd() : 참여자 집중 시간 설정 - member {}", member.getId());
+            if (!Objects.equals(member.getCurrentSessionId(), event.currentSessionId())) {
+                continue;
+            }
 
-            RoomFocusTimeEntity roomFocusTime = roomFocusTimeRepository
-                    .findByUserIdAndStudyRoomIdAndFocusDate(member.getUserId(), event.roomId(), today)
-                    .orElseGet(() -> RoomFocusTimeEntity.builder()
-                            .userId(member.getUserId())
-                            .studyRoomId(event.roomId())
-                            .focusDate(today)
-                            .totalFocusMinutes(0)
-                            .build());
+            int joinElapsedSeconds = member.getFocusJoinElapsedSeconds() == null ? 0 : member.getFocusJoinElapsedSeconds();
+            int earnedSeconds = Math.max(0, fullFocusSeconds - joinElapsedSeconds);
 
-            roomFocusTime.addMinutes(event.focusTime());
-            roomFocusTimeRepository.save(roomFocusTime);
+            focusTimeService.addFocusSeconds(member.getUserId(), event.roomId(), earnedSeconds);
+            member.clearParticipation();
         }
 
         log.info("[FocusTimeTrackingListener] onFocusPhaseEnd() : 방에 있는 사용자 집중 시간 누적 완료 - roomId: {}, focusTime: {}",
@@ -109,7 +101,7 @@ public class FocusTimeTrackingListener {
         List<StudyRoomMemberEntity> members = memberRepository.findAllByStudyRoomId(event.roomId());
 
         for (StudyRoomMemberEntity member : members) {
-            member.markParticipating(event.currentSessionId());
+            member.markParticipating(event.currentSessionId(), 0);
         }
     }
 
