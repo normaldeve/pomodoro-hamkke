@@ -6,6 +6,7 @@ import com.google.firebase.FirebaseOptions;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.ClassPathResource;
 
 import javax.annotation.PostConstruct;
@@ -17,6 +18,7 @@ import java.io.IOException;
  * @date 26. 2. 12.
  */
 @Slf4j
+@Profile("!test")
 @Configuration
 public class FirebaseConfig {
 
