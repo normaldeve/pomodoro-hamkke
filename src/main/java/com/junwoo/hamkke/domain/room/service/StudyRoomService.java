@@ -58,7 +58,10 @@ public class StudyRoomService {
         Pageable pageable = PageRequest.of(
                 page,
                 PAGE_SIZE,
-                Sort.by("createdAt").descending()
+                Sort.by(
+                        Sort.Order.desc("currentParticipants"),
+                        Sort.Order.desc("createdAt")
+                )
         );
 
         // 일반 방만 조회 (상시 운영 방 제외)

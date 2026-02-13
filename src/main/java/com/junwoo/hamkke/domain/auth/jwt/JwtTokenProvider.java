@@ -11,10 +11,12 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseCookie;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import java.time.Duration;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Date;
@@ -112,5 +114,42 @@ public class JwtTokenProvider {
                 .map(Cookie::getValue)
                 .findFirst()
                 .orElseThrow(() -> new AuthException(ErrorCode.INVALID_REFRESH_TOKEN));
+    }
+
+    public String createRefreshTokenCookieHeader(HttpServletRequest request, String refreshToken) {
+        boolean secureRequest = isSecureRequest(request);
+        String sameSite = secureRequest ? "None" : "Lax";
+
+        return ResponseCookie.from("refresh_token", refreshToken)
+                .httpOnly(true)
+                .secure(secureRequest)
+                .sameSite(sameSite)
+                .path("/api/auth")
+                .maxAge(Duration.ofMillis(refreshTokenValidityInMilliseconds))
+                .build()
+                .toString();
+    }
+
+    public String createRefreshTokenClearCookieHeader(HttpServletRequest request) {
+        boolean secureRequest = isSecureRequest(request);
+        String sameSite = secureRequest ? "None" : "Lax";
+
+        return ResponseCookie.from("refresh_token", "")
+                .httpOnly(true)
+                .secure(secureRequest)
+                .sameSite(sameSite)
+                .path("/api/auth")
+                .maxAge(Duration.ZERO)
+                .build()
+                .toString();
+    }
+
+    private boolean isSecureRequest(HttpServletRequest request) {
+        String forwardedProto = request.getHeader("X-Forwarded-Proto");
+        if (forwardedProto != null && !forwardedProto.isBlank()) {
+            return "https".equalsIgnoreCase(forwardedProto);
+        }
+
+        return request.isSecure();
     }
 }

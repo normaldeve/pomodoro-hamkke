@@ -2,7 +2,6 @@ package com.junwoo.hamkke.domain.auth.security.logout;
 
 import com.junwoo.hamkke.domain.auth.jwt.JwtTokenProvider;
 import com.junwoo.hamkke.domain.auth.service.RefreshTokenProvider;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -31,12 +30,7 @@ public class JwtLogoutHandler implements LogoutHandler {
 
         refreshTokenService.delete(username);
 
-        Cookie cookie = new Cookie("refresh_token", null);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(false);
-        cookie.setPath("/api/auth");
-        cookie.setMaxAge(0);
-        response.addCookie(cookie);
+        response.addHeader("Set-Cookie", jwtTokenProvider.createRefreshTokenClearCookieHeader(request));
 
         log.info("로그아웃 완료 - username: {}", username);
     }

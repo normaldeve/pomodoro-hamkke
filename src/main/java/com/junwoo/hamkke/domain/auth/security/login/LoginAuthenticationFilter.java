@@ -12,7 +12,6 @@ import com.junwoo.hamkke.domain.auth.security.userdetail.CustomUserDetails;
 import com.junwoo.hamkke.domain.auth.service.RefreshTokenProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -85,13 +84,7 @@ public class LoginAuthenticationFilter extends UsernamePasswordAuthenticationFil
 
         refreshTokenProvider.save(user.username(), refreshToken, jwtTokenProvider.getRefreshTokenValidityInMilliseconds());
 
-        Cookie refreshTokenCookie = new Cookie("refresh_token", refreshToken);
-        refreshTokenCookie.setHttpOnly(true);
-        refreshTokenCookie.setSecure(false);
-        refreshTokenCookie.setPath("/api/auth");
-        refreshTokenCookie.setMaxAge((int) (jwtTokenProvider.getRefreshTokenValidityInMilliseconds() / 1000));
-
-        response.addCookie(refreshTokenCookie);
+        response.addHeader("Set-Cookie", jwtTokenProvider.createRefreshTokenCookieHeader(request, refreshToken));
 
         log.info("로그인에 성공했습니다 - username: {}, role: {}", user.username(), user.role());
 
