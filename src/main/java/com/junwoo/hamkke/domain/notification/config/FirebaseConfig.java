@@ -10,7 +10,8 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.ClassPathResource;
 
 import javax.annotation.PostConstruct;
-import java.io.IOException;
+import java.io.FileInputStream;
+import java.io.InputStream;
 
 /**
  *
@@ -28,16 +29,27 @@ public class FirebaseConfig {
     @PostConstruct
     public void initialize() {
         try {
-            if (FirebaseApp.getApps().isEmpty()) {
-                FirebaseOptions options = FirebaseOptions.builder()
-                        .setCredentials(GoogleCredentials.fromStream(new ClassPathResource(firebaseConfigPath).getInputStream()
-                        ))
-                        .build();
+            InputStream inputStream;
 
-                FirebaseApp.initializeApp(options);
-                log.info("[FirebaseConfig] Firebase 초기화가 완료되었습니다;");
+            if (firebaseConfigPath.startsWith("classpath:")) {
+                // dev 환경
+                String path = firebaseConfigPath.replace("classpath:", "");
+                inputStream = new ClassPathResource(path).getInputStream();
+                log.info("[FirebaseConfig] classpath에서 Firebase 파일 로드");
+            } else {
+                // prod 환경
+                inputStream = new FileInputStream(firebaseConfigPath);
+                log.info("[FirebaseConfig] 외부 파일 시스템에서 Firebase 파일 로드");
             }
-        } catch (IOException e) {
+
+            FirebaseOptions options = FirebaseOptions.builder()
+                    .setCredentials(GoogleCredentials.fromStream(inputStream))
+                    .build();
+
+            FirebaseApp.initializeApp(options);
+            log.info("[FirebaseConfig] Firebase 초기화 완료");
+
+        } catch (Exception e) {
             log.error("[FirebaseConfig] Firebase 초기화 실패", e);
             throw new RuntimeException("Firebase 초기화 실패", e);
         }
