@@ -21,7 +21,7 @@ public class NotificationController {
 
     private final NotificationService notificationService;
 
-    @PostMapping("/token")
+    @PostMapping("/register-token")
     public ResponseEntity<Void> registerToken(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @Valid @RequestBody RegisterTokenRequest request
@@ -31,7 +31,7 @@ public class NotificationController {
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/token")
+    @DeleteMapping("/delete-token")
     public ResponseEntity<Void> deactivateToken(
             @RequestParam String fcmToken
     ) {
