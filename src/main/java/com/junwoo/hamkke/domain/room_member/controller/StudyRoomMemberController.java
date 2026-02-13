@@ -4,10 +4,8 @@ import com.junwoo.hamkke.domain.auth.security.userdetail.CustomUserDetails;
 import com.junwoo.hamkke.domain.room_member.dto.ParticipateRoomInfo;
 import com.junwoo.hamkke.domain.room_member.dto.StudyRoomMemberResponse;
 import com.junwoo.hamkke.domain.room_member.dto.TransferHostRequests;
-import com.junwoo.hamkke.domain.room_member.service.FocusTimeService;
 import com.junwoo.hamkke.domain.room_member.service.StudyRoomMemberService;
 import jakarta.validation.Valid;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +27,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class StudyRoomMemberController {
 
-    private final FocusTimeService focusTimeService;
     private final StudyRoomMemberService studyRoomMemberService;
 
     @GetMapping("{roomId}")
@@ -37,16 +34,6 @@ public class StudyRoomMemberController {
             @PathVariable UUID roomId
     ) {
         return ResponseEntity.ok(studyRoomMemberService.getStudyRoomMembers(roomId));
-    }
-
-    @GetMapping("/{roomId}/focus-time/total")
-    public ResponseEntity<Integer> getTodayRoomFocusTime(
-            @PathVariable UUID roomId,
-            @AuthenticationPrincipal CustomUserDetails userDetails
-    ) {
-        Long userId = userDetails.getUser().id();
-
-        return ResponseEntity.ok(focusTimeService.getTodayRoomFocusTime(userId, roomId));
     }
 
     @PostMapping("/{roomId}/transfer-host")

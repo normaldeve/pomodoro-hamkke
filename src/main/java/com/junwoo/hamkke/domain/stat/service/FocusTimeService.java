@@ -1,15 +1,14 @@
-package com.junwoo.hamkke.domain.room_member.service;
+package com.junwoo.hamkke.domain.stat.service;
 
 import com.junwoo.hamkke.domain.dial.dto.TimerPhase;
 import com.junwoo.hamkke.domain.dial.dto.TimerRuntimeSnapshot;
 import com.junwoo.hamkke.domain.dial.service.TimerStateService;
-import com.junwoo.hamkke.domain.room_member.entity.RoomFocusTimeEntity;
 import com.junwoo.hamkke.domain.room_member.entity.StudyRoomMemberEntity;
-import com.junwoo.hamkke.domain.room_member.repository.RoomFocusTimeRepository;
 import com.junwoo.hamkke.domain.stat.entity.UserDailyStudyStat;
 import com.junwoo.hamkke.domain.stat.repository.UserDailyStudyStatRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,16 +26,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class FocusTimeService {
 
-    private final RoomFocusTimeRepository focusTimeRepository;
     private final UserDailyStudyStatRepository dailyStatRepository;
     private final TimerStateService timerStateService;
-
-    public int getTodayRoomFocusTime(Long userId, UUID roomId) {
-        RoomFocusTimeEntity focusTime = focusTimeRepository.findByUserIdAndStudyRoomIdAndFocusDate(userId, roomId, LocalDate.now())
-                .orElse(null);
-
-        return (focusTime == null) ? 0 : focusTime.getTotalFocusMinutes();
-    }
 
     public void markParticipationForLateJoin(StudyRoomMemberEntity member) {
         TimerRuntimeSnapshot snapshot = timerStateService.getTimerSnapshot(member.getStudyRoomId());
@@ -87,24 +78,25 @@ public class FocusTimeService {
 
         LocalDate today = LocalDate.now();
 
-        RoomFocusTimeEntity roomFocusTime = focusTimeRepository
-                .findByUserIdAndStudyRoomIdAndFocusDate(userId, roomId, today)
-                .orElseGet(() -> RoomFocusTimeEntity.builder()
-                        .userId(userId)
-                        .studyRoomId(roomId)
-                        .focusDate(today)
-                        .totalFocusMinutes(0)
-                        .build());
-
-        roomFocusTime.addMinutes(focusMinutes);
-        focusTimeRepository.save(roomFocusTime);
-
-        UserDailyStudyStat dailyStat = dailyStatRepository.findByUserIdAndStudyDate(userId, today)
-                .orElseGet(() -> UserDailyStudyStat.create(userId, today));
-        dailyStat.addMinutes(focusMinutes);
-        dailyStatRepository.save(dailyStat);
+        upsertDailyStudyStat(userId, today, focusMinutes);
 
         log.info("[FocusTimeService] 집중 시간 정산 완료 - userId: {}, roomId: {}, seconds: {}, minutes: {}",
                 userId, roomId, focusSeconds, focusMinutes);
+    }
+
+    private void upsertDailyStudyStat(Long userId, LocalDate today, int focusMinutes) {
+        int updated = dailyStatRepository.incrementMinutes(userId, today, focusMinutes);
+        if (updated > 0) {
+            return;
+        }
+
+        try {
+            UserDailyStudyStat newStat = UserDailyStudyStat.create(userId, today);
+            newStat.addMinutes(focusMinutes);
+            dailyStatRepository.save(newStat);
+        } catch (DataIntegrityViolationException e) {
+            // 동시 삽입 경합 시 기존 행에 다시 누적
+            dailyStatRepository.incrementMinutes(userId, today, focusMinutes);
+        }
     }
 }

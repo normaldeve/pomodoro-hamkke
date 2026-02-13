@@ -5,7 +5,7 @@ import com.junwoo.hamkke.domain.dial.dto.event.FocusTimeFinishedEvent;
 import com.junwoo.hamkke.domain.dial.dto.event.FocusTimeStartedEvent;
 import com.junwoo.hamkke.domain.room_member.entity.StudyRoomMemberEntity;
 import com.junwoo.hamkke.domain.room_member.repository.StudyRoomMemberRepository;
-import com.junwoo.hamkke.domain.room_member.service.FocusTimeService;
+import com.junwoo.hamkke.domain.stat.service.FocusTimeService;
 import jakarta.persistence.OptimisticLockException;
 import jakarta.persistence.PessimisticLockException;
 import lombok.RequiredArgsConstructor;

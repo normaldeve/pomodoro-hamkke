@@ -2,6 +2,7 @@ package com.junwoo.hamkke.domain.stat.repository;
 
 import com.junwoo.hamkke.domain.stat.entity.UserDailyStudyStat;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -60,5 +61,25 @@ public interface UserDailyStudyStatRepository extends JpaRepository<UserDailyStu
             @Param("userId") Long userId,
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate
+    );
+
+    @Modifying
+    @Query("""
+        update UserDailyStudyStat s
+        set s.totalMinutes = s.totalMinutes + :minutes,
+            s.level = case
+                when (s.totalMinutes + :minutes) = 0 then 0
+                when (s.totalMinutes + :minutes) <= 60 then 1
+                when (s.totalMinutes + :minutes) <= 120 then 2
+                when (s.totalMinutes + :minutes) <= 180 then 3
+                else 4
+            end
+        where s.userId = :userId
+          and s.studyDate = :studyDate
+    """)
+    int incrementMinutes(
+            @Param("userId") Long userId,
+            @Param("studyDate") LocalDate studyDate,
+            @Param("minutes") int minutes
     );
 }

@@ -9,6 +9,7 @@ import com.junwoo.hamkke.domain.room_member.entity.StudyRoomMemberEntity;
 import com.junwoo.hamkke.domain.room.exception.StudyRoomException;
 import com.junwoo.hamkke.domain.room_member.repository.StudyRoomMemberRepository;
 import com.junwoo.hamkke.domain.room.repository.StudyRoomRepository;
+import com.junwoo.hamkke.domain.stat.service.FocusTimeService;
 import com.junwoo.hamkke.domain.user.entity.UserEntity;
 import com.junwoo.hamkke.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
