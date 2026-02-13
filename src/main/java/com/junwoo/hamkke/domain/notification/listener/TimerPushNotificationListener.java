@@ -53,7 +53,6 @@ public class TimerPushNotificationListener {
             return;
         }
 
-        // ✅ NotificationType을 활용한 간결한 코드
         Map<String, String> variables = Map.of(
                 "roomTitle", room.getTitle(),
                 "session", String.valueOf(event.currentSessionId()),
@@ -91,7 +90,6 @@ public class TimerPushNotificationListener {
             return;
         }
 
-        // ✅ 동일한 패턴으로 간결하게
         Map<String, String> variables = Map.of(
                 "roomTitle", room.getTitle(),
                 "breakMinutes", String.valueOf(room.getBreakMinutes())

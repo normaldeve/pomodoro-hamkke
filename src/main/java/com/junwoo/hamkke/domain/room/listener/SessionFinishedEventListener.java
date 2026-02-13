@@ -45,6 +45,6 @@ public class SessionFinishedEventListener {
         room.finishSession();
 
         RoomInfoMessage roomInfo = new RoomInfoMessage(room.getStatus(), room.getCurrentSession(), room.getTotalSessions());
-        messagingTemplate.convertAndSend(WebSocketDestination.focusTime(event.roomId()),  roomInfo);
+        messagingTemplate.convertAndSend(WebSocketDestination.roomStatus(event.roomId()),  roomInfo);
     }
 }
