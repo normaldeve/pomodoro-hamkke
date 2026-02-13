@@ -62,4 +62,16 @@ public interface PlanRepository extends JpaRepository<PlanEntity, Long> {
     @Query("SELECT COUNT(p) FROM PlanEntity p WHERE p.userId = :userId " +
             "AND p.completed = false AND p.planDate >= :today")
     long countIncompleteByUserId(@Param("userId") Long userId, @Param("today") LocalDate today);
+
+    @Query("SELECT p FROM PlanEntity p " +
+            "WHERE p.planDate = :planDate " +
+            "AND p.startTime >= :fromTime " +
+            "AND p.startTime < :toTime " +
+            "AND p.completed = false " +
+            "AND p.reminderSent = false")
+    List<PlanEntity> findReminderTargets(
+            @Param("planDate") LocalDate planDate,
+            @Param("fromTime") LocalTime fromTime,
+            @Param("toTime") LocalTime toTime
+    );
 }

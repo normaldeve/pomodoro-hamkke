@@ -31,6 +31,12 @@ public enum NotificationType {
             "모든 세션 종료",
             "🎉",
             "{roomTitle} - 모든 세션을 완료했습니다! 수고하셨습니다 🎉"
+    ),
+
+    PLAN_START_REMINDER(
+            "일정 시작 10분 전",
+            "⏰",
+            "\"{planTitle}\" 일정이 10분 뒤({startTime}) 시작됩니다"
     );
 
     private final String description;

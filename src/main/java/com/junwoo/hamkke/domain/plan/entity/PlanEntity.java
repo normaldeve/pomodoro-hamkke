@@ -55,12 +55,17 @@ public class PlanEntity extends UpdatableBaseEntity {
     @Builder.Default
     private boolean completed = false;
 
+    @Column(name = "reminder_sent", nullable = false)
+    @Builder.Default
+    private boolean reminderSent = false;
+
     public void updatePlan(String title, LocalDate planDate, LocalTime startTime, LocalTime endTime, EventColor color) {
         this.title = title;
         this.planDate = planDate;
         this.startTime = startTime;
         this.endTime = endTime;
         this.color = color;
+        this.reminderSent = false;
     }
 
     public void complete() {
@@ -69,5 +74,9 @@ public class PlanEntity extends UpdatableBaseEntity {
 
     public void unComplete() {
         this.completed = false;
+    }
+
+    public void markReminderSent() {
+        this.reminderSent = true;
     }
 }
