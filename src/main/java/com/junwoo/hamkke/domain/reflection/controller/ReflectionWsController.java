@@ -41,6 +41,11 @@ public class ReflectionWsController {
 
         ReflectionResponse response = reflectionService.createReflection(roomId, userId, request);
 
+        if (Boolean.TRUE.equals(response.isPrivate())) {
+            log.info("[WS] 비공개 회고 생성 - 브로드캐스트 생략 roomId={}, userId={}", roomId, userId);
+            return;
+        }
+
         try {
             messagingTemplate.convertAndSend(
                     "/topic/study-room/" + roomId + "/reflection",

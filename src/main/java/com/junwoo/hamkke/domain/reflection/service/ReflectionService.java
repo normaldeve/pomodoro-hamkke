@@ -38,8 +38,9 @@ public class ReflectionService {
     private final StudyRoomRepository studyRoomRepository;
 
     public ReflectionResponse createReflection(UUID roomId, Long userId, CreateReflectionRequest request) {
+        boolean isPrivate = Boolean.TRUE.equals(request.isPrivate());
 
-        ReflectionEntity reflection = ReflectionEntity.createReflection(roomId, userId, request.sessionId(), request.imageUrl(), request.content(), request.focusScore());
+        ReflectionEntity reflection = ReflectionEntity.createReflection(roomId, userId, request.sessionId(), request.imageUrl(), request.content(), request.focusScore(), isPrivate);
 
         ReflectionEntity saved = reflectionRepository.save(reflection);
 
@@ -55,6 +56,7 @@ public class ReflectionService {
                 .userProfileUrl(user.getProfileUrl())
                 .focusScore(saved.getFocusScore())
                 .imageUrl(saved.getImageUrl())
+                .isPrivate(saved.isPrivate())
                 .createdAt(saved.getCreatedAt())
                 .build();
     }
@@ -132,6 +134,7 @@ public class ReflectionService {
                             .content(r.getContent())
                             .focusScore(r.getFocusScore())
                             .imageUrl(r.getImageUrl())
+                            .isPrivate(r.isPrivate())
                             .createdAt(r.getCreatedAt())
                             .user(UserInfo.builder()
                                     .userId(user.getId())

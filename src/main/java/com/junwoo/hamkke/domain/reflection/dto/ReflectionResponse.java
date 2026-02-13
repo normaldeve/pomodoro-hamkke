@@ -19,6 +19,7 @@ public record ReflectionResponse(
         String userProfileUrl,
         Integer focusScore,
         String imageUrl,
+        Boolean isPrivate,
         LocalDateTime createdAt
 ) {
 

@@ -28,11 +28,13 @@ public interface ReflectionRepository extends JpaRepository<ReflectionEntity, Lo
         u.profileUrl,
         r.focusScore,
         r.imageUrl,
+        r.isPrivate,
         r.createdAt
     )
     FROM ReflectionEntity r
     JOIN UserEntity u ON r.userId = u.id
     WHERE r.studyRoomId = :roomId
+    AND r.isPrivate = false
     ORDER BY r.createdAt ASC
     """)
     List<ReflectionResponse> findRoomReflections(UUID roomId);

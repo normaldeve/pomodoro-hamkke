@@ -18,6 +18,7 @@ public record ReflectionQueryResponse(
         String content,
         Integer focusScore,
         String imageUrl,
+        Boolean isPrivate,
         LocalDateTime createdAt,
         UserInfo user,
         RoomInfo room

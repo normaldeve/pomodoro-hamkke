@@ -9,6 +9,7 @@ public record CreateReflectionRequest(
         Long sessionId,
         String content,
         Integer focusScore,
-        String imageUrl
+        String imageUrl,
+        Boolean isPrivate
         ) {
 }

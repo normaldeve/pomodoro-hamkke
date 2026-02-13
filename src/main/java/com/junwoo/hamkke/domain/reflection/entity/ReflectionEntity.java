@@ -46,7 +46,10 @@ public class ReflectionEntity extends BaseEntity {
 
     private Integer focusScore;
 
-    public static ReflectionEntity createReflection(UUID studyRoomId, Long userId, Long sessionId, String imageUrl, String content, Integer focusScore) {
+    @Column(nullable = false)
+    private boolean isPrivate;
+
+    public static ReflectionEntity createReflection(UUID studyRoomId, Long userId, Long sessionId, String imageUrl, String content, Integer focusScore, boolean isPrivate) {
         return ReflectionEntity.builder()
                 .studyRoomId(studyRoomId)
                 .userId(userId)
@@ -54,6 +57,7 @@ public class ReflectionEntity extends BaseEntity {
                 .imageUrl(imageUrl)
                 .content(content)
                 .focusScore(focusScore)
+                .isPrivate(isPrivate)
                 .build();
     }
 }
