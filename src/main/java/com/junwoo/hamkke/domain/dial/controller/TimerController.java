@@ -1,6 +1,6 @@
 package com.junwoo.hamkke.domain.dial.controller;
 
-import com.junwoo.hamkke.domain.dial.dto.NextFocusTimeUpdateRequest;
+import com.junwoo.hamkke.domain.dial.dto.NextFocusTimeUpdateRequestDTO;
 import com.junwoo.hamkke.domain.dial.dto.TimerStartRequest;
 import com.junwoo.hamkke.domain.dial.service.TimerStateService;
 import lombok.RequiredArgsConstructor;
@@ -49,7 +49,7 @@ public class TimerController {
     @MessageMapping("/study-room/{roomId}/timer/next-focus")
     public void updateNextFocusTime(
             @DestinationVariable UUID roomId,
-            @Payload NextFocusTimeUpdateRequest request
+            @Payload NextFocusTimeUpdateRequestDTO request
     ) {
 
         timerStateService.updateNextFocusTime(roomId, request.focusMinutes());

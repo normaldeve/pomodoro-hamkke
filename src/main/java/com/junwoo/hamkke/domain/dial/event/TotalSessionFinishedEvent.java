@@ -1,4 +1,4 @@
-package com.junwoo.hamkke.domain.dial.dto.event;
+package com.junwoo.hamkke.domain.dial.event;
 
 import java.util.UUID;
 

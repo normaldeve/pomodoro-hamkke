@@ -1,7 +1,7 @@
 package com.junwoo.hamkke.domain.plan.scheduler;
 
 import com.junwoo.hamkke.domain.notification.dto.NotificationType;
-import com.junwoo.hamkke.domain.notification.dto.PushNotificationRequest;
+import com.junwoo.hamkke.domain.notification.dto.PushNotificationDTO;
 import com.junwoo.hamkke.domain.notification.service.NotificationService;
 import com.junwoo.hamkke.domain.plan.entity.PlanEntity;
 import com.junwoo.hamkke.domain.plan.repository.PlanRepository;
@@ -50,7 +50,7 @@ public class PlanReminderScheduler {
         log.info("[PlanReminderScheduler] 리마인더 전송 대상 {}건", targets.size());
 
         for (PlanEntity plan : targets) {
-            PushNotificationRequest request = NotificationType.PLAN_START_REMINDER.createRequest(
+            PushNotificationDTO request = NotificationType.PLAN_START_REMINDER.createRequest(
                     Map.of(
                             "planTitle", plan.getTitle(),
                             "startTime", plan.getStartTime().format(TIME_FORMATTER)

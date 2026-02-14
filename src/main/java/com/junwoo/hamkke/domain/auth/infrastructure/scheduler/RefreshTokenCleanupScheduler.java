@@ -1,5 +1,6 @@
-package com.junwoo.hamkke.domain.auth.service;
+package com.junwoo.hamkke.domain.auth.infrastructure.scheduler;
 
+import com.junwoo.hamkke.domain.auth.service.RefreshTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;

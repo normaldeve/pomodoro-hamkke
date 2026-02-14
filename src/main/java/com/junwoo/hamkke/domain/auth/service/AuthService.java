@@ -1,10 +1,9 @@
 package com.junwoo.hamkke.domain.auth.service;
 
+import com.junwoo.hamkke.common.dto.AuthDTO;
 import com.junwoo.hamkke.common.exception.ErrorCode;
-import com.junwoo.hamkke.domain.auth.dto.AuthDTO;
-import com.junwoo.hamkke.domain.auth.dto.UserInfoFromToken;
-import com.junwoo.hamkke.domain.auth.exception.AuthException;
-import com.junwoo.hamkke.domain.auth.jwt.JwtTokenProvider;
+import com.junwoo.hamkke.domain.auth.domain.exception.AuthException;
+import com.junwoo.hamkke.domain.auth.infrastructure.jwt.JwtTokenProvider;
 import com.junwoo.hamkke.domain.user.entity.UserEntity;
 import com.junwoo.hamkke.domain.user.repository.UserRepository;
 import com.junwoo.hamkke.domain.user.service.UserService;
@@ -52,7 +51,7 @@ public class AuthService {
     }
 
     @Transactional(readOnly = true)
-    public UserInfoFromToken getUserInfoFrontToken(String accessToken) {
+    public AuthDTO getUserInfoFrontToken(String accessToken) {
         if (!jwtTokenProvider.validateToken(accessToken)) {
             throw new AuthException(ErrorCode.INVALID_ACCESS_TOKEN);
         }
@@ -69,6 +68,6 @@ public class AuthService {
         UserEntity user = userRepository.findById(userId)
                 .orElseThrow(() -> new AuthException(ErrorCode.CANNOT_FOUND_USER));
 
-        return UserInfoFromToken.of(user);
+        return AuthDTO.from(user);
     }
 }

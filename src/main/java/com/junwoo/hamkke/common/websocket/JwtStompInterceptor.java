@@ -1,8 +1,8 @@
 // JwtStompInterceptor.java
 package com.junwoo.hamkke.common.websocket;
 
-import com.junwoo.hamkke.domain.auth.dto.AuthDTO;
-import com.junwoo.hamkke.domain.auth.jwt.JwtTokenProvider;
+import com.junwoo.hamkke.common.dto.AuthDTO;
+import com.junwoo.hamkke.domain.auth.infrastructure.jwt.JwtTokenProvider;
 import com.junwoo.hamkke.domain.auth.security.userdetail.CustomUserDetails;
 import com.junwoo.hamkke.domain.user.entity.Role;
 import io.jsonwebtoken.Claims;

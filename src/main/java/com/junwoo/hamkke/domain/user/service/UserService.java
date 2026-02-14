@@ -1,7 +1,7 @@
 package com.junwoo.hamkke.domain.user.service;
 
+import com.junwoo.hamkke.common.dto.AuthDTO;
 import com.junwoo.hamkke.common.exception.ErrorCode;
-import com.junwoo.hamkke.domain.auth.dto.AuthDTO;
 import com.junwoo.hamkke.domain.image.ImageDirectory;
 import com.junwoo.hamkke.domain.image.ImageUploader;
 import com.junwoo.hamkke.domain.user.dto.SignupRequest;

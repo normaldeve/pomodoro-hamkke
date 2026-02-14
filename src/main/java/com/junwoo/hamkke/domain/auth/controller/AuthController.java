@@ -1,10 +1,9 @@
 package com.junwoo.hamkke.domain.auth.controller;
 
-import com.junwoo.hamkke.domain.auth.dto.UserInfoFromToken;
-import com.junwoo.hamkke.domain.auth.jwt.JwtTokenProvider;
+import com.junwoo.hamkke.common.dto.AuthDTO;
+import com.junwoo.hamkke.domain.auth.infrastructure.jwt.JwtTokenProvider;
 import com.junwoo.hamkke.domain.auth.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -40,7 +39,7 @@ public class AuthController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<UserInfoFromToken> getInfoFromToken(
+    public ResponseEntity<AuthDTO> getInfoFromToken(
             HttpServletRequest request
     ) {
         // Authorization 헤더에서 토큰 추출
@@ -53,8 +52,8 @@ public class AuthController {
 
         String accessToken = bearerToken.substring(7);
 
-        UserInfoFromToken userInfo = authService.getUserInfoFrontToken(accessToken);
+        AuthDTO response = authService.getUserInfoFrontToken(accessToken);
 
-        return ResponseEntity.ok(userInfo);
+        return ResponseEntity.ok(response);
     }
 }

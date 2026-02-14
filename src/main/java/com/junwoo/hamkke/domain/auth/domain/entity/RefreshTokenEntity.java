@@ -1,7 +1,6 @@
-package com.junwoo.hamkke.domain.auth.entity;
+package com.junwoo.hamkke.domain.auth.domain.entity;
 
 import com.junwoo.hamkke.common.entity.BaseEntity;
-import com.junwoo.hamkke.common.entity.UpdatableBaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 

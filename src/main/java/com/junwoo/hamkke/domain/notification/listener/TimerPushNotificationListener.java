@@ -1,10 +1,10 @@
 package com.junwoo.hamkke.domain.notification.listener;
 
-import com.junwoo.hamkke.domain.dial.dto.event.FocusTimeStartedEvent;
-import com.junwoo.hamkke.domain.dial.dto.event.StartBreakTimeEvent;
-import com.junwoo.hamkke.domain.dial.dto.event.TotalSessionFinishedEvent;
+import com.junwoo.hamkke.domain.dial.event.FocusTimeStartedEvent;
+import com.junwoo.hamkke.domain.dial.event.StartBreakTimeEvent;
+import com.junwoo.hamkke.domain.dial.event.TotalSessionFinishedEvent;
 import com.junwoo.hamkke.domain.notification.dto.NotificationType;
-import com.junwoo.hamkke.domain.notification.dto.PushNotificationRequest;
+import com.junwoo.hamkke.domain.notification.dto.PushNotificationDTO;
 import com.junwoo.hamkke.domain.notification.service.NotificationService;
 import com.junwoo.hamkke.domain.room.entity.StudyRoomEntity;
 import com.junwoo.hamkke.domain.room.repository.StudyRoomRepository;
@@ -66,7 +66,7 @@ public class TimerPushNotificationListener {
                 "focusMinutes", String.valueOf(room.getFocusMinutes())
         );
 
-        PushNotificationRequest request = NotificationType.FOCUS_STARTED.createRequest(variables, data);
+        PushNotificationDTO request = NotificationType.FOCUS_STARTED.createRequest(variables, data);
         notificationService.sendToRoomMembers(event.roomId(), request);
     }
 
@@ -101,7 +101,7 @@ public class TimerPushNotificationListener {
                 "breakMinutes", String.valueOf(room.getBreakMinutes())
         );
 
-        PushNotificationRequest request = NotificationType.BREAK_STARTED.createRequest(variables, data);
+        PushNotificationDTO request = NotificationType.BREAK_STARTED.createRequest(variables, data);
         notificationService.sendToRoomMembers(event.roomId(), request);
     }
 
@@ -135,7 +135,7 @@ public class TimerPushNotificationListener {
                 "totalSessions", String.valueOf(room.getTotalSessions())
         );
 
-        PushNotificationRequest request = NotificationType.TOTAL_SESSION_FINISHED.createRequest(variables, data);
+        PushNotificationDTO request = NotificationType.TOTAL_SESSION_FINISHED.createRequest(variables, data);
         notificationService.sendToRoomMembers(event.roomId(), request);
     }
 }

@@ -1,8 +1,8 @@
 package com.junwoo.hamkke.domain.auth.security;
 
-import com.junwoo.hamkke.domain.auth.dto.AuthDTO;
+import com.junwoo.hamkke.common.dto.AuthDTO;
 import com.junwoo.hamkke.domain.auth.dto.SecurityPassUrlList;
-import com.junwoo.hamkke.domain.auth.jwt.JwtTokenProvider;
+import com.junwoo.hamkke.domain.auth.infrastructure.jwt.JwtTokenProvider;
 import com.junwoo.hamkke.domain.auth.security.userdetail.CustomUserDetails;
 import com.junwoo.hamkke.domain.user.entity.Role;
 import jakarta.servlet.FilterChain;
@@ -33,7 +33,6 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-
 
     private final JwtTokenProvider jwtTokenProvider;
     private final PathMatcher pathMatcher;

@@ -1,6 +1,6 @@
 package com.junwoo.hamkke.domain.auth.security.logout;
 
-import com.junwoo.hamkke.domain.auth.jwt.JwtTokenProvider;
+import com.junwoo.hamkke.domain.auth.infrastructure.jwt.JwtTokenProvider;
 import com.junwoo.hamkke.domain.auth.service.RefreshTokenProvider;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

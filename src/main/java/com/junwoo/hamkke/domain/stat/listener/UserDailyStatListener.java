@@ -1,6 +1,6 @@
 package com.junwoo.hamkke.domain.stat.listener;
 
-import com.junwoo.hamkke.domain.dial.dto.event.FocusTimeFinishedEvent;
+import com.junwoo.hamkke.domain.dial.event.FocusTimeFinishedEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;

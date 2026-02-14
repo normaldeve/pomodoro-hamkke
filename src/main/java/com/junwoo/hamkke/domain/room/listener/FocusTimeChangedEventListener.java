@@ -3,7 +3,7 @@ package com.junwoo.hamkke.domain.room.listener;
 import com.junwoo.hamkke.common.discord.DiscordNotifier;
 import com.junwoo.hamkke.common.exception.ErrorCode;
 import com.junwoo.hamkke.common.websocket.WebSocketDestination;
-import com.junwoo.hamkke.domain.dial.dto.event.FocusTimeChangedEvent;
+import com.junwoo.hamkke.domain.dial.event.FocusTimeChangedEvent;
 import com.junwoo.hamkke.domain.room.entity.StudyRoomEntity;
 import com.junwoo.hamkke.domain.room.exception.StudyRoomException;
 import com.junwoo.hamkke.domain.room.repository.StudyRoomRepository;

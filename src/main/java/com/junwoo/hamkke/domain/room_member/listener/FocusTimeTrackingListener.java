@@ -1,8 +1,8 @@
 package com.junwoo.hamkke.domain.room_member.listener;
 
 import com.junwoo.hamkke.common.discord.DiscordNotifier;
-import com.junwoo.hamkke.domain.dial.dto.event.FocusTimeFinishedEvent;
-import com.junwoo.hamkke.domain.dial.dto.event.FocusTimeStartedEvent;
+import com.junwoo.hamkke.domain.dial.event.FocusTimeFinishedEvent;
+import com.junwoo.hamkke.domain.dial.event.FocusTimeStartedEvent;
 import com.junwoo.hamkke.domain.room_member.entity.StudyRoomMemberEntity;
 import com.junwoo.hamkke.domain.room_member.repository.StudyRoomMemberRepository;
 import com.junwoo.hamkke.domain.stat.service.FocusTimeService;

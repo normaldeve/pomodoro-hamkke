@@ -1,4 +1,4 @@
-package com.junwoo.hamkke.domain.dial.dto;
+package com.junwoo.hamkke.domain.notification.dto;
 
 import com.junwoo.hamkke.domain.notification.entity.DeviceType;
 import jakarta.validation.constraints.NotBlank;

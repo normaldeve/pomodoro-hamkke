@@ -1,7 +1,7 @@
 package com.junwoo.hamkke.domain.reflection.listener;
 
 import com.junwoo.hamkke.common.websocket.WebSocketDestination;
-import com.junwoo.hamkke.domain.dial.dto.event.ReflectionCreateEvent;
+import com.junwoo.hamkke.domain.dial.event.ReflectionCreateEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;

@@ -72,11 +72,7 @@ public enum NotificationType {
     /**
      * 푸시 알림 요청 생성
      */
-    public PushNotificationRequest createRequest(Map<String, String> variables, Map<String, String> data) {
-        return PushNotificationRequest.of(
-                getTitle(),
-                getBody(variables),
-                data
-        );
+    public PushNotificationDTO createRequest(Map<String, String> variables, Map<String, String> data) {
+        return PushNotificationDTO.of(getTitle(), getBody(variables), data);
     }
 }

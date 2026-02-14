@@ -2,7 +2,7 @@ package com.junwoo.hamkke.domain.auth.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.junwoo.hamkke.domain.auth.dto.SecurityPassUrlList;
-import com.junwoo.hamkke.domain.auth.jwt.JwtTokenProvider;
+import com.junwoo.hamkke.domain.auth.infrastructure.jwt.JwtTokenProvider;
 import com.junwoo.hamkke.domain.auth.security.CustomAccessDeniedHandler;
 import com.junwoo.hamkke.domain.auth.security.CustomAuthenticationEntryPoint;
 import com.junwoo.hamkke.domain.auth.security.JwtAuthenticationFilter;

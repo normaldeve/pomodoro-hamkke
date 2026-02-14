@@ -1,6 +1,6 @@
 package com.junwoo.hamkke.domain.auth.security.userdetail;
 
-import com.junwoo.hamkke.domain.auth.dto.AuthDTO;
+import com.junwoo.hamkke.common.dto.AuthDTO;
 import com.junwoo.hamkke.domain.user.entity.UserEntity;
 import com.junwoo.hamkke.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,13 +25,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         UserEntity user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("입력하신 아이디로 사용자를 찾을 수 없습니다: " + username));
 
-        AuthDTO userDTO = new AuthDTO(
-                user.getId(),
-                user.getUsername(),
-                user.getNickname(),
-                user.getProfileUrl(),
-                user.getRole()
-        );
+        AuthDTO userDTO = AuthDTO.from(user);
 
         return new CustomUserDetails(userDTO, user.getPassword());
     }

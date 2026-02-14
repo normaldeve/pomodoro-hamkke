@@ -1,7 +1,7 @@
 package com.junwoo.hamkke.domain.auth.service;
 
-import com.junwoo.hamkke.domain.auth.entity.RefreshTokenEntity;
-import com.junwoo.hamkke.domain.auth.repository.RefreshTokenRepository;
+import com.junwoo.hamkke.domain.auth.domain.entity.RefreshTokenEntity;
+import com.junwoo.hamkke.domain.auth.domain.repository.RefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

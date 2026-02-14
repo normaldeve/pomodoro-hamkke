@@ -1,8 +1,10 @@
-package com.junwoo.hamkke.domain.auth.dto;
+package com.junwoo.hamkke.common.dto;
 
 import com.junwoo.hamkke.domain.user.entity.Role;
 import com.junwoo.hamkke.domain.user.entity.UserEntity;
 import lombok.Builder;
+
+import java.time.LocalDateTime;
 
 /**
  *
@@ -15,7 +17,8 @@ public record AuthDTO(
         String username,
         String nickname,
         String profileUrl,
-        Role role
+        Role role,
+        LocalDateTime createdAt
 ) {
 
     public static AuthDTO from(UserEntity user) {
@@ -25,6 +28,7 @@ public record AuthDTO(
                 .nickname(user.getNickname())
                 .profileUrl(user.getProfileUrl())
                 .role(user.getRole())
+                .createdAt(user.getCreatedAt())
                 .build();
     }
 }

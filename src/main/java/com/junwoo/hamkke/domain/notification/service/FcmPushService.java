@@ -1,7 +1,7 @@
 package com.junwoo.hamkke.domain.notification.service;
 
 import com.google.firebase.messaging.*;
-import com.junwoo.hamkke.domain.notification.dto.PushNotificationRequest;
+import com.junwoo.hamkke.domain.notification.dto.PushNotificationDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,7 +19,7 @@ import java.util.List;
 public class FcmPushService {
 
     // 단일 디바이스에 푸시 알림을 전송
-    public void sendToDevice(String token, PushNotificationRequest request) {
+    public void sendToDevice(String token, PushNotificationDTO request) {
         try {
             Message message = Message.builder()
                     .setToken(token)
@@ -57,7 +57,7 @@ public class FcmPushService {
 
 
      // 여러 디바이스에 푸시 알림 전송 (최대 500개)
-    public void sendToDevices(List<String> tokens, PushNotificationRequest request) {
+    public void sendToDevices(List<String> tokens, PushNotificationDTO request) {
         if (tokens.isEmpty()) {
             log.warn("[FcmPushService] 전송할 토큰이 없습니다");
             return;
@@ -71,7 +71,7 @@ public class FcmPushService {
         }
     }
 
-    private void sendBatch(List<String> tokens, PushNotificationRequest request) {
+    private void sendBatch(List<String> tokens, PushNotificationDTO request) {
         try {
             MulticastMessage message = MulticastMessage.builder()
                     .addAllTokens(tokens)

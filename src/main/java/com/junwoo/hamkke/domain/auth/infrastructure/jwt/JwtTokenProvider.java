@@ -1,8 +1,8 @@
-package com.junwoo.hamkke.domain.auth.jwt;
+package com.junwoo.hamkke.domain.auth.infrastructure.jwt;
 
+import com.junwoo.hamkke.common.dto.AuthDTO;
 import com.junwoo.hamkke.common.exception.ErrorCode;
-import com.junwoo.hamkke.domain.auth.dto.AuthDTO;
-import com.junwoo.hamkke.domain.auth.exception.AuthException;
+import com.junwoo.hamkke.domain.auth.domain.exception.AuthException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -11,13 +11,13 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseCookie;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
-import java.time.Duration;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Date;
 

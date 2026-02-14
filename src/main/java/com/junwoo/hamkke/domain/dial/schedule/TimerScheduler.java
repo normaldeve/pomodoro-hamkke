@@ -36,8 +36,4 @@ public class TimerScheduler {
             future.cancel(false);
         }
     }
-
-    public void shutdown() {
-        executor.shutdown();
-    }
 }

@@ -1,6 +1,6 @@
 package com.junwoo.hamkke.domain.notification.service;
 
-import com.junwoo.hamkke.domain.notification.dto.PushNotificationRequest;
+import com.junwoo.hamkke.domain.notification.dto.PushNotificationDTO;
 import com.junwoo.hamkke.domain.notification.entity.DeviceTokenEntity;
 import com.junwoo.hamkke.domain.notification.entity.DeviceType;
 import com.junwoo.hamkke.domain.notification.repository.DeviceTokenRepository;
@@ -30,7 +30,7 @@ public class NotificationService {
     private final StudyRoomMemberRepository memberRepository;
 
     // 방에 있는 모든 사용자에게 푸시 알림을 전송합니다
-    public void sendToRoomMembers(UUID roomId, PushNotificationRequest request) {
+    public void sendToRoomMembers(UUID roomId, PushNotificationDTO request) {
         List<StudyRoomMemberEntity> members = memberRepository.findByStudyRoomIdOrderByRoleAscCreatedAtAsc(roomId);
 
         if (members.isEmpty()) {
@@ -59,7 +59,7 @@ public class NotificationService {
     }
 
     // 특정 사용자에게 푸시 알림을 전송
-    public void sendToUser(Long userId, PushNotificationRequest request) {
+    public void sendToUser(Long userId, PushNotificationDTO request) {
         List<DeviceTokenEntity> tokens = deviceTokenRepository.findActiveTokensByUserId(userId);
 
         if (tokens.isEmpty()) {

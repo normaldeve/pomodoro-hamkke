@@ -1,4 +1,4 @@
-package com.junwoo.hamkke.domain.auth.exception;
+package com.junwoo.hamkke.domain.auth.domain.exception;
 
 import com.junwoo.hamkke.common.exception.DomainException;
 import com.junwoo.hamkke.common.exception.ErrorCode;

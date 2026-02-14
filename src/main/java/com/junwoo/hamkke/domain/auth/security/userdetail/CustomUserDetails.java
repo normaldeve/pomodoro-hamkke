@@ -1,13 +1,12 @@
 package com.junwoo.hamkke.domain.auth.security.userdetail;
 
-import com.junwoo.hamkke.domain.auth.dto.AuthDTO;
+import com.junwoo.hamkke.common.dto.AuthDTO;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.security.Principal;
 import java.util.Collection;
 import java.util.List;
 

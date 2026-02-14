@@ -1,7 +1,7 @@
 package com.junwoo.hamkke.domain.notification.controller;
 
 import com.junwoo.hamkke.domain.auth.security.userdetail.CustomUserDetails;
-import com.junwoo.hamkke.domain.dial.dto.RegisterTokenRequest;
+import com.junwoo.hamkke.domain.notification.dto.RegisterTokenRequest;
 import com.junwoo.hamkke.domain.notification.service.NotificationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

@@ -2,7 +2,7 @@ package com.junwoo.hamkke.domain.room.listener;
 
 import com.junwoo.hamkke.common.exception.ErrorCode;
 import com.junwoo.hamkke.common.websocket.WebSocketDestination;
-import com.junwoo.hamkke.domain.dial.dto.event.StartBreakTimeEvent;
+import com.junwoo.hamkke.domain.dial.event.StartBreakTimeEvent;
 import com.junwoo.hamkke.domain.room.dto.RoomInfoMessage;
 import com.junwoo.hamkke.domain.room.entity.StudyRoomEntity;
 import com.junwoo.hamkke.domain.room.exception.StudyRoomException;
