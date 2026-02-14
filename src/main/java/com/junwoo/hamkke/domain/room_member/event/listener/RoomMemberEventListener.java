@@ -1,0 +1,127 @@
+package com.junwoo.hamkke.domain.room_member.event.listener;
+
+import com.junwoo.hamkke.common.exception.ErrorCode;
+import com.junwoo.hamkke.common.websocket.WebSocketConnectionTracker;
+import com.junwoo.hamkke.common.websocket.WebSocketDestination;
+import com.junwoo.hamkke.domain.dial.service.TimerStateService;
+import com.junwoo.hamkke.domain.room.entity.RoomStatus;
+import com.junwoo.hamkke.domain.room.entity.StudyRoomEntity;
+import com.junwoo.hamkke.domain.room.exception.StudyRoomException;
+import com.junwoo.hamkke.domain.room.repository.StudyRoomRepository;
+import com.junwoo.hamkke.domain.room_member.dto.HostTransferredResponse;
+import com.junwoo.hamkke.domain.room_member.dto.event.HostTransferredEvent;
+import com.junwoo.hamkke.domain.room_member.dto.event.MemberLeftRoomEvent;
+import com.junwoo.hamkke.domain.room_member.dto.event.RoomEmptiedEvent;
+import com.junwoo.hamkke.domain.room_member.service.StudyRoomMemberService;
+import com.junwoo.hamkke.domain.user.entity.UserEntity;
+import com.junwoo.hamkke.domain.user.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.event.EventListener;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
+
+/**
+ *
+ * @author junnukim1007gmail.com
+ * @date 26. 2. 4.
+ */
+// RoomMemberEventListener.java 수정
+@Slf4j
+@Component
+@RequiredArgsConstructor
+public class RoomMemberEventListener {
+
+    private final WebSocketConnectionTracker connectionTracker;
+    private final StudyRoomRepository studyRoomRepository;
+    private final StudyRoomMemberService studyRoomMemberService;
+    private final UserRepository userRepository;
+    private final TimerStateService timerStateService;
+    private final SimpMessagingTemplate messagingTemplate;
+    private final ApplicationEventPublisher eventPublisher;
+
+    @Async(value = "domainEventExecutor")
+    @TransactionalEventListener(
+            phase = TransactionPhase.AFTER_COMMIT,
+            fallbackExecution = true
+    )
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void onMemberLeft(MemberLeftRoomEvent event) {
+        log.info("[RoomMemberEventListener] onMemberLeft() - roomId: {}, userId: {}, wasHost: {}, remainingMembers: {}",
+                event.roomId(), event.userId(), event.wasHost(), event.remainingMembers());
+
+        // 멤버가 퇴장 시에 WebSocket 추적을 해제 합니다.
+        connectionTracker.onUserLeftRoom(event.userId());
+
+        if (event.remainingMembers() == 0) {
+            // 방에 사용자가 남아 있지 않는 경우 -> 방 삭제 (상시 운영 방 제외)
+            eventPublisher.publishEvent(new RoomEmptiedEvent(event.roomId(), event.userId()));
+        } else if (event.wasHost()) {
+            // 방장이 나갔지만 다른 멤버가 있는 경우 -> 방장 권한 위임
+            studyRoomMemberService.transferHostToOldestMember(event.roomId());
+        }
+    }
+
+    @Async(value = "domainEventExecutor")
+    @TransactionalEventListener(
+            phase = TransactionPhase.AFTER_COMMIT,
+            fallbackExecution = true
+    )
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void onRoomEmptied(RoomEmptiedEvent event) {
+        log.info("[RoomMemberEventListener] onRoomEmptied() - roomId: {}, lastMemberId: {}",
+                event.roomId(), event.lastMemberId());
+
+        StudyRoomEntity room = studyRoomRepository.findById(event.roomId())
+                .orElseThrow(() -> new StudyRoomException(ErrorCode.CANNOT_FOUND_ROOM));
+
+        // 상시 운영 방은 삭제하지 않고 계속 운영
+        if (room.isPermanent()) {
+            log.info("[RoomMemberEventListener] 상시 운영 방은 참여자가 0명이 되어도 계속 운영됩니다 - roomId: {}", event.roomId());
+            return;
+        }
+
+        RoomStatus previousStatus = room.getStatus();
+        room.totalSessionFinish();
+
+        // 타이머 정리
+        timerStateService.cleanupTimer(event.roomId());
+
+        log.info("[RoomMemberEventListener] 마지막 멤버가 나가서 방을 삭제합니다 - roomId: {}, 이전 상태: {}", event.roomId(), previousStatus);
+
+        messagingTemplate.convertAndSend(WebSocketDestination.roomStatus(event.roomId()), RoomStatus.FINISHED);
+    }
+
+    @Async(value = "domainEventExecutor")
+    @TransactionalEventListener(
+            phase = TransactionPhase.AFTER_COMMIT,
+            fallbackExecution = true
+    )
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void onHostTransferred(HostTransferredEvent event) {
+        log.info("[RoomMemberEventListener] onHostTransferred() - roomId: {}, from: {}, to: {}, auto: {}",
+                event.roomId(), event.previousHostId(), event.newHostId(), event.isAutoTransfer());
+
+        UserEntity previousHost = userRepository.findById(event.previousHostId())
+                .orElseThrow(() -> new StudyRoomException(ErrorCode.CANNOT_FOUND_USER));
+
+        UserEntity newHost = userRepository.findById(event.newHostId())
+                .orElseThrow(() -> new StudyRoomException(ErrorCode.CANNOT_FOUND_USER));
+
+        HostTransferredResponse response = HostTransferredResponse.of(
+                previousHost.getId(),
+                previousHost.getNickname(),
+                newHost.getId(),
+                newHost.getNickname(),
+                event.isAutoTransfer()
+        );
+
+        messagingTemplate.convertAndSend(WebSocketDestination.member(event.roomId()), response);
+    }
+}

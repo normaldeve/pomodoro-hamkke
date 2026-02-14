@@ -1,6 +1,6 @@
 package com.junwoo.hamkke.domain.reflection.dto;
 
-import com.junwoo.hamkke.domain.user.dto.UserInfo;
+import com.junwoo.hamkke.common.dto.UserDTO;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
@@ -20,7 +20,7 @@ public record ReflectionQueryResponse(
         String imageUrl,
         Boolean isPrivate,
         LocalDateTime createdAt,
-        UserInfo user,
+        UserDTO user,
         RoomInfo room
 ) {
     @Builder

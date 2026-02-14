@@ -1,8 +1,8 @@
 package com.junwoo.hamkke.domain.reflection.controller;
 
+import com.junwoo.hamkke.common.image.ImageDirectory;
+import com.junwoo.hamkke.common.image.ImageUploader;
 import com.junwoo.hamkke.domain.auth.security.userdetail.CustomUserDetails;
-import com.junwoo.hamkke.domain.image.ImageDirectory;
-import com.junwoo.hamkke.domain.image.ImageUploader;
 import com.junwoo.hamkke.domain.reflection.dto.ReflectionQueryResponse;
 import com.junwoo.hamkke.domain.reflection.dto.ReflectionResponse;
 import com.junwoo.hamkke.domain.reflection.service.ReflectionService;

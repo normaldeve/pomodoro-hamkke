@@ -6,7 +6,7 @@ import com.junwoo.hamkke.common.exception.ErrorCode;
 import com.junwoo.hamkke.common.exception.ErrorResponse;
 import com.junwoo.hamkke.domain.auth.domain.exception.AuthException;
 import com.junwoo.hamkke.domain.auth.dto.AccessTokenDTO;
-import com.junwoo.hamkke.domain.auth.dto.LoginRequestDTO;
+import com.junwoo.hamkke.domain.auth.dto.LoginRequest;
 import com.junwoo.hamkke.domain.auth.infrastructure.jwt.JwtTokenProvider;
 import com.junwoo.hamkke.domain.auth.security.userdetail.CustomUserDetails;
 import com.junwoo.hamkke.domain.auth.service.RefreshTokenProvider;
@@ -60,7 +60,7 @@ public class LoginAuthenticationFilter extends UsernamePasswordAuthenticationFil
         }
 
         try {
-            LoginRequestDTO loginRequest = objectMapper.readValue(request.getInputStream(), LoginRequestDTO.class);
+            LoginRequest loginRequest = objectMapper.readValue(request.getInputStream(), LoginRequest.class);
 
             log.info("로그인을 시도합니다 - username: {}", loginRequest.username());
 

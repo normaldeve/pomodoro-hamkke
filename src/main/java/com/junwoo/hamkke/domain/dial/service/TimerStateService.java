@@ -3,7 +3,7 @@ package com.junwoo.hamkke.domain.dial.service;
 import com.junwoo.hamkke.domain.dial.calculator.PermanentTimerCalculation;
 import com.junwoo.hamkke.domain.dial.calculator.PermanentTimerCalculator;
 import com.junwoo.hamkke.domain.dial.dto.*;
-import com.junwoo.hamkke.domain.dial.event.*;
+import com.junwoo.hamkke.common.event.*;
 import com.junwoo.hamkke.domain.dial.schedule.TimerScheduler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -1,5 +1,6 @@
 package com.junwoo.hamkke.domain.reflection.service;
 
+import com.junwoo.hamkke.common.dto.UserDTO;
 import com.junwoo.hamkke.common.exception.ErrorCode;
 import com.junwoo.hamkke.domain.reflection.dto.CreateReflectionRequest;
 import com.junwoo.hamkke.domain.reflection.dto.ReflectionQueryResponse;
@@ -8,7 +9,6 @@ import com.junwoo.hamkke.domain.reflection.entity.ReflectionEntity;
 import com.junwoo.hamkke.domain.reflection.repository.ReflectionRepository;
 import com.junwoo.hamkke.domain.room.entity.StudyRoomEntity;
 import com.junwoo.hamkke.domain.room.repository.StudyRoomRepository;
-import com.junwoo.hamkke.domain.user.dto.UserInfo;
 import com.junwoo.hamkke.domain.user.entity.UserEntity;
 import com.junwoo.hamkke.domain.user.exception.UserException;
 import com.junwoo.hamkke.domain.user.repository.UserRepository;
@@ -142,11 +142,7 @@ public class ReflectionService {
                             .imageUrl(r.getImageUrl())
                             .isPrivate(r.isPrivate())
                             .createdAt(r.getCreatedAt())
-                            .user(UserInfo.builder()
-                                    .userId(user.getId())
-                                    .nickname(user.getNickname())
-                                    .profileUrl(user.getProfileUrl())
-                                    .build())
+                            .user(UserDTO.from(user))
                             .room(ReflectionQueryResponse.RoomInfo.builder()
                                     .roomId(room.getId())
                                     .roomName(room.getTitle())

@@ -1,9 +1,9 @@
 package com.junwoo.hamkke.domain.user.controller;
 
+import com.junwoo.hamkke.common.dto.UserDTO;
 import com.junwoo.hamkke.domain.auth.security.userdetail.CustomUserDetails;
 import com.junwoo.hamkke.domain.user.dto.SignupRequest;
 import com.junwoo.hamkke.domain.user.dto.SignupResponse;
-import com.junwoo.hamkke.domain.user.dto.UserInfo;
 import com.junwoo.hamkke.domain.user.dto.UserSearchResponse;
 import com.junwoo.hamkke.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -52,13 +52,13 @@ public class UserController {
     }
 
     @PatchMapping(value = "/me", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<UserInfo> updateProfileImage(
+    public ResponseEntity<UserDTO> updateProfileImage(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestPart(value = "file", required = false) MultipartFile file,
             @RequestPart(value = "nickname", required = false) String nickname
     ) {
         Long userId = userDetails.getUser().id();
-        UserInfo response = userService.updateUserInfo(userId, file, nickname);
+        UserDTO response = userService.updateUserInfo(userId, file, nickname);
 
         return ResponseEntity.ok(response);
     }

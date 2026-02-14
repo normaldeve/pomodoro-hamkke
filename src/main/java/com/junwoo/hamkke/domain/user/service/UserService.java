@@ -1,12 +1,12 @@
 package com.junwoo.hamkke.domain.user.service;
 
 import com.junwoo.hamkke.common.dto.AuthDTO;
+import com.junwoo.hamkke.common.dto.UserDTO;
 import com.junwoo.hamkke.common.exception.ErrorCode;
-import com.junwoo.hamkke.domain.image.ImageDirectory;
-import com.junwoo.hamkke.domain.image.ImageUploader;
+import com.junwoo.hamkke.common.image.ImageDirectory;
+import com.junwoo.hamkke.common.image.ImageUploader;
 import com.junwoo.hamkke.domain.user.dto.SignupRequest;
 import com.junwoo.hamkke.domain.user.dto.SignupResponse;
-import com.junwoo.hamkke.domain.user.dto.UserInfo;
 import com.junwoo.hamkke.domain.user.dto.UserSearchResponse;
 import com.junwoo.hamkke.domain.user.entity.UserEntity;
 import com.junwoo.hamkke.domain.user.exception.UserException;
@@ -55,7 +55,7 @@ public class UserService {
         );
     }
 
-    public UserInfo updateUserInfo(Long userId, MultipartFile file, String nickname) {
+    public UserDTO updateUserInfo(Long userId, MultipartFile file, String nickname) {
         UserEntity user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserException(ErrorCode.CANNOT_FOUND_USER));
 
@@ -76,7 +76,7 @@ public class UserService {
 
         log.info("[UserService] 프로필 이미지 변경 - userId: {}, imageUrl: {}", userId, newImageUrl);
 
-        return UserInfo.from(user);
+        return UserDTO.from(user);
     }
 
     @Transactional(readOnly = true)
