@@ -4,7 +4,6 @@ import com.junwoo.hamkke.common.websocket.event.AutoLeaveEvent;
 import com.junwoo.hamkke.domain.room_member.service.StudyRoomMemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;

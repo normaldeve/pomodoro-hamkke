@@ -115,7 +115,12 @@ public class TimerStateService {
     private void switchToBreak(TimerState state) {
         log.info("[TimerStateService] switchToBreak() : 휴식 전환 - roomId: {}", state.getRoomId());
 
-        state.moveToBreakPhase();
+        if (state.isPermanent()) {
+            long nextPhaseStartTime = state.getPhaseStartTime() + (state.getPhaseDurationSeconds() * 1000L);
+            state.moveToBreakPhaseAt(nextPhaseStartTime);
+        } else {
+            state.moveToBreakPhase();
+        }
 
         log.info("[TimerStateService] switchToBreak() : 타이머 상태 변경 이벤트를 생성합니다 - roomId: {}, phase: {}", state.getRoomId(), TimerPhase.BREAK);
         eventPublisher.publishEvent(new StartBreakTimeEvent(state.getRoomId()));
@@ -129,8 +134,13 @@ public class TimerStateService {
     }
 
     public void startNextFocus(TimerState state) {
-
-        int session = state.moveToNextFocusSession();
+        int session;
+        if (state.isPermanent()) {
+            long nextPhaseStartTime = state.getPhaseStartTime() + (state.getPhaseDurationSeconds() * 1000L);
+            session = state.moveToNextFocusSessionAt(nextPhaseStartTime);
+        } else {
+            session = state.moveToNextFocusSession();
+        }
 
         log.info("[TimerStateService] startNextFocus() : 다음 세션 시작 - roomId: {}, session: {}", state.getRoomId(), state.getCurrentSession());
 

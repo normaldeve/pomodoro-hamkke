@@ -1,9 +1,6 @@
 package com.junwoo.hamkke.domain.dial.dto;
 
-import lombok.Builder;
-import lombok.Data;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.util.UUID;
 
@@ -32,6 +29,8 @@ public class TimerState {
 
     private boolean phaseCompleted;
 
+    private final boolean permanent;
+
     private boolean running;
 
     private long phaseStartTime;
@@ -46,6 +45,7 @@ public class TimerState {
                 request.totalSessions(),
                 1,
                 null,
+                false,
                 true,
                 System.currentTimeMillis()
         );
@@ -68,6 +68,7 @@ public class TimerState {
                 1,
                 null,
                 true,
+                true,
                 phaseStartTime
         );
     }
@@ -81,6 +82,7 @@ public class TimerState {
             int totalSessions,
             int currentSession,
             Integer nextFocusMinutes,
+            boolean permanent,
             boolean running,
             long phaseStartTime
     ) {
@@ -92,6 +94,7 @@ public class TimerState {
         this.totalSessions = totalSessions;
         this.currentSession = currentSession;
         this.nextFocusMinutes = nextFocusMinutes;
+        this.permanent = permanent;
         this.running = running;
         this.phaseStartTime = phaseStartTime;
     }
@@ -137,8 +140,12 @@ public class TimerState {
     }
 
     public void startPhase(int durationSeconds) {
+        startPhaseAt(durationSeconds, System.currentTimeMillis());
+    }
+
+    public void startPhaseAt(int durationSeconds, long phaseStartTime) {
         this.phaseDurationSeconds = durationSeconds;
-        this.phaseStartTime = System.currentTimeMillis();
+        this.phaseStartTime = phaseStartTime;
         this.accumulatedSeconds = 0;
         this.running = true;
         this.phaseCompleted = false;
@@ -166,6 +173,15 @@ public class TimerState {
         return currentSession;
     }
 
+    public int moveToNextFocusSessionAt(long phaseStartTime) {
+        currentSession++;
+        int focusMinutes = nextFocusMinutes != null ? nextFocusMinutes : defaultFocusMinutes;
+        nextFocusMinutes = null;
+        phase = TimerPhase.FOCUS;
+        startPhaseAt(focusMinutes * 60, phaseStartTime);
+        return currentSession;
+    }
+
     public void moveToBreakPhase() {
 
         phase = TimerPhase.BREAK;
@@ -173,6 +189,15 @@ public class TimerState {
         int breakSeconds = defaultBreakMinutes * 60;
 
         startPhase(breakSeconds);
+    }
+
+    public void moveToBreakPhaseAt(long phaseStartTime) {
+
+        phase = TimerPhase.BREAK;
+
+        int breakSeconds = defaultBreakMinutes * 60;
+
+        startPhaseAt(breakSeconds, phaseStartTime);
     }
 
     public boolean updateNextFocusMinutes(int focusMinutes) {

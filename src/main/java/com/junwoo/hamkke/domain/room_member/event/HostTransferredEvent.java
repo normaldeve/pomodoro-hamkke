@@ -1,4 +1,4 @@
-package com.junwoo.hamkke.domain.room_member.dto.event;
+package com.junwoo.hamkke.domain.room_member.event;
 
 import java.util.UUID;
 
